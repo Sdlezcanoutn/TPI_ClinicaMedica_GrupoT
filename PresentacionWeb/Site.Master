@@ -8,9 +8,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title><%: Page.Title %> - Clínica Médica</title>
 
-    <asp:PlaceHolder runat="server">
-        <%: Scripts.Render("~/bundles/modernizr") %>
-    </asp:PlaceHolder>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet" />
+    <link href="/Content/estilos.css" rel="stylesheet" type="text/css" />
 
     <webopt:bundlereference runat="server" path="~/Content/css" />
     <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon" />
@@ -33,20 +33,21 @@
             </Scripts>
         </asp:ScriptManager>
 
-        <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom shadow-sm mb-4">
+        <nav class="navbar navbar-expand-lg navbar-dark navbar-custom py-2 mb-4">
             <div class="container">
-                <a class="navbar-brand fw-bold text-primary" runat="server" href="~/">🏥 Clínica Médica</a>
-                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" title="Alternar navegación" aria-controls="navbarSupportedContent"
-                    aria-expanded="false" aria-label="Toggle navigation">
+                <a class="navbar-brand d-flex align-items-center gap-2" runat="server" href="~/">
+                    <span>🏥 Clínica Médica</span>
+                </a>
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" title="Alternar navegación">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="collapse navbar-collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item"><a class="nav-link text-dark" runat="server" href="~/">Inicio</a></li>
-                        <li class="nav-item"><a class="nav-link text-dark" runat="server" href="~/Pacientes">Pacientes</a></li>
-                        <li class="nav-item"><a class="nav-link text-dark" runat="server" href="~/Medicos">Médicos</a></li>
-                        <li class="nav-item"><a class="nav-link text-dark" runat="server" href="~/Especialidades">Especialidades</a></li>
-                        <li class="nav-item"><a class="nav-link text-dark" runat="server" href="~/Turnos">Turnos</a></li>
+                <div class="collapse navbar-collapse d-sm-inline-flex justify-content-end">
+                    <ul class="navbar-nav gap-1">
+                        <li class="nav-item"><a class="nav-link" runat="server" href="~/">Inicio</a></li>
+                        <li class="nav-item"><a class="nav-link" runat="server" href="~/Pacientes">Pacientes</a></li>
+                        <li class="nav-item"><a class="nav-link" runat="server" href="~/Medicos">Médicos</a></li>
+                        <li class="nav-item"><a class="nav-link" runat="server" href="~/Especialidades">Especialidades</a></li>
+                        <li class="nav-item"><a class="nav-link" runat="server" href="~/Turnos">Turnos</a></li>
                     </ul>
                 </div>
             </div>
@@ -55,14 +56,16 @@
         <div class="container body-content">
             <asp:ContentPlaceHolder ID="MainContent" runat="server">
             </asp:ContentPlaceHolder>
-            <hr />
+            <hr class="mt-5" />
             <footer>
-                <p class="text-muted">&copy; <%: DateTime.Now.Year %> - Clínica Médica | Grupo T</p>
+                <p>&copy; <%: DateTime.Now.Year %> - Clínica Médica | Grupo T</p>
             </footer>
         </div>
     </form>
     <asp:PlaceHolder runat="server">
         <%: Scripts.Render("~/Scripts/bootstrap.js") %>
     </asp:PlaceHolder>
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
