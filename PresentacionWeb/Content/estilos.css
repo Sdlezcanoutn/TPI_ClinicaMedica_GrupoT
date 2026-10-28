@@ -1,9 +1,33 @@
-﻿body {
-    background-color: #f0f2f5 !important;
-    color: #212529;
-    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+﻿/* Layout y estructura base */
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
 }
 
+form {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+body {
+    background-color: #f0f2f5 !important;
+    color: #212529;
+    font-weight: 400;
+    letter-spacing: 0.2px;
+}
+
+body, h1, h2, h3, h4, h5, h6, p, span, a, div {
+    font-family: 'Outfit', sans-serif !important;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 600;
+    letter-spacing: -0.3px;
+}
+
+/* Navbar */
 .navbar-custom {
     background-color: #2c3036 !important;
     border-bottom: 1px solid #1a1d20;
@@ -29,11 +53,65 @@
     color: #ffffff !important;
 }
 
-footer p {
-    color: #6c757d;
-    font-size: 0.875rem;
+/* Footer */
+.footer-institucional {
+    font-weight: 300;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-top: auto;
 }
 
+.footer-institucional h6 {
+    font-weight: 400;
+    font-size: 0.95rem;
+    letter-spacing: 1.2px;
+    color: #ffffff;
+    opacity: 0.95;
+    text-transform: uppercase;
+}
+
+.footer-institucional h6 i {
+    font-size: 1.1rem;
+}
+
+.footer-institucional p, 
+.footer-institucional li, 
+.footer-institucional a, 
+.footer-institucional span {
+    font-weight: 300;
+    font-size: 0.92rem;
+    letter-spacing: 0.3px;
+    opacity: 0.85;
+}
+
+.footer-institucional .fab {
+    font-size: 1.6rem;
+    opacity: 0.9;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.footer-institucional .fab:hover {
+    opacity: 1;
+    transform: translateY(-2px);
+}
+
+.footer-institucional h3 {
+    font-size: 2rem;
+    font-weight: 500;
+    letter-spacing: -0.5px;
+}
+
+.footer-institucional a:hover {
+    opacity: 1;
+    color: #ffffff;
+}
+
+.footer-institucional strong {
+    font-weight: 400;
+    color: #ffffff;
+}
+
+/* Componentes reutilizables */
 .btn-clinica-primary {
     background-color: #2c3036;
     color: #ffffff;

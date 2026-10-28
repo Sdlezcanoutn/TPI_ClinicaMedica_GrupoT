@@ -8,9 +8,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title><%: Page.Title %> - Clínica Médica</title>
 
+    <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+    <!-- FontAwesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet" />
-    <link href="/Content/estilos.css" rel="stylesheet" type="text/css" />
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <!-- CSS de ASP.NET / Bundles -->
+    <webopt:BundleReference runat="server" Path="~/Content/css" />
+
+    <!-- CSS PERSONALIZADO -->
+    <link href="/Content/estilos.css?v=1.1" rel="stylesheet" type="text/css" />
 
     <webopt:BundleReference runat="server" Path="~/Content/css" />
     <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon" />
@@ -54,15 +67,81 @@
             </div>
         </nav>
 
-        <div class="container body-content">
+        <!-- Contenido principal de las páginas -->
+        <div class="container body-content pb-5">
             <asp:ContentPlaceHolder ID="MainContent" runat="server">
             </asp:ContentPlaceHolder>
-            <hr class="mt-5" />
-            <footer>
-                <p>&copy; <%: DateTime.Now.Year %> - Clínica Médica | Grupo T</p>
-            </footer>
         </div>
+
+        <!-- Footer -->
+        <footer class="footer-institucional navbar-custom text-white pt-5 pb-3 mt-auto">
+            <div class="container">
+                <div class="row g-4">
+                    <!-- Columna 1: Ubicación y Privacidad -->
+                    <div class="col-12 col-md-3">
+                        <h6 class="text-uppercase mb-3 text-white">
+                            <i class="fas fa-map-marker-alt me-2 text-info"></i>Ubicación
+                        </h6>
+                        <p class="mb-4">
+                            Av. Hipólito Yrigoyen 2886<br />
+                            General Pacheco, Buenos Aires<br />
+                            Argentina
+                        </p>
+
+                        <h6 class="text-uppercase mb-3 text-white">
+                            <i class="fas fa-shield-alt me-2 text-info"></i>Privacidad
+                        </h6>
+                        <ul class="list-unstyled">
+                            <li><a href="#" class="text-white-50 text-decoration-none">Ver aviso de privacidad</a></li>
+                            <li><a href="#" class="text-white-50 text-decoration-none">Términos y condiciones de uso</a></li>
+                        </ul>
+                    </div>
+
+                    <!-- Columna 2: Teléfonos de Contacto -->
+                    <div class="col-12 col-md-3">
+                        <h6 class="text-uppercase mb-3 text-white">
+                            <i class="fas fa-headset me-2 text-info"></i>Teléfonos de Contacto
+                        </h6>
+                        <p class="mb-1"><span class="text-white">Central de Turnos:</span> 0810-333-2211</p>
+                        <p class="mb-1"><span class="text-white">Urgencias:</span> (011) 4740-9900</p>
+                        <p><span class="text-white">Soporte Portal:</span> (011) 4740-9901</p>
+                    </div>
+
+                    <!-- Columna 3: Redes Sociales -->
+                    <div class="col-12 col-md-3">
+                        <h6 class="text-uppercase mb-3 text-white">
+                            <i class="fas fa-thumbs-up me-2 text-info"></i>Síguenos en Redes
+                        </h6>
+                        <div class="d-flex gap-3 fs-4">
+                            <a href="#" class="text-white"><i class="fab fa-facebook"></i></a>
+                            <a href="#" class="text-white"><i class="fab fa-instagram"></i></a>
+                            <a href="#" class="text-white"><i class="fab fa-linkedin"></i></a>
+                            <a href="#" class="text-white"><i class="fab fa-youtube"></i></a>
+                        </div>
+                    </div>
+
+                    <!-- Columna 4: Marca / Branding -->
+                    <div class="col-12 col-md-3 text-md-end">
+                        <h3 class="text-white mb-2">GSH Clínica Médica</h3>
+                        <p class="text-white-50">
+                            Sistema integral para el control de operaciones médicas, gestión de pacientes y asignación eficiente de turnos.
+                        </p>
+                    </div>
+                </div>
+
+                <hr class="border-secondary my-4 opacity-25" />
+
+                <!-- Derechos reservados -->
+                <div class="row">
+                    <div class="col text-center text-white-50">
+                        GSH Clínica Médica | © <%= DateTime.Now.Year %> Todos los derechos reservados
+                    </div>
+                </div>
+            </div>
+        </footer>
+
     </form>
+
     <asp:PlaceHolder runat="server">
         <%: Scripts.Render("~/Scripts/bootstrap.js") %>
     </asp:PlaceHolder>
