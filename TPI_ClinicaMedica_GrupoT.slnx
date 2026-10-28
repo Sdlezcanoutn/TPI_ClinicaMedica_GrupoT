@@ -1,6 +1,6 @@
 <Solution>
-  <Project Path="Datos/Datos.csproj" />
-  <Project Path="Dominio/Dominio.csproj" />
-  <Project Path="Negocio/Negocio.csproj" />
-  <Project Path="PresentacionWeb/PresentacionWeb.csproj" />
+  <Project Path="Datos/Datos.csproj" Id="17ccf64a-818c-469f-83bc-a3a55d53464d" />
+  <Project Path="Dominio/Dominio.csproj" Id="e889118f-ae26-40d6-ad78-17d0e522ba97" />
+  <Project Path="Negocio/Negocio.csproj" Id="98ccea03-e68e-4312-b946-98c844c16f5a" />
+  <Project Path="PresentacionWeb/PresentacionWeb.csproj" Id="e6b424ff-ced9-4bd2-a910-bb3f9c0d7713" />
 </Solution>
