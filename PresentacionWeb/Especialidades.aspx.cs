@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using Negocio;
 
 namespace PresentacionWeb
 {
@@ -11,7 +12,13 @@ namespace PresentacionWeb
     {
         protected void Page_Load(object sender, EventArgs e)
         {
+            if (!IsPostBack)
+            {
+                EspecialidadNegocio negocio = new EspecialidadNegocio();
 
+                dgvEspecialidades.DataSource = negocio.listar();
+                dgvEspecialidades.DataBind();
+            }
         }
     }
 }
