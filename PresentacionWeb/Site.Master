@@ -1,10 +1,9 @@
 ﻿<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="Site.master.cs" Inherits="PresentacionWeb.SiteMaster" %>
 
 <!DOCTYPE html>
-
 <html lang="es">
 <head runat="server">
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title><%: Page.Title %> - Clínica Médica</title>
@@ -15,14 +14,11 @@
 
     <webopt:bundlereference runat="server" path="~/Content/css" />
     <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon" />
-
 </head>
 <body>
     <form runat="server">
         <asp:ScriptManager runat="server">
             <Scripts>
-                <%--To learn more about bundling scripts in ScriptManager see https://go.microsoft.com/fwlink/?LinkID=301884 --%>
-                <%--Framework Scripts--%>
                 <asp:ScriptReference Name="MsAjaxBundle" />
                 <asp:ScriptReference Name="jquery" />
                 <asp:ScriptReference Name="WebForms.js" Assembly="System.Web" Path="~/Scripts/WebForms/WebForms.js" />
@@ -34,24 +30,23 @@
                 <asp:ScriptReference Name="WebParts.js" Assembly="System.Web" Path="~/Scripts/WebForms/WebParts.js" />
                 <asp:ScriptReference Name="Focus.js" Assembly="System.Web" Path="~/Scripts/WebForms/Focus.js" />
                 <asp:ScriptReference Name="WebFormsBundle" />
-                <%--Site Scripts--%>
             </Scripts>
         </asp:ScriptManager>
 
-        <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm mb-4">
+        <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom shadow-sm mb-4">
             <div class="container">
-                <a class="navbar-brand fw-bold" runat="server" href="~/">🏥 Clínica Médica</a>
+                <a class="navbar-brand fw-bold text-primary" runat="server" href="~/">🏥 Clínica Médica</a>
                 <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" title="Alternar navegación" aria-controls="navbarSupportedContent"
                     aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item"><a class="nav-link" runat="server" href="~/">Inicio</a></li>
-                        <li class="nav-item"><a class="nav-link" runat="server" href="~/Pacientes">Pacientes</a></li>
-                        <li class="nav-item"><a class="nav-link" runat="server" href="~/Medicos">Médicos</a></li>
-                        <li class="nav-item"><a class="nav-link" runat="server" href="~/Especialidades">Especialidades</a></li>
-                        <li class="nav-item"><a class="nav-link" runat="server" href="~/Turnos">Turnos</a></li>
+                        <li class="nav-item"><a class="nav-link text-dark" runat="server" href="~/">Inicio</a></li>
+                        <li class="nav-item"><a class="nav-link text-dark" runat="server" href="~/Pacientes">Pacientes</a></li>
+                        <li class="nav-item"><a class="nav-link text-dark" runat="server" href="~/Medicos">Médicos</a></li>
+                        <li class="nav-item"><a class="nav-link text-dark" runat="server" href="~/Especialidades">Especialidades</a></li>
+                        <li class="nav-item"><a class="nav-link text-dark" runat="server" href="~/Turnos">Turnos</a></li>
                     </ul>
                 </div>
             </div>
@@ -62,7 +57,7 @@
             </asp:ContentPlaceHolder>
             <hr />
             <footer>
-                <p>&copy; <%: DateTime.Now.Year %> - Clínica Médica | Grupo T</p>
+                <p class="text-muted">&copy; <%: DateTime.Now.Year %> - Clínica Médica | Grupo T</p>
             </footer>
         </div>
     </form>
