@@ -23,7 +23,7 @@
     <webopt:BundleReference runat="server" Path="~/Content/css" />
 
     <!-- CSS PERSONALIZADO -->
-    <link href="/Content/estilos.css?v=1.3" rel="stylesheet" type="text/css" />
+    <link href="/Content/estilos.css?v=1.9" rel="stylesheet" type="text/css" />
 
     <webopt:BundleReference runat="server" Path="~/Content/css" />
     <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon" />
@@ -48,9 +48,8 @@
 
         <nav class="navbar navbar-expand-lg navbar-dark navbar-custom sticky-top py-3 mb-4">
             <div class="container">
-                <a class="navbar-brand d-flex align-items-center gap-2" runat="server" href="~/">
-                    <i class="fa-solid fa-hospital text-info fs-3"></i>
-                    <span class="fs-1">GSH Clínica Médica</span>
+                <a class="navbar-brand d-flex align-items-center" runat="server" href="~/">
+                    <img src="/Images/logo-gsh.png" alt="GSH Clínica Médica" class="img-fluid logo-navbar" />
                 </a>
                 <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" title="Alternar navegación">
                     <span class="navbar-toggler-icon"></span>
