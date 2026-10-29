@@ -23,7 +23,7 @@
     <webopt:BundleReference runat="server" Path="~/Content/css" />
 
     <!-- CSS PERSONALIZADO -->
-    <link href="/Content/estilos.css?v=1.1" rel="stylesheet" type="text/css" />
+    <link href="/Content/estilos.css?v=1.9" rel="stylesheet" type="text/css" />
 
     <webopt:BundleReference runat="server" Path="~/Content/css" />
     <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon" />
@@ -46,17 +46,16 @@
             </Scripts>
         </asp:ScriptManager>
 
-        <nav class="navbar navbar-expand-lg navbar-dark navbar-custom py-2 mb-4">
+        <nav class="navbar navbar-expand-lg navbar-dark navbar-custom sticky-top py-3 mb-4">
             <div class="container">
-                <a class="navbar-brand d-flex align-items-center gap-2" runat="server" href="~/">
-                    <i class="fa-solid fa-hospital text-info fs-5"></i>
-                    <span>Clínica Médica</span>
+                <a class="navbar-brand d-flex align-items-center" runat="server" href="~/">
+                    <img src="/Images/logo-gsh.png" alt="GSH Clínica Médica" class="img-fluid logo-navbar" />
                 </a>
                 <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" title="Alternar navegación">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse d-sm-inline-flex justify-content-end">
-                    <ul class="navbar-nav gap-1">
+                    <ul class="navbar-nav gap-2">
                         <li class="nav-item"><a class="nav-link" runat="server" href="~/">Inicio</a></li>
                         <li class="nav-item"><a class="nav-link" runat="server" href="~/Pacientes">Pacientes</a></li>
                         <li class="nav-item"><a class="nav-link" runat="server" href="~/Medicos">Médicos</a></li>
