@@ -57,30 +57,29 @@
         </div>
     </div>
 
-    <!-- CONTENEDOR PARA EL RESTO DEL DASHBOARD -->
-    <div class="container">
+    <!-- CONTENEDOR FLUIDO ANCHO PARA EL DASHBOARD -->
+    <div class="container-fluid px-4 px-lg-5 mb-5">
 
         <!-- Banner Bienvenida -->
-        <div class="container my-5">
+        <div class="my-5">
             <div class="row">
-                <div class="col-lg-10">
-                    <h2 class="fw-bold text-dark display-6 mb-2">Te damos la bienvenida a la medicina del futuro, centrada en vos y con el sentido humano de siempre
+                <div class="col-xl-9">
+                    <h2 class="fw-bold text-dark display-6 mb-2">
+                        Te damos la bienvenida a la medicina del futuro, centrada en vos y con el sentido humano de siempre
                     </h2>
                     <div class="divider-line mb-4"></div>
                     <p class="text-muted fs-5 lh-base mb-3">
                         Hace más de 170 años que transformamos la salud con innovación, excelencia y compromiso. Ese legado nos impulsa a seguir siendo pioneros en cuidados y tratamientos de vanguardia, marcando el rumbo de la medicina en la Argentina.
                     </p>
-                    <p class="text-secondary fs-6 mb-0">
-                        Seleccioná un módulo desde el menú superior o utilizá los accesos directos a continuación para gestionar el sistema.
-                    </p>
                 </div>
             </div>
         </div>
 
-        <!-- Tarjetas de Acceso Directo (Dashboard) -->
-        <div class="row g-4 mb-4">
+        <!-- Tarjetas de Acceso Directo -->
+        <div class="row g-4">
+            
             <!-- Turnos -->
-            <div class="col-md-6 col-lg-3">
+            <div class="col-md-6 col-xl-3">
                 <div class="card dashboard-glass-card border-0 shadow-sm rounded-3 h-100">
                     <div class="card-body p-4 d-flex flex-column justify-content-between">
                         <div>
@@ -101,7 +100,7 @@
             </div>
 
             <!-- Pacientes -->
-            <div class="col-md-6 col-lg-3">
+            <div class="col-md-6 col-xl-3">
                 <div class="card dashboard-glass-card border-0 shadow-sm rounded-3 h-100">
                     <div class="card-body p-4 d-flex flex-column justify-content-between">
                         <div>
@@ -122,7 +121,7 @@
             </div>
 
             <!-- Médicos -->
-            <div class="col-md-6 col-lg-3">
+            <div class="col-md-6 col-xl-3">
                 <div class="card dashboard-glass-card border-0 shadow-sm rounded-3 h-100">
                     <div class="card-body p-4 d-flex flex-column justify-content-between">
                         <div>
@@ -143,7 +142,7 @@
             </div>
 
             <!-- Especialidades -->
-            <div class="col-md-6 col-lg-3">
+            <div class="col-md-6 col-xl-3">
                 <div class="card dashboard-glass-card border-0 shadow-sm rounded-3 h-100">
                     <div class="card-body p-4 d-flex flex-column justify-content-between">
                         <div>
@@ -162,6 +161,7 @@
                     </div>
                 </div>
             </div>
+
         </div>
 
     </div>

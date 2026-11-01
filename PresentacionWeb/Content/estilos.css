@@ -143,15 +143,12 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Contenedor ancho del Dashboard */
 .dashboard-container-wide {
-    width: 100vw !important;
-    max-width: 100% !important;
-    position: relative !important;
-    left: 50% !important;
-    right: 50% !important;
-    margin-left: -50vw !important;
-    margin-right: -50vw !important;
-    padding-left: 4rem !important;   
-    padding-right: 4rem !important;
+    width: 100% !important;
+    max-width: 1500px !important; 
+    margin-left: auto !important;
+    margin-right: auto !important;
+    padding-left: 2rem !important;   
+    padding-right: 2rem !important;
     box-sizing: border-box !important;
 }
 
@@ -162,7 +159,7 @@ form > div, main, .body-content {
     padding-right: 0 !important;
 }
 
-/* Tarjetas de acceso directo con efecto glass translúcido */
+/* Tarjetas de acceso directo con efecto glass */
 .card.dashboard-glass-card {
     background: rgba(255, 255, 255, 0.7) !important;
     backdrop-filter: blur(12px) !important;
@@ -171,6 +168,10 @@ form > div, main, .body-content {
     border-radius: 14px !important;
     box-shadow: 0 10px 30px 0 rgba(0, 0, 0, 0.04) !important;
     transition: transform 0.2s ease, background 0.2s ease !important;
+    min-height: 240px !important;
+    max-width: 360px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
 }
 
 .card.dashboard-glass-card:hover {
