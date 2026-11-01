@@ -61,17 +61,18 @@
     <div class="container">
 
         <!-- Banner Bienvenida -->
-        <div class="card border-0 shadow-sm rounded-3 bg-white p-4 my-4">
-            <div class="row align-items-center">
-                <div class="col-md-8">
-                    <h2 class="fw-bold text-dark m-0">Bienvenido al Sistema de Gestión Médica GSH:</h2>
-                    <p class="text-muted mt-4 mb-0">Hace más de 170 años que transformamos la salud con innovación, excelencia y compromiso. Ese legado nos impulsa a seguir siendo pioneros en cuidados y tratamientos de vanguardia, marcando el rumbo de la medicina en la Argentina.</p>
-                    <p class="text-muted mt-4 mb-0">Seleccioná un módulo desde el menú superior o utilizá los accesos directos a continuación para gestionar el sistema.</p>
-                </div>
-                <div class="col-md-4 text-md-end mt-3 mt-md-0">
-                    <span class="badge bg-light text-dark border p-2 fw-normal">
-                        <i class="fa-regular fa-clock me-1"></i>Panel General
-                    </span>
+        <div class="container my-5">
+            <div class="row">
+                <div class="col-lg-10">
+                    <h2 class="fw-bold text-dark display-6 mb-2">Te damos la bienvenida a la medicina del futuro, centrada en vos y con el sentido humano de siempre
+                    </h2>
+                    <div class="divider-line mb-4"></div>
+                    <p class="text-muted fs-5 lh-base mb-3">
+                        Hace más de 170 años que transformamos la salud con innovación, excelencia y compromiso. Ese legado nos impulsa a seguir siendo pioneros en cuidados y tratamientos de vanguardia, marcando el rumbo de la medicina en la Argentina.
+                    </p>
+                    <p class="text-secondary fs-6 mb-0">
+                        Seleccioná un módulo desde el menú superior o utilizá los accesos directos a continuación para gestionar el sistema.
+                    </p>
                 </div>
             </div>
         </div>
@@ -80,7 +81,7 @@
         <div class="row g-4 mb-4">
             <!-- Turnos -->
             <div class="col-md-6 col-lg-3">
-                <div class="card border-0 shadow-sm rounded-3 h-100 bg-white">
+                <div class="card dashboard-glass-card border-0 shadow-sm rounded-3 h-100">
                     <div class="card-body p-4 d-flex flex-column justify-content-between">
                         <div>
                             <div class="d-flex align-items-center justify-content-between mb-3">
@@ -101,7 +102,7 @@
 
             <!-- Pacientes -->
             <div class="col-md-6 col-lg-3">
-                <div class="card border-0 shadow-sm rounded-3 h-100 bg-white">
+                <div class="card dashboard-glass-card border-0 shadow-sm rounded-3 h-100">
                     <div class="card-body p-4 d-flex flex-column justify-content-between">
                         <div>
                             <div class="d-flex align-items-center justify-content-between mb-3">
@@ -122,7 +123,7 @@
 
             <!-- Médicos -->
             <div class="col-md-6 col-lg-3">
-                <div class="card border-0 shadow-sm rounded-3 h-100 bg-white">
+                <div class="card dashboard-glass-card border-0 shadow-sm rounded-3 h-100">
                     <div class="card-body p-4 d-flex flex-column justify-content-between">
                         <div>
                             <div class="d-flex align-items-center justify-content-between mb-3">
@@ -143,7 +144,7 @@
 
             <!-- Especialidades -->
             <div class="col-md-6 col-lg-3">
-                <div class="card border-0 shadow-sm rounded-3 h-100 bg-white">
+                <div class="card dashboard-glass-card border-0 shadow-sm rounded-3 h-100">
                     <div class="card-body p-4 d-flex flex-column justify-content-between">
                         <div>
                             <div class="d-flex align-items-center justify-content-between mb-3">
