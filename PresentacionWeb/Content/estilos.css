@@ -34,15 +34,25 @@ h1, h2, h3, h4, h5, h6 {
     -webkit-backdrop-filter: blur(12px);
     border-bottom: 1px solid rgba(255, 255, 255, 0.08); 
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-    padding-top: 1rem !important;    
-    padding-bottom: 1rem !important;
+    padding-top: 0.2rem !important;   
+    padding-bottom: 0.2rem !important;
+    overflow: visible !important;      
     z-index: 1030;
 }
 
+.navbar-brand {
+    overflow: visible !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+}
+
 .navbar-brand .logo-navbar {
-    height: 90px;                   
-    width: auto;
+    height: 105px !important;           
+    width: auto !important;
+    max-height: none !important;
     object-fit: contain;
+    margin-top: -15px;                
+    margin-bottom: -15px;              
     transition: transform 0.2s ease;
 }
 
@@ -52,10 +62,10 @@ h1, h2, h3, h4, h5, h6 {
 
 .navbar-custom .nav-link {
     color: #e2e8f0;
-    font-size: 1.15rem;             
-    font-weight: 300;               
+    font-size: 1.15rem;
+    font-weight: 300;
     letter-spacing: 0.3px;
-    padding: 0.75rem 1.4rem;
+    padding: 0.6rem 1.4rem;
     border-radius: 8px;
     transition: all 0.2s ease;
 }
@@ -63,7 +73,7 @@ h1, h2, h3, h4, h5, h6 {
 .navbar-custom .nav-link:hover {
     background-color: rgba(255, 255, 255, 0.1);
     color: #ffffff;
-    font-weight: 400;               
+    font-weight: 400;
 }
 
 /* Footer */
