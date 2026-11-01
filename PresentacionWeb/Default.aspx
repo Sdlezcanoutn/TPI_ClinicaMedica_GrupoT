@@ -6,12 +6,17 @@
     <div class="card border-0 shadow-sm rounded-3 bg-white p-4 my-4">
         <div class="row align-items-center">
             <div class="col-md-8">
-                <h2 class="fw-bold text-dark m-0">Bienvenido al Sistema de Gestión Médica</h2>
-                <p class="text-muted mt-2 mb-0">Seleccioná un módulo desde el menú superior o utilizá los accesos directos a continuación para gestionar el sistema.</p>
+                <h2 class="fw-bold text-dark m-0">
+                    Bienvenido al Sistema de Gestión Médica GSH:                  
+                    <br />
+                    Medicina del futuro, centrada en vos y con el sentido humano de siempre.
+                </h2>
+                <p class="text-muted mt-4 mb-0">Hace más de 170 años que transformamos la salud con innovación, excelencia y compromiso. Ese legado nos impulsa a seguir siendo pioneros en cuidados y tratamientos de vanguardia, marcando el rumbo de la medicina en la Argentina.</p>
+                <p class="text-muted mt-4 mb-0">Seleccioná un módulo desde el menú superior o utilizá los accesos directos a continuación para gestionar el sistema.</p>
             </div>
             <div class="col-md-4 text-md-end mt-3 mt-md-0">
                 <span class="badge bg-light text-dark border p-2 fw-normal">
-                    <i class="fa-regular fa-clock me-1"></i> Panel General
+                    <i class="fa-regular fa-clock me-1"></i>Panel General
                 </span>
             </div>
         </div>
@@ -19,7 +24,7 @@
 
     <!-- Tarjetas de Acceso Directo (Dashboard) -->
     <div class="row g-4 mb-4">
-        
+
         <!-- Turnos -->
         <div class="col-md-6 col-lg-3">
             <div class="card border-0 shadow-sm rounded-3 h-100 bg-white">
