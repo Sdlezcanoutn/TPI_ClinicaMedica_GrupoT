@@ -76,6 +76,63 @@ h1, h2, h3, h4, h5, h6 {
     font-weight: 400;
 }
 
+/* Carrusel hero */
+
+.backdrop-blur {
+    backdrop-filter: blur(6px);
+    max-width: 550px;
+}
+
+.full-bleed-carousel {
+    width: 100vw;
+    position: relative;
+    left: 50%;
+    right: 50%;
+    margin-left: -50vw;
+    margin-right: -50vw;
+    margin-top: -1.5rem; 
+}
+
+.carousel-img {
+    height: 480px !important;
+    object-fit: cover;
+    filter: brightness(0.85);
+}
+
+/* Tarjeta flotante translúcida con efecto glassmorphism */
+.carousel .carousel-caption.hero-caption-wide {
+    position: absolute !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    left: 8% !important;
+    right: auto !important;
+    bottom: auto !important;
+    width: 480px !important;
+    min-height: 260px !important;
+    background: rgba(15, 23, 42, 0.45) !important;
+    backdrop-filter: blur(14px) !important;
+    -webkit-backdrop-filter: blur(14px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.18) !important;
+    border-radius: 16px !important;
+    border-left: 5px solid #0dcaf0 !important;
+    padding: 2.5rem !important;
+    text-align: left !important;
+    box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.4) !important;
+}
+
+/* Ajuste responsive para celulares */
+@media (max-width: 768px) {
+    .carousel .carousel-caption.hero-caption-wide {
+        left: 5% !important;
+        right: 5% !important;
+        width: auto !important;
+    }
+
+    .carousel-img {
+        height: 380px !important;
+    }
+}
+
 /* Footer */
 .footer-institucional {
     font-weight: 300;
