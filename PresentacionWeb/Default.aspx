@@ -57,15 +57,14 @@
         </div>
     </div>
 
-    <!-- CONTENEDOR FLUIDO ANCHO PARA EL DASHBOARD -->
+    <!-- CONTENEDOR PARA EL DASHBOARD -->
     <div class="container-fluid px-4 px-lg-5 mb-5">
 
         <!-- Banner Bienvenida -->
         <div class="my-5">
             <div class="row">
                 <div class="col-xl-9">
-                    <h2 class="fw-bold text-dark display-6 mb-2">
-                        Te damos la bienvenida a la medicina del futuro, centrada en vos y con el sentido humano de siempre
+                    <h2 class="fw-bold text-dark display-6 mb-2">Te damos la bienvenida a la medicina del futuro, centrada en vos y con el sentido humano de siempre
                     </h2>
                     <div class="divider-line mb-4"></div>
                     <p class="text-muted fs-5 lh-base mb-3">
@@ -77,7 +76,7 @@
 
         <!-- Tarjetas de Acceso Directo -->
         <div class="row g-4">
-            
+
             <!-- Turnos -->
             <div class="col-md-6 col-xl-3">
                 <div class="card dashboard-glass-card border-0 shadow-sm rounded-3 h-100">
