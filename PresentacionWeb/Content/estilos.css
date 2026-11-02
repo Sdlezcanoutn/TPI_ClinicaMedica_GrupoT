@@ -160,14 +160,12 @@ form > div, main, .body-content {
 }
 
 /* Tarjetas de acceso directo con efecto glass */
-/* Tarjetas de acceso directo con sombra profunda y efecto glass suave sobre fondo blanco */
 .card.dashboard-glass-card {
-    background: rgba(255, 255, 255, 0.85) !important; /* Ligeramente translúcida para mantener el concepto */
+    background: rgba(255, 255, 255, 0.85) !important; 
     backdrop-filter: blur(12px) !important;
     -webkit-backdrop-filter: blur(12px) !important;
-    border: 1px solid rgba(226, 232, 240, 0.8) !important; /* Borde gris clarito muy sutil */
+    border: 1px solid rgba(226, 232, 240, 0.8) !important; 
     border-radius: 18px !important;
-    /* Sombra difuminada y elegante para que "floten" sobre el fondo blanco */
     box-shadow: 0 20px 40px -10px rgba(15, 23, 42, 0.08), 0 10px 20px -15px rgba(15, 23, 42, 0.04) !important;
     transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease !important;
     min-height: 260px !important;
@@ -179,11 +177,9 @@ form > div, main, .body-content {
 .card.dashboard-glass-card:hover {
     transform: translateY(-5px);
     background: rgba(255, 255, 255, 0.95) !important;
-    /* Sombra más marcada al pasar el cursor para dar sensación de elevación */
     box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.15), 0 12px 24px -12px rgba(15, 23, 42, 0.08) !important;
 }
 
-/* Textos internos oscuros y legibles */
 .card.dashboard-glass-card h5 {
     color: #1e293b !important;
 }
@@ -198,7 +194,7 @@ form > div, main, .body-content {
     border-color: rgba(0, 0, 0, 0.06) !important;
 }
 
-/* Botones sólidos: blancos de base, turquesa al pasar el cursor */
+/* Botones */
 .card.dashboard-glass-card .btn {
     background-color: #ffffff !important;
     color: #0f172a !important;
@@ -207,15 +203,15 @@ form > div, main, .body-content {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04) !important;
     transition: all 0.2s ease !important;
 }
-
+ 
 .card.dashboard-glass-card .btn:hover {
-    background-color: #0dcaf0 !important; /* Turquesa institucional */
-    border-color: #0dcaf0 !important;
-    color: #0f172a !important;
-    transform: translateY(-1px);
-    box-shadow: 0 6px 15px rgba(13, 202, 240, 0.3) !important;
+        background-color: rgba(0,166,255,0.98) !important; 
+        border-color: #0dcaf0 !important;
+        color: #0f172a !important;
+        transform: translateY(-1px);
+        box-shadow: 0 6px 15px rgba(13, 202, 240, 0.3) !important;
 }
-
+  
 /* Footer */
 .footer-institucional {
     font-weight: 300;
