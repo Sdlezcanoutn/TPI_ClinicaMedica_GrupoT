@@ -5,10 +5,11 @@ using System.Text;
 using System.Threading.Tasks;
 using Dominio;
 using Datos;
+using System.Security.Cryptography.X509Certificates;
 
 namespace Negocio
 {
-    public  class EspecialidadNegocio
+    public class EspecialidadNegocio
     {
         public List<Especialidad> listar()
         {
@@ -39,8 +40,29 @@ namespace Negocio
 
                     lista.Add(aux);
                 }
-
                 return lista;
+            }
+            finally
+            {
+                datos.cerrarConexion();
+            }
+        }
+
+        public void agregar(Especialidad nuevo)
+        {
+            AccesoDatos datos = new AccesoDatos();
+
+            try
+            {
+                datos.setearConsulta(
+                    "INSERT INTO ESPECIALIDADES (Nombre, Descripcion, Estado) " +
+                    "VALUES (@Nombre, @Descripcion, @Estado)"
+                );
+                datos.setearParametro("@Nombre", nuevo.Nombre);
+                datos.setearParametro("@Descripcion", nuevo.Descripcion);
+                datos.setearParametro("@Estado", nuevo.Estado);
+
+                datos.ejecutarAccion();
             }
             finally
             {

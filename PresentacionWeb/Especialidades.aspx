@@ -1,7 +1,7 @@
 ﻿<%@ Page Title="Especialidades" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Especialidades.aspx.cs" Inherits="PresentacionWeb.Especialidades" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
-    
+
     <!-- CONTENEDOR -->
     <div class="container-fluid px-4 px-lg-5 my-5">
         <div style="max-width: 1500px; margin: 0 auto;">
@@ -16,7 +16,7 @@
                         <p class="text-muted small m-0 mt-1">Listado y administración de especialidades médicas</p>
                     </div>
                     <div class="mt-3 mt-md-0">
-                        <asp:Button ID="btnAgregar" runat="server" Text="+ Nueva Especialidad" CssClass="btn btn-clinica-primary px-4 py-2 rounded-3 shadow-sm" />
+                        <asp:Button ID="btnAgregar" runat="server" Text="+ Nueva Especialidad" CssClass="btn btn-clinica-primary px-4 py-2 rounded-3 shadow-sm" OnClientClick="return false;" data-bs-toggle="modal" data-bs-target="#modalEspecialidad" />
                     </div>
                 </div>
 
@@ -34,7 +34,7 @@
 
                 <!-- Tabla -->
                 <div class="table-responsive">
-                    <asp:GridView ID="dgvEspecialidades" runat="server" AutoGenerateColumns="False" 
+                    <asp:GridView ID="dgvEspecialidades" runat="server" AutoGenerateColumns="False"
                         CssClass="table table-custom align-middle mb-0" GridLines="None">
                         <Columns>
                             <asp:BoundField DataField="Id" HeaderText="ID" ItemStyle-CssClass="fw-semibold text-secondary" HeaderStyle-Width="80px" />
@@ -59,10 +59,50 @@
                         </EmptyDataTemplate>
                     </asp:GridView>
                 </div>
+                <!-- Modal Nueva Especialidad -->
+                <div class="modal fade" id="modalEspecialidad" tabindex="-1"
+                    aria-labelledby="tituloModalEspecialidad" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
 
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="tituloModalEspecialidad">Nueva Especialidad
+                                </h5>
+                                <button type="button" class="btn-close"
+                                    data-bs-dismiss="modal" aria-label="Cerrar">
+                                </button>
+                            </div>
+
+                            <div class="modal-body">
+                                <div class="mb-3">
+                                    <label class="form-label">Nombre</label>
+                                    <asp:TextBox ID="txtNombre" runat="server"
+                                        CssClass="form-control" MaxLength="100" />
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Descripción</label>
+                                    <asp:TextBox ID="txtDescripcion" runat="server"
+                                        CssClass="form-control"
+                                        TextMode="MultiLine" Rows="3"
+                                        MaxLength="500" />
+                                </div>
+                            </div>
+
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary"
+                                    data-bs-dismiss="modal">
+                                    Cancelar</button>
+                                <asp:Button ID="btnGuardar" runat="server"
+                                    Text="Guardar"
+                                    CssClass="btn btn-clinica-primary" />
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
             </div>
 
         </div>
     </div>
-
 </asp:Content>
