@@ -50,6 +50,34 @@ namespace Negocio
 
         public void agregar(Especialidad nuevo)
         {
+            if (nuevo == null || string.IsNullOrWhiteSpace(nuevo.Nombre))
+            {
+                throw new ArgumentException("El nombre de la especialidad es obligatorio.");
+            }
+
+            nuevo.Nombre = nuevo.Nombre.Trim();
+
+            Especialidad existente = listar().FirstOrDefault(e =>
+             System.Globalization.CultureInfo.GetCultureInfo("es-AR")
+                 .CompareInfo.Compare(
+                     e.Nombre.Trim(),
+                     nuevo.Nombre,
+                     System.Globalization.CompareOptions.IgnoreCase |
+                     System.Globalization.CompareOptions.IgnoreNonSpace
+                 ) == 0);
+
+            if (existente != null)
+            {
+                if (existente.Estado)
+                {
+                    throw new ArgumentException("Ya existe una especialidad con ese nombre.");
+                }
+                else
+                {
+                    throw new ArgumentException("Esta especialidad está dada de baja y debe reactivarse.");
+                }
+            }
+
             AccesoDatos datos = new AccesoDatos();
 
             try

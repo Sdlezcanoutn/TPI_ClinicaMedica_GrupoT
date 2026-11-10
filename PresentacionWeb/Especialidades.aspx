@@ -16,7 +16,7 @@
                         <p class="text-muted small m-0 mt-1">Listado y administración de especialidades médicas</p>
                     </div>
                     <div class="mt-3 mt-md-0">
-                        <asp:Button ID="btnAgregar" runat="server" Text="+ Nueva Especialidad" CssClass="btn btn-clinica-primary px-4 py-2 rounded-3 shadow-sm" OnClientClick="return false;" data-bs-toggle="modal" data-bs-target="#modalEspecialidad" />
+                        <asp:Button ID="btnAgregar" runat="server" Text="+ Nueva Especialidad" CssClass="btn btn-clinica-primary px-4 py-2 rounded-3 shadow-sm" OnClientClick="bootstrap.Modal.getOrCreateInstance(document.getElementById('modalEspecialidad')).show(); return false;" />
                     </div>
                 </div>
 
@@ -33,35 +33,48 @@
                 </div>
 
                 <!-- Tabla -->
-                <div class="table-responsive">
-                    <asp:GridView ID="dgvEspecialidades" runat="server" AutoGenerateColumns="False"
-                        CssClass="table table-custom align-middle mb-0" GridLines="None">
-                        <Columns>
-                            <asp:BoundField DataField="Id" HeaderText="ID" ItemStyle-CssClass="fw-semibold text-secondary" HeaderStyle-Width="80px" />
-                            <asp:BoundField DataField="Nombre" HeaderText="Especialidad" />
-                            <asp:BoundField DataField="Descripcion" HeaderText="Descripción" />
-                            <asp:TemplateField HeaderText="Acciones" ItemStyle-CssClass="text-end" HeaderStyle-CssClass="text-end">
-                                <ItemTemplate>
-                                    <asp:LinkButton ID="btnEditar" runat="server" CssClass="btn btn-sm btn-outline-secondary me-1">
+                <asp:UpdatePanel ID="upListado" runat="server" UpdateMode="Conditional">
+                    <ContentTemplate>
+
+                        <div id="mensajeExito"
+                            class="alert alert-success d-none mb-3"
+                            role="alert">
+                            Especialidad registrada correctamente.
+                        </div>
+
+                        <div class="table-responsive">
+                            <asp:GridView ID="dgvEspecialidades" runat="server" AutoGenerateColumns="False"
+                                CssClass="table table-custom align-middle mb-0" GridLines="None">
+                                <Columns>
+                                    <asp:BoundField DataField="Id" HeaderText="ID" ItemStyle-CssClass="fw-semibold text-secondary" HeaderStyle-Width="80px" />
+                                    <asp:BoundField DataField="Nombre" HeaderText="Especialidad" />
+                                    <asp:BoundField DataField="Descripcion" HeaderText="Descripción" />
+                                    <asp:TemplateField HeaderText="Acciones" ItemStyle-CssClass="text-end" HeaderStyle-CssClass="text-end">
+                                        <ItemTemplate>
+                                            <asp:LinkButton ID="btnEditar" runat="server" CssClass="btn btn-sm btn-outline-secondary me-1">
                                         <i class="fa-solid fa-pen-to-square me-1"></i> Editar
-                                    </asp:LinkButton>
-                                    <asp:LinkButton ID="btnEliminar" runat="server" CssClass="btn btn-sm btn-outline-danger">
+                                            </asp:LinkButton>
+                                            <asp:LinkButton ID="btnEliminar" runat="server" CssClass="btn btn-sm btn-outline-danger">
                                         <i class="fa-solid fa-trash me-1"></i> Eliminar
-                                    </asp:LinkButton>
-                                </ItemTemplate>
-                            </asp:TemplateField>
-                        </Columns>
-                        <EmptyDataTemplate>
-                            <div class="text-center py-5 text-muted">
-                                <i class="fa-solid fa-folder-open fs-2 mb-2 d-block text-secondary opacity-50"></i>
-                                <p class="m-0 fw-medium">No hay especialidades registradas por el momento.</p>
-                            </div>
-                        </EmptyDataTemplate>
-                    </asp:GridView>
-                </div>
+                                            </asp:LinkButton>
+                                        </ItemTemplate>
+                                    </asp:TemplateField>
+                                </Columns>
+                                <EmptyDataTemplate>
+                                    <div class="text-center py-5 text-muted">
+                                        <i class="fa-solid fa-folder-open fs-2 mb-2 d-block text-secondary opacity-50"></i>
+                                        <p class="m-0 fw-medium">No hay especialidades registradas por el momento.</p>
+                                    </div>
+                                </EmptyDataTemplate>
+                            </asp:GridView>
+                        </div>
+                    </ContentTemplate>
+                </asp:UpdatePanel>
+
                 <!-- Modal Nueva Especialidad -->
                 <div class="modal fade" id="modalEspecialidad" tabindex="-1"
                     aria-labelledby="tituloModalEspecialidad" aria-hidden="true">
+
                     <div class="modal-dialog modal-dialog-centered">
                         <div class="modal-content">
 
@@ -73,36 +86,87 @@
                                 </button>
                             </div>
 
-                            <div class="modal-body">
-                                <div class="mb-3">
-                                    <label class="form-label">Nombre</label>
-                                    <asp:TextBox ID="txtNombre" runat="server"
-                                        CssClass="form-control" MaxLength="100" />
-                                </div>
+                            <asp:UpdatePanel ID="upEspecialidad" runat="server" UpdateMode="Conditional">
+                                <ContentTemplate>
 
-                                <div class="mb-3">
-                                    <label class="form-label">Descripción</label>
-                                    <asp:TextBox ID="txtDescripcion" runat="server"
-                                        CssClass="form-control"
-                                        TextMode="MultiLine" Rows="3"
-                                        MaxLength="500" />
-                                </div>
-                            </div>
+                                    <div class="modal-body">
+                                        <div class="mb-3">
+                                            <label class="form-label">Nombre</label>
+                                            <asp:TextBox ID="txtNombre" runat="server"
+                                                CssClass="form-control" MaxLength="100" />
+                                        </div>
 
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary"
-                                    data-bs-dismiss="modal">
-                                    Cancelar</button>
-                                <asp:Button ID="btnGuardar" runat="server"
-                                    Text="Guardar"
-                                    CssClass="btn btn-clinica-primary" />
-                            </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Descripción</label>
+                                            <asp:TextBox ID="txtDescripcion" runat="server"
+                                                CssClass="form-control"
+                                                TextMode="MultiLine" Rows="3"
+                                                MaxLength="500" />
+                                        </div>
+
+                                        <asp:Label ID="lblMensaje" runat="server"
+                                            CssClass="text-danger small"
+                                            Visible="false" />
+                                    </div>
+
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary"
+                                            data-bs-dismiss="modal">
+                                            Cancelar
+                                        </button>
+
+                                        <asp:Button ID="btnGuardar" runat="server"
+                                            Text="Guardar"
+                                            CssClass="btn btn-clinica-primary"
+                                            OnClick="btnGuardar_Click" />
+                                    </div>
+
+                                </ContentTemplate>
+                            </asp:UpdatePanel>
 
                         </div>
                     </div>
                 </div>
             </div>
-
         </div>
+        <script>
+    const modalEspecialidad = document.getElementById('modalEspecialidad');
+
+    function ocultarError() {
+        var mensaje = document.getElementById('<%= lblMensaje.ClientID %>');
+
+        if (mensaje) {
+            mensaje.textContent = '';
+            mensaje.style.display = 'none';
+        }
+    }
+
+    modalEspecialidad.addEventListener('hidden.bs.modal', function () {
+        document.getElementById('<%= txtNombre.ClientID %>').value = '';
+        document.getElementById('<%= txtDescripcion.ClientID %>').value = '';
+    });
+
+modalEspecialidad.addEventListener('show.bs.modal', ocultarError);
+
+    modalEspecialidad.addEventListener('input', function (event) {
+        if (event.target.id === '<%= txtNombre.ClientID %>') {
+            ocultarError();
+        }
+    });
+
+    function mostrarExito() {
+        var elementoModal = document.getElementById('modalEspecialidad');
+        var modal = bootstrap.Modal.getOrCreateInstance(elementoModal);
+
+        modal.hide();
+
+        var mensaje = document.getElementById('mensajeExito');
+        mensaje.classList.remove('d-none');
+
+        setTimeout(function () {
+            mensaje.classList.add('d-none');
+        }, 4000);
+    }
+        </script>
     </div>
 </asp:Content>
