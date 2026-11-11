@@ -66,6 +66,17 @@ namespace Negocio
 
             nuevo.Nombre = nuevo.Nombre.Trim();
 
+            // --- Validar longitud de los campos ---
+            if (nuevo.Nombre.Length > 100)
+            {
+                throw new ArgumentException("El nombre no puede superar los 100 caracteres.");
+            }
+
+            if (!string.IsNullOrEmpty(nuevo.Descripcion) && nuevo.Descripcion.Length > 500)
+            {
+                throw new ArgumentException("La descripción no puede superar los 500 caracteres.");
+            }
+
             // --- Validar nombres duplicados ---
             Especialidad existente = listar().FirstOrDefault(e =>
              System.Globalization.CultureInfo.GetCultureInfo("es-AR")
@@ -122,6 +133,17 @@ namespace Negocio
 
             especialidad.Nombre = especialidad.Nombre.Trim();
 
+            // --- Validar longitud de los campos ---
+            if (especialidad.Nombre.Length > 100)
+            {
+                throw new ArgumentException("El nombre no puede superar los 100 caracteres.");
+            }
+
+            if (!string.IsNullOrEmpty(especialidad.Descripcion) && especialidad.Descripcion.Length > 500)
+            {
+                throw new ArgumentException("La descripción no puede superar los 500 caracteres.");
+            }
+
             // --- Verificar que la especialidad exista ---
             List<Especialidad> lista = listar();
 
@@ -131,6 +153,12 @@ namespace Negocio
             if (actual == null)
             {
                 throw new ArgumentException("La especialidad que intenta modificar no existe.");
+            }
+
+            // --- Verificar que la especialidad esté activa ---
+            if (!actual.Estado)
+            {
+                throw new ArgumentException("No se puede modificar una especialidad inactiva.");
             }
 
             // --- Validar nombres duplicados ---
@@ -174,5 +202,122 @@ namespace Negocio
                 datos.cerrarConexion();
             }
         }
+
+        // ============================================================
+        // CONTEO DE TURNOS PENDIENTES POR ESPECIALIDAD
+        // ============================================================
+        public int contarTurnosPendientes(int idEspecialidad)
+        {
+            AccesoDatos datos = new AccesoDatos();
+
+            try
+            {
+                // --- Consultar turnos futuros pendientes ---
+                datos.setearConsulta(
+                    "SELECT COUNT(*) AS Cantidad " +
+                    "FROM TURNOS T " +
+                    "INNER JOIN ESTADOS_TURNO E " +
+                    "ON T.Id_Estado_Turno = E.Id_Estado_Turno " +
+                    "WHERE T.Id_Especialidad = @IdEspecialidad " +
+                    "AND E.Nombre IN (N'Nuevo', N'Reprogramado') " +
+                    "AND (T.Fecha > CAST(GETDATE() AS DATE) " +
+                    "OR (T.Fecha = CAST(GETDATE() AS DATE) " +
+                    "AND T.Hora_Inicio > CAST(GETDATE() AS TIME)))"
+                );
+
+                datos.setearParametro("@IdEspecialidad", idEspecialidad);
+                datos.ejecutarLectura();
+
+                if (datos.Lector.Read())
+                {
+                    return Convert.ToInt32(datos.Lector["Cantidad"]);
+                }
+
+                return 0;
+            }
+            finally
+            {
+                datos.cerrarConexion();
+            }
+        }
+
+        // ============================================================
+        // BAJA LÓGICA DE ESPECIALIDADES
+        // ============================================================
+        public void darDeBaja(int id)
+        {
+            // --- Verificar que la especialidad exista y esté activa ---
+            Especialidad especialidad = listar()
+                .FirstOrDefault(e => e.Id == id);
+
+            if (especialidad == null)
+            {
+                throw new ArgumentException("La especialidad seleccionada no existe.");
+            }
+
+            if (!especialidad.Estado)
+            {
+                throw new ArgumentException("La especialidad ya se encuentra dada de baja.");
+            }
+
+            // --- Desactivar especialidad ---
+            AccesoDatos datos = new AccesoDatos();
+
+            try
+            {
+                datos.setearConsulta(
+                    "UPDATE ESPECIALIDADES " +
+                    "SET Estado = 0 " +
+                    "WHERE Id_Especialidad = @Id AND Estado = 1"
+                );
+
+                datos.setearParametro("@Id", id);
+                datos.ejecutarAccion();
+            }
+            finally
+            {
+                datos.cerrarConexion();
+            }
+        }
+
+        // ============================================================
+        // REACTIVACIÓN DE ESPECIALIDADES
+        // ============================================================
+        public void reactivar(int id)
+        {
+            // --- Verificar que la especialidad exista y esté inactiva ---
+            Especialidad especialidad = listar()
+                .FirstOrDefault(e => e.Id == id);
+
+            if (especialidad == null)
+            {
+                throw new ArgumentException("La especialidad seleccionada no existe.");
+            }
+
+            if (especialidad.Estado)
+            {
+                throw new ArgumentException("La especialidad ya se encuentra activa.");
+            }
+
+            // --- Reactivar especialidad ---
+            AccesoDatos datos = new AccesoDatos();
+
+            try
+            {
+                datos.setearConsulta(
+                    "UPDATE ESPECIALIDADES " +
+                    "SET Estado = 1 " +
+                    "WHERE Id_Especialidad = @Id AND Estado = 0"
+                );
+
+                datos.setearParametro("@Id", id);
+                datos.ejecutarAccion();
+            }
+            finally
+            {
+                datos.cerrarConexion();
+            }
+        }
+
     }
 }

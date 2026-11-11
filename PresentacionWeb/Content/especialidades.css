@@ -1,0 +1,32 @@
+﻿/* ============================================================
+   FILTROS DE ESPECIALIDADES
+   ============================================================ */
+.btn-filtro-activo {
+    background-color: #18628A !important;
+    border-color: #18628A !important;
+    color: #ffffff !important;
+}
+
+.btn-filtro-activo:hover {
+     background-color: #145373 !important;
+     border-color: #145373 !important;
+     color: #ffffff !important;  
+
+}
+
+/* ============================================================
+   CONTENEDOR DE ESPECIALIDADES
+   ============================================================ */
+
+.contenedor-especialidades {
+    max-width: 1500px;
+    margin: 0 auto;
+}
+
+/* ============================================================
+   BÚSQUEDA DE ESPECIALIDADES
+   ============================================================ */
+
+.boton-busqueda-oculto {
+    display: none;
+}

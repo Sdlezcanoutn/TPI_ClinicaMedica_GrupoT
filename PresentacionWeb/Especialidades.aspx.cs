@@ -1,11 +1,12 @@
-﻿using System;
+﻿using Dominio;
+using Negocio;
+using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-using Negocio;
-using Dominio;
 
 namespace PresentacionWeb
 {
@@ -18,11 +19,11 @@ namespace PresentacionWeb
         {
             if (!IsPostBack)
             {
-                EspecialidadNegocio negocio = new EspecialidadNegocio();
-
-                dgvEspecialidades.DataSource = negocio.listar();
-                dgvEspecialidades.DataBind();
+                cargarEspecialidades();
             }
+
+            // --- Mantener la apariencia del filtro seleccionado ---
+            actualizarEstiloFiltro();
         }
 
         // ============================================================
@@ -103,15 +104,27 @@ namespace PresentacionWeb
         {
             // --- Obtener listado de especialidades ---
             EspecialidadNegocio negocio = new EspecialidadNegocio();
-            List<Especialidad> lista = negocio.listar();
+
+            // --- Filtrar especialidades según el estado seleccionado ---
+            bool mostrarActivas = hfEstado.Value == "1";
+
+            List<Especialidad> lista = negocio.listar()
+                .Where(e => e.Estado == mostrarActivas)
+                .ToList();
 
             string busqueda = txtBuscar.Text.Trim();
 
             // --- Filtrar por nombre ---
             if (!string.IsNullOrEmpty(busqueda))
             {
+                CompareInfo comparador = CultureInfo.GetCultureInfo("es-AR").CompareInfo;
+
                 lista = lista.Where(e =>
-                    e.Nombre.IndexOf(busqueda, StringComparison.OrdinalIgnoreCase) >= 0
+                    comparador.IndexOf(
+                        e.Nombre,
+                        busqueda,
+                        CompareOptions.IgnoreCase | CompareOptions.IgnoreNonSpace
+                    ) >= 0
                 ).ToList();
             }
 
@@ -128,8 +141,10 @@ namespace PresentacionWeb
                 if (lblSinResultados != null)
                 {
                     lblSinResultados.Text = string.IsNullOrEmpty(busqueda)
-                        ? "No hay especialidades registradas por el momento."
-                        : "No se encontraron especialidades que coincidan con la búsqueda.";
+                    ? (mostrarActivas
+                        ? "No hay especialidades activas."
+                        : "No hay especialidades inactivas.")
+                    : "No se encontraron especialidades que coincidan con la búsqueda.";
                 }
             }
         }
@@ -139,6 +154,45 @@ namespace PresentacionWeb
         {
             cargarEspecialidades();
             upListado.Update();
+        }
+
+        // ============================================================
+        // FILTRO POR ESTADO DE ESPECIALIDADES
+        // ============================================================
+        protected void btnActivas_Click(object sender, EventArgs e)
+        {
+            // --- Seleccionar especialidades activas ---
+            hfEstado.Value = "1";
+
+            // --- Actualizar apariencia y listado ---
+            actualizarEstiloFiltro();
+            cargarEspecialidades();
+            upListado.Update();
+        }
+
+        protected void btnInactivas_Click(object sender, EventArgs e)
+        {
+            // --- Seleccionar especialidades inactivas ---
+            hfEstado.Value = "0";
+
+            // --- Actualizar apariencia y listado ---
+            actualizarEstiloFiltro();
+            cargarEspecialidades();
+            upListado.Update();
+        }
+
+        // --- Actualizar apariencia del filtro ---
+        private void actualizarEstiloFiltro()
+        {
+            bool mostrarActivas = hfEstado.Value == "1";
+
+            btnActivas.CssClass = mostrarActivas
+                ? "btn btn-filtro-activo"
+                : "btn btn-outline-secondary";
+
+            btnInactivas.CssClass = mostrarActivas
+                ? "btn btn-outline-secondary"
+                : "btn btn-filtro-activo";
         }
 
         // ============================================================
@@ -178,5 +232,177 @@ namespace PresentacionWeb
                 true
             );
         }
+
+        // ============================================================
+        // PREPARACIÓN DE BAJA DE ESPECIALIDADES
+        // ============================================================
+        protected void btnEliminar_Click(object sender, EventArgs e)
+        {
+            // --- Obtener especialidad seleccionada ---
+            LinkButton boton = (LinkButton)sender;
+            int id = int.Parse(boton.CommandArgument);
+
+            EspecialidadNegocio negocio = new EspecialidadNegocio();
+
+            Especialidad especialidad = negocio.listar()
+                .FirstOrDefault(esp => esp.Id == id);
+
+            if (especialidad == null || !especialidad.Estado)
+            {
+                return;
+            }
+
+            // --- Consultar turnos pendientes ---
+            int turnosPendientes = negocio.contarTurnosPendientes(id);
+
+            // --- Cargar datos en el modal ---
+            hfIdBaja.Value = especialidad.Id.ToString();
+            lblNombreBaja.Text = especialidad.Nombre;
+
+            lblTurnosPendientes.Text = turnosPendientes == 0
+                ? "Esta especialidad no tiene turnos pendientes."
+                : "Turnos pendientes: " + turnosPendientes;
+
+            upBajaEspecialidad.Update();
+
+            // --- Abrir modal de confirmación ---
+            ScriptManager.RegisterStartupScript(
+                Page,
+                Page.GetType(),
+                "abrirModalBaja",
+                "bootstrap.Modal.getOrCreateInstance(document.getElementById('modalBajaEspecialidad')).show();",
+                true
+            );
+        }
+
+        // ============================================================
+        // CONFIRMACIÓN DE BAJA DE ESPECIALIDADES
+        // ============================================================
+        protected void btnConfirmarBaja_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                // --- Obtener especialidad seleccionada ---
+                int id = int.Parse(hfIdBaja.Value);
+
+                // --- Ejecutar baja lógica ---
+                EspecialidadNegocio negocio = new EspecialidadNegocio();
+                negocio.darDeBaja(id);
+
+                // --- Actualizar listado ---
+                cargarEspecialidades();
+                upListado.Update();
+
+                // --- Limpiar selección ---
+                hfIdBaja.Value = "";
+
+                // --- Cerrar modal y mostrar confirmación ---
+                ScriptManager.RegisterStartupScript(
+                    Page,
+                    Page.GetType(),
+                    "bajaExitosa",
+                    "bootstrap.Modal.getOrCreateInstance(document.getElementById('modalBajaEspecialidad')).hide();" +
+                    "var mensaje = document.getElementById('mensajeExito');" +
+                    "mensaje.textContent = 'Especialidad dada de baja correctamente.';" +
+                    "mensaje.classList.remove('d-none');" +
+                    "setTimeout(function() { mensaje.classList.add('d-none'); }, 4000);",
+                    true
+                );
+            }
+            catch (ArgumentException ex)
+            {
+                // --- Mostrar error ---
+                lblTurnosPendientes.Text = ex.Message;
+                upBajaEspecialidad.Update();
+            }
+        }
+
+        // ============================================================
+        // PREPARACIÓN DE REACTIVACIÓN DE ESPECIALIDADES
+        // ============================================================
+        protected void btnReactivar_Click(object sender, EventArgs e)
+        {
+            // --- Obtener especialidad seleccionada ---
+            LinkButton boton = (LinkButton)sender;
+            int id = int.Parse(boton.CommandArgument);
+
+            EspecialidadNegocio negocio = new EspecialidadNegocio();
+
+            Especialidad especialidad = negocio.listar()
+                .FirstOrDefault(esp => esp.Id == id);
+
+            if (especialidad == null || especialidad.Estado)
+            {
+                return;
+            }
+
+            // --- Cargar datos en el modal ---
+            hfIdReactivar.Value = especialidad.Id.ToString();
+            lblNombreReactivar.Text = especialidad.Nombre;
+
+            upReactivarEspecialidad.Update();
+
+            // --- Abrir modal de confirmación ---
+            ScriptManager.RegisterStartupScript(
+                Page,
+                Page.GetType(),
+                "abrirModalReactivar",
+                "bootstrap.Modal.getOrCreateInstance(document.getElementById('modalReactivarEspecialidad')).show();",
+                true
+            );
+        }
+
+        // ============================================================
+        // CONFIRMACIÓN DE REACTIVACIÓN DE ESPECIALIDADES
+        // ============================================================
+        protected void btnConfirmarReactivar_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                // --- Obtener especialidad seleccionada ---
+                int id;
+
+                if (!int.TryParse(hfIdReactivar.Value, out id) || id <= 0)
+                {
+                    throw new ArgumentException("La especialidad seleccionada no es válida.");
+                }
+
+                // --- Ejecutar reactivación ---
+                EspecialidadNegocio negocio = new EspecialidadNegocio();
+                negocio.reactivar(id);
+
+                // --- Actualizar listado ---
+                cargarEspecialidades();
+                upListado.Update();
+
+                // --- Limpiar selección ---
+                hfIdReactivar.Value = "";
+
+                // --- Cerrar modal y mostrar confirmación ---
+                ScriptManager.RegisterStartupScript(
+                    Page,
+                    Page.GetType(),
+                    "reactivacionExitosa",
+                    "bootstrap.Modal.getOrCreateInstance(document.getElementById('modalReactivarEspecialidad')).hide();" +
+                    "var mensaje = document.getElementById('mensajeExito');" +
+                    "mensaje.textContent = 'Especialidad reactivada correctamente.';" +
+                    "mensaje.classList.remove('d-none');" +
+                    "setTimeout(function() { mensaje.classList.add('d-none'); }, 4000);",
+                    true
+                );
+            }
+            catch (ArgumentException ex)
+            {
+                // --- Mostrar error ---
+                ScriptManager.RegisterStartupScript(
+                    Page,
+                    Page.GetType(),
+                    "errorReactivacion",
+                    "alert('" + HttpUtility.JavaScriptStringEncode(ex.Message) + "');",
+                    true
+                );
+            }
+        }
+
     }
 }
