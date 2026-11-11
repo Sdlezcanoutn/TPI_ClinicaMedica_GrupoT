@@ -16,7 +16,7 @@
                         <p class="text-muted small m-0 mt-1">Listado y administración de especialidades médicas</p>
                     </div>
                     <div class="mt-3 mt-md-0">
-                        <asp:Button ID="btnAgregar" runat="server" Text="+ Nueva Especialidad" CssClass="btn btn-clinica-primary px-4 py-2 rounded-3 shadow-sm" OnClientClick="bootstrap.Modal.getOrCreateInstance(document.getElementById('modalEspecialidad')).show(); return false;" />
+                        <asp:Button ID="btnAgregar" runat="server" Text="+ Nueva Especialidad" CssClass="btn btn-clinica-primary px-4 py-2 rounded-3 shadow-sm" OnClientClick="prepararNuevaEspecialidad(); return false;" />
                     </div>
                 </div>
 
@@ -53,9 +53,8 @@
                                     <asp:BoundField DataField="Descripcion" HeaderText="Descripción" />
                                     <asp:TemplateField HeaderText="Acciones" ItemStyle-CssClass="text-end" HeaderStyle-CssClass="text-end">
                                         <ItemTemplate>
-                                            <asp:LinkButton ID="btnEditar" runat="server" CssClass="btn btn-sm btn-outline-secondary me-1">
-                                        <i class="fa-solid fa-pen-to-square me-1"></i> Editar
-                                            </asp:LinkButton>
+                                            <asp:LinkButton ID="btnEditar" runat="server" CssClass="btn btn-sm btn-outline-secondary me-1"
+                                                CommandArgument='<%# Eval("Id") %>' OnClick="btnEditar_Click"> <i class="fa-solid fa-pen-to-square me-1"></i> Editar </asp:LinkButton>
                                             <asp:LinkButton ID="btnEliminar" runat="server" CssClass="btn btn-sm btn-outline-danger">
                                         <i class="fa-solid fa-trash me-1"></i> Eliminar
                                             </asp:LinkButton>
@@ -87,8 +86,7 @@
                         <div class="modal-content">
 
                             <div class="modal-header">
-                                <h5 class="modal-title" id="tituloModalEspecialidad">Nueva Especialidad
-                                </h5>
+                                <h5 class="modal-title" id="tituloModalEspecialidad">Nueva Especialidad</h5>
                                 <button type="button" class="btn-close"
                                     data-bs-dismiss="modal" aria-label="Cerrar">
                                 </button>
@@ -96,6 +94,8 @@
 
                             <asp:UpdatePanel ID="upEspecialidad" runat="server" UpdateMode="Conditional">
                                 <ContentTemplate>
+
+                                    <asp:HiddenField ID="hfIdEspecialidad" runat="server" />
 
                                     <div class="modal-body">
                                         <div class="mb-3">
@@ -166,6 +166,29 @@
 
     const modalEspecialidad = document.getElementById('modalEspecialidad');
 
+    // --- Preparar formulario para nueva especialidad ---
+    function prepararNuevaEspecialidad() {
+        document.getElementById('<%= hfIdEspecialidad.ClientID %>').value = '';
+        document.getElementById('<%= txtNombre.ClientID %>').value = '';
+        document.getElementById('<%= txtDescripcion.ClientID %>').value = '';
+
+        document.getElementById('tituloModalEspecialidad').textContent = 'Nueva Especialidad';
+        document.getElementById('<%= btnGuardar.ClientID %>').value = 'Guardar';
+
+        ocultarError();
+
+        bootstrap.Modal.getOrCreateInstance(modalEspecialidad).show();
+    }
+
+    // --- Preparar formulario para editar especialidad ---
+    function prepararEdicionEspecialidad() {
+        document.getElementById('tituloModalEspecialidad').textContent = 'Editar Especialidad';
+
+        document.getElementById('<%= btnGuardar.ClientID %>').value = 'Guardar cambios';
+
+        bootstrap.Modal.getOrCreateInstance(modalEspecialidad).show();
+    }
+
     // --- Ocultar mensajes de error ---
     function ocultarError() {
         var mensaje = document.getElementById('<%= lblMensaje.ClientID %>');
@@ -193,13 +216,14 @@
     });
  
     // --- Cerrar modal y mostrar confirmación ---
-    function mostrarExito() {
+    function mostrarExito(texto) {
         var elementoModal = document.getElementById('modalEspecialidad');
         var modal = bootstrap.Modal.getOrCreateInstance(elementoModal);
 
         modal.hide();
 
         var mensaje = document.getElementById('mensajeExito');
+        mensaje.textContent = texto;
         mensaje.classList.remove('d-none');
 
         setTimeout(function () {

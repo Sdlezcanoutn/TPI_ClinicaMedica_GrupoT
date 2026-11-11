@@ -11,6 +11,9 @@ namespace Negocio
 {
     public class EspecialidadNegocio
     {
+        // ============================================================
+        // LISTADO DE ESPECIALIDADES
+        // ============================================================
         public List<Especialidad> listar()
         {
             List<Especialidad> lista = new List<Especialidad>();
@@ -18,12 +21,14 @@ namespace Negocio
 
             try
             {
+                // --- Consultar especialidades ---
                 datos.setearConsulta(
                     "SELECT Id_Especialidad, Nombre, Descripcion, Estado FROM ESPECIALIDADES"
                 );
 
                 datos.ejecutarLectura();
 
+                // --- Cargar listado ---
                 while (datos.Lector.Read())
                 {
                     Especialidad aux = new Especialidad();
@@ -48,8 +53,12 @@ namespace Negocio
             }
         }
 
+        // ============================================================
+        // ALTA DE ESPECIALIDADES
+        // ============================================================
         public void agregar(Especialidad nuevo)
         {
+            // --- Validar datos ---
             if (nuevo == null || string.IsNullOrWhiteSpace(nuevo.Nombre))
             {
                 throw new ArgumentException("El nombre de la especialidad es obligatorio.");
@@ -57,6 +66,7 @@ namespace Negocio
 
             nuevo.Nombre = nuevo.Nombre.Trim();
 
+            // --- Validar nombres duplicados ---
             Especialidad existente = listar().FirstOrDefault(e =>
              System.Globalization.CultureInfo.GetCultureInfo("es-AR")
                  .CompareInfo.Compare(
@@ -78,6 +88,7 @@ namespace Negocio
                 }
             }
 
+            // --- Registrar especialidad ---
             AccesoDatos datos = new AccesoDatos();
 
             try
@@ -89,6 +100,72 @@ namespace Negocio
                 datos.setearParametro("@Nombre", nuevo.Nombre);
                 datos.setearParametro("@Descripcion", nuevo.Descripcion);
                 datos.setearParametro("@Estado", nuevo.Estado);
+
+                datos.ejecutarAccion();
+            }
+            finally
+            {
+                datos.cerrarConexion();
+            }
+        }
+
+        // ============================================================
+        // MODIFICACIÓN DE ESPECIALIDADES
+        // ============================================================
+        public void modificar(Especialidad especialidad)
+        {
+            // --- Validar datos ---
+            if (especialidad == null || string.IsNullOrWhiteSpace(especialidad.Nombre))
+            {
+                throw new ArgumentException("El nombre de la especialidad es obligatorio.");
+            }
+
+            especialidad.Nombre = especialidad.Nombre.Trim();
+
+            // --- Verificar que la especialidad exista ---
+            List<Especialidad> lista = listar();
+
+            Especialidad actual = lista.FirstOrDefault(e =>
+                e.Id == especialidad.Id);
+
+            if (actual == null)
+            {
+                throw new ArgumentException("La especialidad que intenta modificar no existe.");
+            }
+
+            // --- Validar nombres duplicados ---
+            Especialidad existente = lista.FirstOrDefault(e =>
+                e.Id != especialidad.Id &&
+                System.Globalization.CultureInfo.GetCultureInfo("es-AR")
+                    .CompareInfo.Compare(
+                        e.Nombre.Trim(),
+                        especialidad.Nombre,
+                        System.Globalization.CompareOptions.IgnoreCase |
+                        System.Globalization.CompareOptions.IgnoreNonSpace
+                    ) == 0);
+
+            if (existente != null)
+            {
+                throw new ArgumentException(
+                    existente.Estado
+                        ? "Ya existe una especialidad con ese nombre."
+                        : "Esta especialidad está dada de baja y debe reactivarse.");
+            }
+
+            // --- Actualizar especialidad ---
+            AccesoDatos datos = new AccesoDatos();
+
+            try
+            {
+                datos.setearConsulta(
+                    "UPDATE ESPECIALIDADES " +
+                    "SET Nombre = @Nombre, Descripcion = @Descripcion " +
+                    "WHERE Id_Especialidad = @Id"
+                );
+
+                datos.setearParametro("@Nombre", especialidad.Nombre);
+                datos.setearParametro("@Descripcion", especialidad.Descripcion ?? "");
+                datos.setearParametro("@Id", especialidad.Id);
 
                 datos.ejecutarAccion();
             }

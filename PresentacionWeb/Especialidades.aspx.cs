@@ -26,30 +26,46 @@ namespace PresentacionWeb
         }
 
         // ============================================================
-        // ALTA DE ESPECIALIDADES
+        // ALTA Y MODIFICACIÓN DE ESPECIALIDADES
         // ============================================================
         protected void btnGuardar_Click(object sender, EventArgs e)
         {
             try
             {
                 // --- Obtener datos del formulario ---
-                Especialidad nueva = new Especialidad();
+                Especialidad especialidad = new Especialidad();
 
-                nueva.Nombre = txtNombre.Text.Trim();
-                nueva.Descripcion = txtDescripcion.Text.Trim();
-                nueva.Estado = true;
+                especialidad.Nombre = txtNombre.Text.Trim();
+                especialidad.Descripcion = txtDescripcion.Text.Trim();
 
-                // --- Validar y registrar especialidad ---
                 EspecialidadNegocio negocio = new EspecialidadNegocio();
-                negocio.agregar(nueva);
+                bool esEdicion = !string.IsNullOrEmpty(hfIdEspecialidad.Value);
+
+                // --- Registrar o modificar especialidad ---
+                if (esEdicion)
+                {
+                    int id;
+
+                    if (!int.TryParse(hfIdEspecialidad.Value, out id) || id <= 0)
+                    {
+                        throw new ArgumentException("La especialidad seleccionada no es válida.");
+                    }
+
+                    especialidad.Id = id;
+                    negocio.modificar(especialidad);
+                }
+                else
+                {
+                    especialidad.Estado = true;
+                    negocio.agregar(especialidad);
+                }
 
                 // --- Actualizar listado ---
-                dgvEspecialidades.DataSource = negocio.listar();
-                dgvEspecialidades.DataBind();
-
+                cargarEspecialidades();
                 upListado.Update();
 
                 // --- Limpiar formulario ---
+                hfIdEspecialidad.Value = "";
                 txtNombre.Text = "";
                 txtDescripcion.Text = "";
                 lblMensaje.Text = "";
@@ -60,7 +76,9 @@ namespace PresentacionWeb
                     upEspecialidad,
                     upEspecialidad.GetType(),
                     "guardarExito",
-                    "mostrarExito();",
+                    esEdicion
+                        ? "mostrarExito('Especialidad modificada correctamente.');"
+                        : "mostrarExito('Especialidad registrada correctamente.');",
                     true
                 );
             }
@@ -69,6 +87,11 @@ namespace PresentacionWeb
                 // --- Mostrar errores de validación ---
                 lblMensaje.Text = ex.Message;
                 lblMensaje.Visible = true;
+
+                // --- Mantener el texto del botón según la operación ---
+                btnGuardar.Text = string.IsNullOrEmpty(hfIdEspecialidad.Value)
+                    ? "Guardar"
+                    : "Guardar cambios";
             }
         }
 
@@ -116,6 +139,44 @@ namespace PresentacionWeb
         {
             cargarEspecialidades();
             upListado.Update();
+        }
+
+        // ============================================================
+        // CARGA DE DATOS PARA EDICIÓN DE ESPECIALIDADES
+        // ============================================================
+        protected void btnEditar_Click(object sender, EventArgs e)
+        {
+            // --- Obtener especialidad seleccionada ---
+            LinkButton boton = (LinkButton)sender;
+            int id = int.Parse(boton.CommandArgument);
+
+            EspecialidadNegocio negocio = new EspecialidadNegocio();
+            Especialidad especialidad = negocio.listar()
+                .FirstOrDefault(esp => esp.Id == id);
+
+            if (especialidad == null)
+            {
+                return;
+            }
+
+            // --- Cargar datos en el formulario ---
+            hfIdEspecialidad.Value = especialidad.Id.ToString();
+            txtNombre.Text = especialidad.Nombre;
+            txtDescripcion.Text = especialidad.Descripcion;
+
+            lblMensaje.Text = "";
+            lblMensaje.Visible = false;
+
+            upEspecialidad.Update();
+
+            // --- Abrir modal en modo edición ---
+            ScriptManager.RegisterStartupScript(
+                Page,
+                Page.GetType(),
+                "abrirEdicion",
+                "prepararEdicionEspecialidad();",
+                true
+            );
         }
     }
 }
