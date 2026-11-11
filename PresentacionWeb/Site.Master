@@ -23,7 +23,7 @@
     <webopt:BundleReference runat="server" Path="~/Content/css" />
 
     <!-- CSS PERSONALIZADO -->
-    <link href="/Content/estilos.css?v=1.14" rel="stylesheet" type="text/css" />
+    <link href="/Content/estilos.css?v=1.15" rel="stylesheet" type="text/css" />
 
     <webopt:BundleReference runat="server" Path="~/Content/css" />
     <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon" />

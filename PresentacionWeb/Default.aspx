@@ -15,7 +15,7 @@
             <div class="carousel-inner">
 
                 <!-- Slide 1 -->
-                <div class="carousel-item active" data-bs-interval="3000">
+                <div class="carousel-item active" data-bs-interval="2500">
                     <img src="/Images/slide-1.jpg" class="d-block w-100 carousel-img" alt="Medicina de Vanguardia">
                     <div class="carousel-caption hero-caption-wide">
                         <span class="badge bg-primary mb-2 px-3 py-2">Excelencia Médica</span>
@@ -25,7 +25,7 @@
                 </div>
 
                 <!-- Slide 2 -->
-                <div class="carousel-item" data-bs-interval="3000">
+                <div class="carousel-item" data-bs-interval="2500">
                     <img src="/Images/slide-2.jpg" class="d-block w-100 carousel-img" alt="Tecnología y Diagnóstico">
                     <div class="carousel-caption hero-caption-wide">
                         <span class="badge bg-info text-dark mb-2 px-3 py-2">Infraestructura</span>
@@ -35,7 +35,7 @@
                 </div>
 
                 <!-- Slide 3 -->
-                <div class="carousel-item" data-bs-interval="3000">
+                <div class="carousel-item" data-bs-interval="2500">
                     <img src="/Images/slide-3.jpg" class="d-block w-100 carousel-img" alt="Atención Profesional">
                     <div class="carousel-caption hero-caption-wide">
                         <span class="badge bg-success mb-2 px-3 py-2">Equipo Profesional</span>
