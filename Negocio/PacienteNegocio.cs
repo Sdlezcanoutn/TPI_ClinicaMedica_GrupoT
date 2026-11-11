@@ -105,5 +105,24 @@ namespace Negocio
                 datos.cerrarConexion();
             }
         }
+
+        public void eliminarLogico(int id)
+        {
+            AccesoDatos datos = new AccesoDatos();
+            try
+            {
+                datos.setearConsulta("UPDATE PACIENTES SET Estado = 0 WHERE Id_Paciente = @id");
+                datos.setearParametro("@id", id);
+                datos.ejecutarAccion();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                datos.cerrarConexion();
+            }
+        }
     }
 }
