@@ -13,34 +13,64 @@ namespace PresentacionWeb
     {
         protected void Page_Load(object sender, EventArgs e)
         {
+            if (!IsPostBack)
+            {
+                // Validamos si nos pasan un ID por la URL
+                if (Request.QueryString["id"] != null)
+                {
+                    int id = int.Parse(Request.QueryString["id"]);
+                    PacienteNegocio negocio = new PacienteNegocio();
 
+                    // Buscamos al paciente 
+                    // Como alternativa rápida, filtramos de listar() o traemos el objeto:
+                    List<Paciente> lista = negocio.listar();
+                    Paciente seleccionado = lista.Find(x => x.Id == id);
+
+                    if (seleccionado != null)
+                    {
+                        txtNombre.Text = seleccionado.Nombre;
+                        txtApellido.Text = seleccionado.Apellido;
+                        txtDni.Text = seleccionado.DNI;
+                        txtFechaNacimiento.Text = seleccionado.Fecha_Nacimiento.ToString("yyyy-MM-dd");
+                        txtTelefono.Text = seleccionado.Telefono;
+                        txtEmail.Text = seleccionado.Email;
+                        txtDireccion.Text = seleccionado.Direccion;
+                    }
+                }
+            }
         }
 
         protected void btnGuardar_Click(object sender, EventArgs e)
         {
             try
             {
-                Paciente nuevo = new Paciente();
+                Paciente paciente = new Paciente();
                 PacienteNegocio negocio = new PacienteNegocio();
 
-                nuevo.Nombre = txtNombre.Text;
-                nuevo.Apellido = txtApellido.Text;
-                nuevo.DNI = txtDni.Text;
+                paciente.Nombre = txtNombre.Text;
+                paciente.Apellido = txtApellido.Text;
+                paciente.DNI = txtDni.Text;
 
-                // Conversión segura de la fecha
                 if (DateTime.TryParse(txtFechaNacimiento.Text, out DateTime fecha))
                 {
-                    nuevo.Fecha_Nacimiento = fecha;
+                    paciente.Fecha_Nacimiento = fecha;
                 }
 
-                nuevo.Telefono = txtTelefono.Text;
-                nuevo.Email = txtEmail.Text;
-                nuevo.Direccion = txtDireccion.Text;
+                paciente.Telefono = txtTelefono.Text;
+                paciente.Email = txtEmail.Text;
+                paciente.Direccion = txtDireccion.Text;
 
-                // Llamamos al método agregar que creamos en el negocio
-                negocio.agregar(nuevo);
+                // Verificamos si estamos editando o agregando
+                if (Request.QueryString["id"] != null)
+                {
+                    paciente.Id = int.Parse(Request.QueryString["id"]);
+                    negocio.modificar(paciente); 
+                }
+                else
+                {
+                    negocio.agregar(paciente);
+                }
 
-                // Redirigimos de vuelta a la lista de pacientes
                 Response.Redirect("Pacientes.aspx", false);
             }
             catch (Exception ex)

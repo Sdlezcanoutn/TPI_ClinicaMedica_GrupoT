@@ -44,10 +44,12 @@
                             <asp:BoundField DataField="Email" HeaderText="Email" />
                             <asp:TemplateField HeaderText="Acciones" ItemStyle-CssClass="text-end" HeaderStyle-CssClass="text-end">
                                 <ItemTemplate>
-                                    <asp:LinkButton ID="btnEditar" runat="server" CssClass="btn btn-sm btn-outline-secondary me-1">
+                                    <asp:LinkButton ID="btnEditar" runat="server" CssClass="btn btn-sm btn-outline-secondary me-1"
+                                        CommandName="Editar" CommandArgument='<%# Eval("Id") %>' OnClick="btnEditar_Click">
                                         <i class="fa-solid fa-pen-to-square me-1"></i>Editar
                                     </asp:LinkButton>
-                                    <asp:LinkButton ID="btnEliminar" runat="server" CssClass="btn btn-sm btn-outline-danger">
+                                    <asp:LinkButton ID="btnEliminar" runat="server" CssClass="btn btn-sm btn-outline-danger"
+                                        CommandName="Eliminar" CommandArgument='<%# Eval("Id") %>'>
                                         <i class="fa-solid fa-trash me-1"></i>Eliminar
                                     </asp:LinkButton>
                                 </ItemTemplate>
