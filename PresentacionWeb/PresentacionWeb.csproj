@@ -119,6 +119,7 @@
     <Content Include="Content\estilos.css" />
     <Content Include="Default.aspx" />
     <Content Include="favicon.ico" />
+    <Content Include="FormPaciente.aspx" />
     <Content Include="Global.asax" />
     <Content Include="Images\logo-gsh.png" />
     <Content Include="Scripts\bootstrap.bundle.js" />
@@ -209,6 +210,13 @@
     </Compile>
     <Compile Include="Default.aspx.designer.cs">
       <DependentUpon>Default.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="FormPaciente.aspx.cs">
+      <DependentUpon>FormPaciente.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="FormPaciente.aspx.designer.cs">
+      <DependentUpon>FormPaciente.aspx</DependentUpon>
     </Compile>
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
