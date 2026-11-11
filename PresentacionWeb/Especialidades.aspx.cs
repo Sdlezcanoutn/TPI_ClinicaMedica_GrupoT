@@ -108,7 +108,11 @@ namespace PresentacionWeb
             // --- Filtrar especialidades según el estado seleccionado ---
             bool mostrarActivas = hfEstado.Value == "1";
 
-            List<Especialidad> lista = negocio.listar()
+            // Obtiene todas las especialidades de la base de datos
+            List<Especialidad> todas = negocio.listar();
+
+            // Filtra según el botón seleccionado
+            List<Especialidad> lista = todas
                 .Where(e => e.Estado == mostrarActivas)
                 .ToList();
 
@@ -140,11 +144,24 @@ namespace PresentacionWeb
 
                 if (lblSinResultados != null)
                 {
-                    lblSinResultados.Text = string.IsNullOrEmpty(busqueda)
-                    ? (mostrarActivas
-                        ? "No hay especialidades activas."
-                        : "No hay especialidades inactivas.")
-                    : "No se encontraron especialidades que coincidan con la búsqueda.";
+                    if (todas.Count == 0)
+                    {
+                        lblSinResultados.Text =
+                            "No hay especialidades registradas en el sistema.";
+                    }
+                    else if (!string.IsNullOrEmpty(busqueda))
+                    {
+                        lblSinResultados.Text =
+                            "No se encontraron especialidades que coincidan con la búsqueda.";
+                    }
+                    else if (mostrarActivas)
+                    {
+                        lblSinResultados.Text = "No hay especialidades activas.";
+                    }
+                    else
+                    {
+                        lblSinResultados.Text = "No hay especialidades inactivas.";
+                    }
                 }
             }
         }
