@@ -16,7 +16,7 @@
                         <p class="text-muted small m-0 mt-1">Administración de historias clínicas y datos personales</p>
                     </div>
                     <div class="mt-3 mt-md-0">
-                        <asp:Button ID="btnAgregar" runat="server" Text="+ Nuevo Paciente" CssClass="btn btn-clinica-primary px-4 py-2 rounded-3 shadow-sm" />
+                        <asp:Button ID="btnAgregar" runat="server" Text="+ Nuevo Paciente" CssClass="btn btn-clinica-primary px-4 py-2 rounded-3 shadow-sm" OnClick="btnAgregar_Click" />
                     </div>
                 </div>
 
