@@ -65,7 +65,10 @@
                                 <EmptyDataTemplate>
                                     <div class="text-center py-5 text-muted">
                                         <i class="fa-solid fa-folder-open fs-2 mb-2 d-block text-secondary opacity-50"></i>
-                                        <p class="m-0 fw-medium">No hay especialidades registradas por el momento.</p>
+                                        <p class="m-0 fw-medium">
+                                            <asp:Label ID="lblSinResultados" runat="server"
+                                                Text="No hay especialidades registradas por el momento." />
+                                        </p>
                                     </div>
                                 </EmptyDataTemplate>
                             </asp:GridView>

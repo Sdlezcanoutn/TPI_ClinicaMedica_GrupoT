@@ -95,6 +95,20 @@ namespace PresentacionWeb
             // --- Mostrar resultados en la tabla ---
             dgvEspecialidades.DataSource = lista;
             dgvEspecialidades.DataBind();
+
+            // --- Mostrar mensaje según el resultado ---
+            if (lista.Count == 0)
+            {
+                Label lblSinResultados = dgvEspecialidades.Controls[0]
+                      .Controls[0].FindControl("lblSinResultados") as Label;
+
+                if (lblSinResultados != null)
+                {
+                    lblSinResultados.Text = string.IsNullOrEmpty(busqueda)
+                        ? "No hay especialidades registradas por el momento."
+                        : "No se encontraron especialidades que coincidan con la búsqueda.";
+                }
+            }
         }
 
         // --- Ejecutar búsqueda ---
