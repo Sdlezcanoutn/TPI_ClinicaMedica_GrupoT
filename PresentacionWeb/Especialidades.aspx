@@ -27,7 +27,9 @@
                             <span class="input-group-text bg-light border-end-0">
                                 <i class="fa-solid fa-magnifying-glass"></i>
                             </span>
-                            <asp:TextBox ID="txtBuscar" runat="server" CssClass="form-control bg-light border-start-0" Placeholder="Buscar por nombre..."></asp:TextBox>
+                            <asp:TextBox ID="txtBuscar" runat="server" CssClass="form-control bg-light border-start-0" Placeholder="Buscar por nombre..." AutoPostBack="false" oninput="programarBusqueda()" onkeydown="if (event.key === 'Enter') { event.preventDefault(); ejecutarBusqueda(); }"></asp:TextBox>
+                            <!-- Botón oculto para ejecutar la búsqueda -->
+                            <asp:LinkButton ID="btnBuscar" runat="server" OnClick="btnBuscar_Click" Style="display: none;"></asp:LinkButton>
                         </div>
                     </div>
                 </div>
@@ -69,6 +71,9 @@
                             </asp:GridView>
                         </div>
                     </ContentTemplate>
+                    <Triggers>
+                        <asp:AsyncPostBackTrigger ControlID="btnBuscar" EventName="Click" />
+                    </Triggers>
                 </asp:UpdatePanel>
 
                 <!-- Modal Nueva Especialidad -->
@@ -130,8 +135,35 @@
             </div>
         </div>
         <script>
+
+    // ============================================================
+    // BÚSQUEDA DE ESPECIALIDADES
+    // ============================================================
+
+    let temporizadorBusqueda;
+
+    // --- Esperar antes de buscar ---
+    function programarBusqueda() {
+        clearTimeout(temporizadorBusqueda);
+
+        temporizadorBusqueda = setTimeout(function () {
+            ejecutarBusqueda();
+        }, 300);
+    }
+
+    // --- Ejecutar búsqueda ---
+    function ejecutarBusqueda() {
+        clearTimeout(temporizadorBusqueda);
+        __doPostBack('<%= btnBuscar.UniqueID %>', '');
+    }
+
+    // ============================================================
+    // MODAL DE ESPECIALIDADES
+    // ============================================================
+
     const modalEspecialidad = document.getElementById('modalEspecialidad');
 
+    // --- Ocultar mensajes de error ---
     function ocultarError() {
         var mensaje = document.getElementById('<%= lblMensaje.ClientID %>');
 
@@ -141,19 +173,23 @@
         }
     }
 
+    // --- Limpiar campos al cerrar el modal ---
     modalEspecialidad.addEventListener('hidden.bs.modal', function () {
         document.getElementById('<%= txtNombre.ClientID %>').value = '';
         document.getElementById('<%= txtDescripcion.ClientID %>').value = '';
     });
 
-modalEspecialidad.addEventListener('show.bs.modal', ocultarError);
+    // --- Ocultar errores al abrir el modal ---
+    modalEspecialidad.addEventListener('show.bs.modal', ocultarError);
 
+    // --- Ocultar errores al modificar el nombre ---
     modalEspecialidad.addEventListener('input', function (event) {
         if (event.target.id === '<%= txtNombre.ClientID %>') {
             ocultarError();
         }
     });
-
+ 
+    // --- Cerrar modal y mostrar confirmación ---
     function mostrarExito() {
         var elementoModal = document.getElementById('modalEspecialidad');
         var modal = bootstrap.Modal.getOrCreateInstance(elementoModal);
