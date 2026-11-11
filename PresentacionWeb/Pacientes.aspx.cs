@@ -44,5 +44,27 @@ namespace PresentacionWeb
             string id = btn.CommandArgument;
             Response.Redirect("FormPaciente.aspx?id=" + id);
         }
+
+        protected void btnEliminar_Command(object sender, CommandEventArgs e)
+        {
+            try
+            {
+                if (e.CommandName == "Eliminar")
+                {
+                    int idPaciente = int.Parse(e.CommandArgument.ToString());
+                    PacienteNegocio negocio = new PacienteNegocio();
+
+                    // Llamamos al método de baja lógica
+                    negocio.eliminarLogico(idPaciente);
+
+                    // Recargamos la grilla para que desaparezca el paciente dado de baja
+                    CargarPacientes();
+                }
+            }
+            catch (Exception ex)
+            {
+                Session.Add("error", ex.ToString());
+            }
+        }
     }
 }

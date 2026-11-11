@@ -49,7 +49,8 @@
                                         <i class="fa-solid fa-pen-to-square me-1"></i>Editar
                                     </asp:LinkButton>
                                     <asp:LinkButton ID="btnEliminar" runat="server" CssClass="btn btn-sm btn-outline-danger"
-                                        CommandName="Eliminar" CommandArgument='<%# Eval("Id") %>'>
+                                        CommandName="Eliminar" CommandArgument='<%# Eval("Id") %>' OnCommand="btnEliminar_Command"
+                                        OnClientClick="return confirm('¿Estás seguro de que querés dar de baja a este paciente?');">
                                         <i class="fa-solid fa-trash me-1"></i>Eliminar
                                     </asp:LinkButton>
                                 </ItemTemplate>
