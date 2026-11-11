@@ -52,7 +52,6 @@ namespace Negocio
                 datos.cerrarConexion();
             }
         }
-
         public void agregar(Paciente nuevo)
         {
             AccesoDatos datos = new AccesoDatos();
@@ -105,7 +104,6 @@ namespace Negocio
                 datos.cerrarConexion();
             }
         }
-
         public void eliminarLogico(int id)
         {
             AccesoDatos datos = new AccesoDatos();

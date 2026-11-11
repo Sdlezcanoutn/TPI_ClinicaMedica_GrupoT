@@ -39,7 +39,6 @@ namespace PresentacionWeb
                 }
             }
         }
-
         protected void btnGuardar_Click(object sender, EventArgs e)
         {
             try
@@ -78,7 +77,6 @@ namespace PresentacionWeb
                 Session.Add("error", ex.ToString());
             }
         }
-
         protected void btnCancelar_Click(object sender, EventArgs e)
         {
             Response.Redirect("Pacientes.aspx", false);
