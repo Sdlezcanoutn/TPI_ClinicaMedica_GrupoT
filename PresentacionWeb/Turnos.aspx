@@ -1,13 +1,13 @@
 ﻿<%@ Page Title="Turnos" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Turnos.aspx.cs" Inherits="PresentacionWeb.Turnos" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
-    
+
     <!-- CONTENEDOR -->
     <div class="container-fluid px-4 px-lg-5 my-5">
         <div style="max-width: 1500px; margin: 0 auto;">
 
             <!-- TARJETA PANEL PRINCIPAL DASHBOARD -->
-            <div class="card border-0 shadow-sm rounded-4 bg-white p-4 p-md-5">
+            <div class="card border-0 dashboard-panel p-4 p-md-5">
 
                 <!-- Encabezado integrado dentro del panel -->
                 <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 pb-3 border-bottom">
@@ -34,7 +34,7 @@
 
                 <!-- Tabla de Turnos -->
                 <div class="table-responsive">
-                    <asp:GridView ID="dgvTurnos" runat="server" AutoGenerateColumns="False" 
+                    <asp:GridView ID="dgvTurnos" runat="server" AutoGenerateColumns="False"
                         CssClass="table table-custom align-middle mb-0" GridLines="None">
                         <Columns>
                             <asp:BoundField DataField="FechaHora" HeaderText="Fecha y Hora" ItemStyle-CssClass="fw-semibold text-secondary" HeaderStyle-Width="160px" />
@@ -49,10 +49,10 @@
                             <asp:TemplateField HeaderText="Acciones" ItemStyle-CssClass="text-end" HeaderStyle-CssClass="text-end">
                                 <ItemTemplate>
                                     <asp:LinkButton ID="btnEditar" runat="server" CssClass="btn btn-sm btn-outline-secondary me-1">
-                                        <i class="fa-solid fa-pen-to-square me-1"></i> Editar
+                                    <i class="fa-solid fa-pen-to-square me-1"></i> Editar
                                     </asp:LinkButton>
                                     <asp:LinkButton ID="btnCancelar" runat="server" CssClass="btn btn-sm btn-outline-danger">
-                                        <i class="fa-solid fa-calendar-xmark me-1"></i> Cancelar
+                                    <i class="fa-solid fa-calendar-xmark me-1"></i> Cancelar
                                     </asp:LinkButton>
                                 </ItemTemplate>
                             </asp:TemplateField>
