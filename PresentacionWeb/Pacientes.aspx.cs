@@ -32,9 +32,17 @@ namespace PresentacionWeb
                 Session.Add("error", ex.ToString());
             }
         }
+
         protected void btnAgregar_Click(object sender, EventArgs e)
         {
             Response.Redirect("FormPaciente.aspx");
+        }
+
+        protected void btnEditar_Click(object sender, EventArgs e)
+        {
+            LinkButton btn = (LinkButton)sender;
+            string id = btn.CommandArgument;
+            Response.Redirect("FormPaciente.aspx?id=" + id);
         }
     }
 }

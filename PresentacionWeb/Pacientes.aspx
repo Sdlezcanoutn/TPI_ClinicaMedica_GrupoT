@@ -34,21 +34,23 @@
 
                 <!-- Tabla de Pacientes -->
                 <div class="table-responsive">
-                    <asp:GridView ID="dgvPacientes" runat="server" AutoGenerateColumns="False" 
+                    <asp:GridView ID="dgvPacientes" runat="server" AutoGenerateColumns="False"
                         CssClass="table table-custom align-middle mb-0" GridLines="None">
                         <Columns>
-                            <asp:BoundField DataField="Dni" HeaderText="DNI" ItemStyle-CssClass="fw-semibold text-secondary" HeaderStyle-Width="110px" />
-                            <asp:BoundField DataField="NombreCompleto" HeaderText="Nombre y Apellido" />
+                            <asp:BoundField DataField="DNI" HeaderText="DNI" ItemStyle-CssClass="fw-semibold text-secondary" HeaderStyle-Width="110px" />
+                            <asp:BoundField DataField="Nombre" HeaderText="Nombre" />
+                            <asp:BoundField DataField="Apellido" HeaderText="Apellido" />
                             <asp:BoundField DataField="Telefono" HeaderText="Teléfono" />
                             <asp:BoundField DataField="Email" HeaderText="Email" />
-                            <asp:BoundField DataField="ObraSocial" HeaderText="Obra Social" />
                             <asp:TemplateField HeaderText="Acciones" ItemStyle-CssClass="text-end" HeaderStyle-CssClass="text-end">
                                 <ItemTemplate>
-                                    <asp:LinkButton ID="btnEditar" runat="server" CssClass="btn btn-sm btn-outline-secondary me-1">
-                                        <i class="fa-solid fa-pen-to-square me-1"></i> Editar
+                                    <asp:LinkButton ID="btnEditar" runat="server" CssClass="btn btn-sm btn-outline-secondary me-1"
+                                        CommandName="Editar" CommandArgument='<%# Eval("Id") %>' OnClick="btnEditar_Click">
+                                        <i class="fa-solid fa-pen-to-square me-1"></i>Editar
                                     </asp:LinkButton>
-                                    <asp:LinkButton ID="btnEliminar" runat="server" CssClass="btn btn-sm btn-outline-danger">
-                                        <i class="fa-solid fa-trash me-1"></i> Eliminar
+                                    <asp:LinkButton ID="btnEliminar" runat="server" CssClass="btn btn-sm btn-outline-danger"
+                                        CommandName="Eliminar" CommandArgument='<%# Eval("Id") %>'>
+                                        <i class="fa-solid fa-trash me-1"></i>Eliminar
                                     </asp:LinkButton>
                                 </ItemTemplate>
                             </asp:TemplateField>
