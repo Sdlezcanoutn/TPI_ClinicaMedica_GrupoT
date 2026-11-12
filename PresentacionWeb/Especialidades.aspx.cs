@@ -94,6 +94,19 @@ namespace PresentacionWeb
                     ? "Guardar"
                     : "Guardar cambios";
             }
+            catch (Exception)
+            {
+                // --- Mostrar error general ---
+                lblMensaje.Text =
+                    "Ocurrió un error al guardar la especialidad. Intente nuevamente.";
+
+                lblMensaje.Visible = true;
+
+                // --- Mantener el texto del botón según la operación ---
+                btnGuardar.Text = string.IsNullOrEmpty(hfIdEspecialidad.Value)
+                    ? "Guardar"
+                    : "Guardar cambios";
+            }
         }
 
         // ============================================================
@@ -332,6 +345,14 @@ namespace PresentacionWeb
                 lblTurnosPendientes.Text = ex.Message;
                 upBajaEspecialidad.Update();
             }
+            catch (Exception)
+            {
+                // --- Mostrar error general ---
+                lblTurnosPendientes.Text =
+                    "Ocurrió un error al dar de baja la especialidad. Intente nuevamente.";
+
+                upBajaEspecialidad.Update();
+            }
         }
 
         // ============================================================
@@ -416,6 +437,17 @@ namespace PresentacionWeb
                     Page.GetType(),
                     "errorReactivacion",
                     "alert('" + HttpUtility.JavaScriptStringEncode(ex.Message) + "');",
+                    true
+                );
+            }
+            catch (Exception)
+            {
+                // --- Mostrar error general ---
+                ScriptManager.RegisterStartupScript(
+                    Page,
+                    Page.GetType(),
+                    "errorGeneralReactivacion",
+                    "alert('Ocurrió un error al reactivar la especialidad. Intente nuevamente.');",
                     true
                 );
             }
