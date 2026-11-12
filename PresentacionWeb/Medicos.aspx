@@ -118,40 +118,53 @@
                     Visible="false">
                 </asp:Label>
 
-                <!-- Tabla de Médicos -->
-                <div class="table-responsive">
-                    <asp:GridView ID="dgvMedicos" runat="server" AutoGenerateColumns="False"
-                        CssClass="table table-custom align-middle mb-0" GridLines="None">
-                        <Columns>
-                            <asp:BoundField DataField="Matricula" HeaderText="Matrícula" ItemStyle-CssClass="fw-semibold text-secondary" HeaderStyle-Width="120px" />
-                            <asp:BoundField DataField="NombreCompleto" HeaderText="Médico" />
-                            <asp:BoundField DataField="Especialidad" HeaderText="Especialidad" />
-                            <asp:BoundField DataField="Email" HeaderText="Email" />
-                            <asp:TemplateField HeaderText="Estado">
-                                <ItemTemplate>
-                                    <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1 fw-medium">Activo</span>
-                                </ItemTemplate>
-                            </asp:TemplateField>
-                            <asp:TemplateField HeaderText="Acciones" ItemStyle-CssClass="text-end" HeaderStyle-CssClass="text-end">
-                                <ItemTemplate>
-                                    <asp:LinkButton ID="btnEditar" runat="server" CssClass="btn btn-sm btn-outline-secondary me-1">
-                                        <i class="fa-solid fa-pen-to-square me-1"></i> Editar
-                                    </asp:LinkButton>
-                                    <asp:LinkButton ID="btnEliminar" runat="server" CssClass="btn btn-sm btn-outline-danger">
-                                        <i class="fa-solid fa-user-xmark me-1"></i> Desactivar
-                                    </asp:LinkButton>
-                                </ItemTemplate>
-                            </asp:TemplateField>
-                        </Columns>
-                        <EmptyDataTemplate>
-                            <div class="text-center py-5 text-muted">
-                                <i class="fa-solid fa-user-doctor fs-2 mb-2 d-block text-secondary opacity-50"></i>
-                                <p class="m-0 fw-medium">No hay médicos registrados en el sistema.</p>
-                            </div>
-                        </EmptyDataTemplate>
-                    </asp:GridView>
-                </div>
+                <!-- ============================================================ -->
+                <!-- LISTADO DE MÉDICOS Y MENSAJES DE CONFIRMACIÓN -->
+                <!-- ============================================================ -->
+                <asp:UpdatePanel ID="upListado" runat="server" UpdateMode="Conditional">
+                    <ContentTemplate>
 
+                        <!-- Mensaje de registro exitoso -->
+                        <div id="mensajeExito"
+                            class="alert alert-success d-none mb-3"
+                            role="alert">
+                        </div>
+
+                        <!-- Tabla de Médicos -->
+                        <div class="table-responsive">
+                            <asp:GridView ID="dgvMedicos" runat="server" AutoGenerateColumns="False"
+                                CssClass="table table-custom align-middle mb-0" GridLines="None">
+                                <Columns>
+                                    <asp:BoundField DataField="Matricula" HeaderText="Matrícula" ItemStyle-CssClass="fw-semibold text-secondary" HeaderStyle-Width="120px" />
+                                    <asp:BoundField DataField="NombreCompleto" HeaderText="Médico" />
+                                    <asp:BoundField DataField="Especialidad" HeaderText="Especialidad" />
+                                    <asp:BoundField DataField="Email" HeaderText="Email" />
+                                    <asp:TemplateField HeaderText="Estado">
+                                        <ItemTemplate>
+                                            <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1 fw-medium">Activo</span>
+                                        </ItemTemplate>
+                                    </asp:TemplateField>
+                                    <asp:TemplateField HeaderText="Acciones" ItemStyle-CssClass="text-end" HeaderStyle-CssClass="text-end">
+                                        <ItemTemplate>
+                                            <asp:LinkButton ID="btnEditar" runat="server" CssClass="btn btn-sm btn-outline-secondary me-1">
+                                        <i class="fa-solid fa-pen-to-square me-1"></i> Editar
+                                            </asp:LinkButton>
+                                            <asp:LinkButton ID="btnEliminar" runat="server" CssClass="btn btn-sm btn-outline-danger">
+                                        <i class="fa-solid fa-user-xmark me-1"></i> Desactivar
+                                            </asp:LinkButton>
+                                        </ItemTemplate>
+                                    </asp:TemplateField>
+                                </Columns>
+                                <EmptyDataTemplate>
+                                    <div class="text-center py-5 text-muted">
+                                        <i class="fa-solid fa-user-doctor fs-2 mb-2 d-block text-secondary opacity-50"></i>
+                                        <p class="m-0 fw-medium">No hay médicos registrados en el sistema.</p>
+                                    </div>
+                                </EmptyDataTemplate>
+                            </asp:GridView>
+                        </div>
+                    </ContentTemplate>
+                </asp:UpdatePanel>
             </div>
 
         </div>
@@ -207,7 +220,7 @@
                                 <div class="col-md-6">
                                     <label class="form-label">DNI *</label>
                                     <asp:TextBox ID="txtDniMedico" runat="server"
-                                        CssClass="form-control" MaxLength="20" />
+                                        CssClass="form-control" MaxLength="8" />
                                 </div>
 
                                 <!-- Matrícula -->
@@ -406,6 +419,76 @@
             actualizarEspecialidadesSeleccionadas();
         }
     });
+
+    // ============================================================
+    // RESTAURAR ESPECIALIDADES DESPUÉS DE UN POSTBACK PARCIAL
+    // ============================================================
+
+    // --- Actualizar las etiquetas después de que ASP.NET
+    //     vuelva a cargar el contenido del UpdatePanel ---
+    Sys.WebForms.PageRequestManager.getInstance().add_endRequest(function () {
+        actualizarEspecialidadesSeleccionadas();
+    });
+
+    // ============================================================
+    // CONFIRMACIÓN DE REGISTRO DE MÉDICO
+    // ============================================================
+    function mostrarExitoMedico() {
+        // --- Cerrar el formulario ---
+        const modal = bootstrap.Modal.getOrCreateInstance(
+            document.getElementById("modalMedico")
+        );
+        modal.hide();
+
+        // --- Mostrar el mensaje de confirmación ---
+        const mensaje = document.getElementById("mensajeExito");
+        mensaje.textContent = "Médico registrado correctamente.";
+        mensaje.classList.remove("d-none");
+
+        // --- Ocultar el mensaje después de 4 segundos ---
+        setTimeout(function () {
+            mensaje.classList.add("d-none");
+        }, 4000);
+    }
+
+    // ============================================================
+    // LIMPIAR FORMULARIO AL CERRAR EL MODAL
+    // ============================================================
+    function limpiarFormularioMedico() {
+        // --- Limpiar los campos ---
+        document.getElementById('<%= txtNombreMedico.ClientID %>').value = '';
+        document.getElementById('<%= txtApellidoMedico.ClientID %>').value = '';
+        document.getElementById('<%= txtDniMedico.ClientID %>').value = '';
+        document.getElementById('<%= txtMatriculaMedico.ClientID %>').value = '';
+        document.getElementById('<%= txtTelefonoMedico.ClientID %>').value = '';
+        document.getElementById('<%= txtEmailMedico.ClientID %>').value = '';
+
+        // --- Desmarcar las especialidades ---
+        document.querySelectorAll(
+            '.lista-especialidades-medico input[type="checkbox"]'
+        ).forEach(function (checkbox) {
+            checkbox.checked = false;
+        });
+
+        // --- Limpiar el buscador de especialidades ---
+        document.getElementById('txtBuscarEspecialidadMedico').value = '';
+
+        // --- Ocultar el mensaje de error ---
+        const error = document.getElementById('<%= lblErrorMedico.ClientID %>');
+        if (error) {
+            error.style.display = 'none';
+        }
+
+        // --- Cerrar el desplegable de especialidades ---
+        document.getElementById('panelEspecialidades').style.display = 'none';
+
+        // --- Actualizar las especialidades seleccionadas ---
+        actualizarEspecialidadesSeleccionadas();
+        }
+
+        // --- Limpiar al cerrar con Cancelar o la X ---
+        document.getElementById('modalMedico')
+            .addEventListener('hidden.bs.modal', limpiarFormularioMedico);
 </script>
 
 

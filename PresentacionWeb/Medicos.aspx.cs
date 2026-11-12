@@ -178,8 +178,50 @@ namespace PresentacionWeb
             medico.Especialidades = especialidades;
 
             // ========================================================
-            // PENDIENTE: VALIDACIONES DE NEGOCIO Y REGISTRO DEL MÉDICO
+            // 4. REGISTRAR EL MÉDICO EN LA BASE DE DATOS
             // ========================================================
+
+            try
+            {
+                // --- Crear instancia de la capa de negocio ---
+                MedicoNegocio negocio = new MedicoNegocio();
+
+                // --- Registrar el médico junto con sus especialidades ---
+                negocio.agregar(medico);
+
+                // --- Actualizar el listado de médicos ---
+                cargarMedicos();
+                upListado.Update();
+
+                // --- Limpiar el formulario después de guardar ---
+                txtNombreMedico.Text = "";
+                txtApellidoMedico.Text = "";
+                txtDniMedico.Text = "";
+                txtMatriculaMedico.Text = "";
+                txtTelefonoMedico.Text = "";
+                txtEmailMedico.Text = "";
+                cblEspecialidades.ClearSelection();
+                lblErrorMedico.Visible = false;
+
+                // --- Cerrar el modal y mostrar confirmación ---
+                ScriptManager.RegisterStartupScript(
+                    upMedico,
+                    upMedico.GetType(),
+                    "guardarExito",
+                    "mostrarExitoMedico();",
+                    true
+                );
+            }
+            catch (ArgumentException ex)
+            {
+                // --- Mostrar errores de validación específicos ---
+                mostrarErrorMedico(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                // --- Mostrar el error real para identificar el problema ---
+                mostrarErrorMedico(ex.Message);
+            }
         }
 
         // ============================================================

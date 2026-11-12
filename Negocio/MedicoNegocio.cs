@@ -97,6 +97,41 @@ namespace Negocio
                     "El médico debe tener al menos una especialidad.");
             }
 
+            // ====================================================
+            // VALIDAR DNI Y MATRÍCULA DUPLICADOS
+            // ====================================================
+
+            // --- Obtener los médicos registrados, activos e inactivos ---
+            List<Medico> medicosRegistrados = listar();
+
+            // --- Verificar si ya existe el DNI ---
+            Medico medicoConDni = medicosRegistrados.Find(m =>
+                m.DNI.Trim() == medico.DNI.Trim());
+
+            if (medicoConDni != null)
+            {
+                throw new ArgumentException(
+                    medicoConDni.Estado
+                        ? "Ya existe un médico registrado con ese DNI."
+                        : "El médico con ese DNI está dado de baja y debe reactivarse.");
+            }
+
+            // --- Verificar si ya existe la matrícula ---
+            Medico medicoConMatricula = medicosRegistrados.Find(m =>
+                string.Equals(
+                    m.Matricula.Trim(),
+                    medico.Matricula.Trim(),
+                    StringComparison.OrdinalIgnoreCase));
+
+            if (medicoConMatricula != null)
+            {
+                throw new ArgumentException(
+                    medicoConMatricula.Estado
+                        ? "Ya existe un médico registrado con esa matrícula."
+                        : "El médico con esa matrícula está dado de baja y debe reactivarse.");
+            }
+
+            // --- Preparar el acceso a datos para registrar el médico ---
             AccesoDatos datos = new AccesoDatos();
             bool transaccionIniciada = false;
 
@@ -112,9 +147,9 @@ namespace Negocio
 
                 datos.setearConsulta(
                     "INSERT INTO MEDICOS " +
-                    "(Nombre, Apellido, DNI, Matricula, Telefono, Email, Estado) " +
+                    "(Nombre, Apellido, DNI, Matricula, Telefono, Email, Estado, Id_Usuario) " +
                     "VALUES " +
-                    "(@Nombre, @Apellido, @DNI, @Matricula, @Telefono, @Email, 1); " +
+                    "(@Nombre, @Apellido, @DNI, @Matricula, @Telefono, @Email, 1, NULL); " +
                     "SELECT CAST(SCOPE_IDENTITY() AS INT);"
                 );
 
