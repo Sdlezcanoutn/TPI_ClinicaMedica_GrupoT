@@ -51,9 +51,13 @@ CREATE TABLE MEDICOS (
     Telefono VARCHAR(30) NULL,
     Email NVARCHAR(254) NOT NULL,
     Estado BIT NOT NULL CONSTRAINT DF_Medicos_Estado DEFAULT(1),
-    CONSTRAINT FK_Medicos_Usuarios FOREIGN KEY (Id_Usuario) REFERENCES USUARIOS(Id_Usuario),
-    CONSTRAINT UQ_Medicos_IdUsuario UNIQUE (Id_Usuario)
+    CONSTRAINT FK_Medicos_Usuarios FOREIGN KEY (Id_Usuario) REFERENCES USUARIOS(Id_Usuario)
 );
+GO
+-- Permitir médicos sin usuario, evitando usuarios duplicados
+CREATE UNIQUE INDEX UX_Medicos_IdUsuario
+ON MEDICOS (Id_Usuario)
+WHERE Id_Usuario IS NOT NULL;
 GO
 CREATE TABLE EMPLEADOS (
     Id_Empleado INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
@@ -62,9 +66,13 @@ CREATE TABLE EMPLEADOS (
     Apellido NVARCHAR(100) NOT NULL,
     DNI VARCHAR(20) NOT NULL UNIQUE,
     Estado BIT NOT NULL CONSTRAINT DF_Empleados_Estado DEFAULT(1),
-    CONSTRAINT FK_Empleados_Usuarios FOREIGN KEY (Id_Usuario) REFERENCES USUARIOS(Id_Usuario),
-    CONSTRAINT UQ_Empleados_IdUsuario UNIQUE (Id_Usuario)
+    CONSTRAINT FK_Empleados_Usuarios FOREIGN KEY (Id_Usuario) REFERENCES USUARIOS(Id_Usuario)
 );
+GO
+-- Permitir empleados sin usuario, evitando usuarios duplicados
+CREATE UNIQUE INDEX UX_Empleados_IdUsuario
+ON EMPLEADOS (Id_Usuario)
+WHERE Id_Usuario IS NOT NULL;
 GO
 CREATE TABLE ESPECIALIDADES (
     Id_Especialidad INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
