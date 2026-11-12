@@ -52,7 +52,6 @@ namespace Negocio
                 datos.cerrarConexion();
             }
         }
-
         public void agregar(Paciente nuevo)
         {
             AccesoDatos datos = new AccesoDatos();
@@ -68,6 +67,50 @@ namespace Negocio
                 datos.setearParametro("@Email", nuevo.Email);
                 datos.setearParametro("@Direccion", string.IsNullOrEmpty(nuevo.Direccion) ? (object)DBNull.Value : nuevo.Direccion);
 
+                datos.ejecutarAccion();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                datos.cerrarConexion();
+            }
+        }
+        public void modificar(Paciente pac)
+        {
+            AccesoDatos datos = new AccesoDatos();
+            try
+            {
+                datos.setearConsulta("UPDATE PACIENTES SET Nombre = @nombre, Apellido = @apellido, DNI = @dni, Fecha_Nacimiento = @fecha, Telefono = @telefono, Email = @email, Direccion = @direccion WHERE Id_Paciente = @id");
+                datos.setearParametro("@nombre", pac.Nombre);
+                datos.setearParametro("@apellido", pac.Apellido);
+                datos.setearParametro("@dni", pac.DNI);
+                datos.setearParametro("@fecha", pac.Fecha_Nacimiento);
+                datos.setearParametro("@telefono", (object)pac.Telefono ?? DBNull.Value);
+                datos.setearParametro("@email", pac.Email);
+                datos.setearParametro("@direccion", (object)pac.Direccion ?? DBNull.Value);
+                datos.setearParametro("@id", pac.Id);
+
+                datos.ejecutarAccion();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                datos.cerrarConexion();
+            }
+        }
+        public void eliminarLogico(int id)
+        {
+            AccesoDatos datos = new AccesoDatos();
+            try
+            {
+                datos.setearConsulta("UPDATE PACIENTES SET Estado = 0 WHERE Id_Paciente = @id");
+                datos.setearParametro("@id", id);
                 datos.ejecutarAccion();
             }
             catch (Exception ex)
