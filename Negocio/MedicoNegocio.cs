@@ -336,7 +336,6 @@ namespace Negocio
                     }
                 }
 
-
                 // ====================================================
                 // 3. CONFIRMAR LOS CAMBIOS
                 // ====================================================
@@ -358,6 +357,118 @@ namespace Negocio
             }
         }
 
+
+        // ============================================================
+        // CONSULTAR TURNOS PENDIENTES DEL MÉDICO
+        // ============================================================
+        public int contarTurnosPendientes(int idMedico)
+        {
+            // --- Preparar el acceso a datos ---
+            AccesoDatos datos = new AccesoDatos();
+
+            try
+            {
+                // --- Contar los turnos futuros que siguen pendientes ---
+                datos.setearConsulta(
+                    "SELECT COUNT(*) AS CantidadTurnos FROM TURNOS T " +
+                    "INNER JOIN ESTADOS_TURNO ET " +
+                    "ON T.Id_Estado_Turno = ET.Id_Estado_Turno " +
+                    "WHERE T.Id_Medico = @IdMedico " +
+                    "AND ET.Nombre IN (N'Nuevo', N'Reprogramado') " +
+                    "AND (T.Fecha > CAST(GETDATE() AS DATE) " +
+                    "OR (T.Fecha = CAST(GETDATE() AS DATE) " +
+                    "AND T.Hora_Inicio >= CAST(GETDATE() AS TIME)))"
+                );
+
+                datos.setearParametro("@IdMedico", idMedico);
+
+                // --- Ejecutar la consulta ---
+                datos.ejecutarLectura();
+
+                // --- Obtener la cantidad de turnos pendientes ---
+                int cantidadTurnos = 0;
+
+                if (datos.Lector.Read())
+                {
+                    cantidadTurnos = Convert.ToInt32(
+                        datos.Lector["CantidadTurnos"]
+                    );
+                }
+                return cantidadTurnos;
+            }
+            finally
+            {
+                // --- Cerrar la conexión a la base de datos ---
+                datos.cerrarConexion();
+            }
+        }
+
+
+        // ============================================================
+        // BAJA LÓGICA DE MÉDICOS
+        // ============================================================
+        public void desactivar(int idMedico)
+        {
+            // --- Verificar que el médico exista y esté activo ---
+            Medico medico = listar().Find(m => m.Id == idMedico);
+
+            if (medico == null || !medico.Estado)
+            {
+                throw new ArgumentException(
+                    "El médico no existe o ya está inactivo.");
+            }
+
+            // --- Verificar si tiene turnos futuros pendientes ---
+            int turnosPendientes = contarTurnosPendientes(idMedico);
+
+            if (turnosPendientes > 0)
+            {
+                throw new ArgumentException(
+                    "No se puede desactivar el médico porque tiene " +
+                    turnosPendientes + " turno(s) pendiente(s).");
+            }
+
+            // --- Preparar el acceso a datos ---
+            AccesoDatos datos = new AccesoDatos();
+
+            try
+            {
+                // --- Cambiar el estado solo si no tiene turnos pendientes ---
+                datos.setearConsulta(
+                    "UPDATE MEDICOS SET Estado = 0 " +
+                    "WHERE Id_Medico = @IdMedico AND Estado = 1 " +
+                    "AND NOT EXISTS ( " +
+                    "SELECT 1 FROM TURNOS T " +
+                    "INNER JOIN ESTADOS_TURNO ET " +
+                    "ON T.Id_Estado_Turno = ET.Id_Estado_Turno " +
+                    "WHERE T.Id_Medico = @IdMedico " +
+                    "AND ET.Nombre IN (N'Nuevo', N'Reprogramado') " +
+                    "AND (T.Fecha > CAST(GETDATE() AS DATE) " +
+                    "OR (T.Fecha = CAST(GETDATE() AS DATE) " +
+                    "AND T.Hora_Inicio >= CAST(GETDATE() AS TIME)))" +
+                    ")"
+                );
+
+                datos.setearParametro("@IdMedico", idMedico);
+
+                // --- Ejecutar la baja lógica ---
+                datos.ejecutarAccion();
+            }
+            finally
+            {
+                // --- Cerrar la conexión a la base de datos ---
+                datos.cerrarConexion();
+            }
+            // --- Comprobar que el médico quedó inactivo ---
+            Medico medicoActualizado = listar().Find(m => m.Id == idMedico);
+
+            if (medicoActualizado == null || medicoActualizado.Estado)
+            {
+                throw new ArgumentException(
+                    "No se pudo completar la baja del médico. Intente nuevamente.");
+            }
+
+        }
     }
 }
 

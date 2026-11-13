@@ -154,9 +154,12 @@
                                                 OnClick="btnEditar_Click">
                                         <i class="fa-solid fa-pen-to-square me-1"></i> Editar
                                             </asp:LinkButton>
-                                            <asp:LinkButton ID="btnEliminar" runat="server" CssClass="btn btn-sm btn-outline-danger">
-                                        <i class="fa-solid fa-user-xmark me-1"></i> Desactivar
-                                            </asp:LinkButton>
+                                            <asp:LinkButton ID="btnEliminar" runat="server"
+                                                CssClass="btn btn-sm btn-outline-danger"
+                                                CommandArgument='<%# Eval("Id") %>'
+                                                OnClick="btnEliminar_Click">
+                                            <i class="fa-solid fa-user-xmark me-1"></i> Desactivar
+                                        </asp:LinkButton>
                                         </ItemTemplate>
                                     </asp:TemplateField>
                                 </Columns>
@@ -326,6 +329,94 @@
         </div>
     </div>
 
+
+    <!-- ============================================================ -->
+    <!-- MODAL DE BAJA LÓGICA DE MÉDICOS -->
+    <!-- ============================================================ -->
+    <div class="modal fade" id="modalBajaMedico" tabindex="-1"
+        aria-labelledby="tituloModalBajaMedico" aria-hidden="true">
+
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+
+                <asp:UpdatePanel ID="upBajaMedico" runat="server"
+                    UpdateMode="Conditional">
+                    <ContentTemplate>
+
+                        <asp:HiddenField ID="hfIdBaja" runat="server" />
+
+                        <!-- Encabezado del modal -->
+                        <div class="modal-header">
+                            <h5 class="modal-title fw-bold"
+                                id="tituloModalBajaMedico">Desactivar médico
+                            </h5>
+
+                            <button type="button" class="btn-close"
+                                data-bs-dismiss="modal" aria-label="Cerrar">
+                            </button>
+                        </div>
+
+                        <!-- Información de la baja -->
+                        <div class="modal-body">
+
+                            <p class="mb-2">
+                                Médico:
+                               
+                                <strong>
+                                    <asp:Label ID="lblNombreBaja"
+                                        runat="server" />
+                                </strong>
+                            </p>
+
+                            <asp:Panel ID="pnlBajaPermitida" runat="server">
+                                <p class="text-muted mb-0">
+                                    ¿Confirmás que querés desactivar
+                                    a este médico?
+                               
+                                </p>
+                            </asp:Panel>
+
+                            <asp:Panel ID="pnlBajaBloqueada" runat="server"
+                                Visible="false">
+
+                                <div class="alert alert-warning mb-0">
+                                    No se puede desactivar al médico porque
+                                    tiene
+                                   
+                                    <strong>
+                                        <asp:Label ID="lblTurnosPendientes"
+                                            runat="server" />
+                                    </strong>
+                                    turno(s) pendiente(s).
+                               
+                                </div>
+
+                            </asp:Panel>
+                        </div>
+
+                        <!-- Acciones -->
+                        <div class="modal-footer">
+                            <button type="button"
+                                class="btn btn-outline-secondary"
+                                data-bs-dismiss="modal">
+                                Cancelar
+                           
+                            </button>
+
+                            <asp:Button ID="btnConfirmarBaja"
+                                runat="server"
+                                Text="Confirmar baja"
+                                CssClass="btn btn-danger"
+                                OnClick="btnConfirmarBaja_Click" />
+                        </div>
+
+                    </ContentTemplate>
+                </asp:UpdatePanel>
+
+            </div>
+        </div>
+    </div>
+
     <script>
     // ============================================================
     // NORMALIZACIÓN DE TEXTO PARA BÚSQUEDAS
@@ -450,6 +541,24 @@
 
         // --- Mostrar el mensaje de confirmación ---
         const mensaje = document.getElementById("mensajeExito");
+        mensaje.textContent = texto;
+        mensaje.classList.remove("d-none");
+
+        // --- Ocultar el mensaje después de 4 segundos ---
+        setTimeout(function () {
+            mensaje.classList.add("d-none");
+        }, 4000);
+    }
+
+    // ============================================================
+    // CONFIRMACIÓN DE BAJA LÓGICA DEL MÉDICO
+    // ============================================================
+    function mostrarExitoListadoMedico(texto) {
+
+        // --- Obtener el contenedor del mensaje ---
+        const mensaje = document.getElementById("mensajeExito");
+
+        // --- Mostrar la confirmación ---
         mensaje.textContent = texto;
         mensaje.classList.remove("d-none");
 

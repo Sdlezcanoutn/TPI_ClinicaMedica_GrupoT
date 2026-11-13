@@ -355,5 +355,109 @@ namespace PresentacionWeb
             lblErrorMedico.Text = mensaje;
             lblErrorMedico.Visible = true;
         }
+
+
+        // ============================================================
+        // PREPARAR BAJA LÓGICA DEL MÉDICO
+        // ============================================================
+        protected void btnEliminar_Click(object sender, EventArgs e)
+        {
+            // --- Obtener el ID del médico seleccionado ---
+            LinkButton boton = (LinkButton)sender;
+            int idMedico = int.Parse(boton.CommandArgument);
+
+            try
+            {
+                // --- Buscar el médico registrado ---
+                MedicoNegocio negocio = new MedicoNegocio();
+                Medico medico = negocio.listar().Find(m => m.Id == idMedico);
+
+                if (medico == null || !medico.Estado)
+                {
+                    lblErrorListado.Text = "El médico no existe o está inactivo.";
+                    lblErrorListado.Visible = true;
+                    return;
+                }
+
+                // --- Guardar el ID y mostrar el nombre del médico ---
+                hfIdBaja.Value = idMedico.ToString();
+                lblNombreBaja.Text = medico.NombreCompleto;
+
+                // --- Consultar los turnos pendientes ---
+                int turnosPendientes = negocio.contarTurnosPendientes(idMedico);
+
+                // --- Permitir o bloquear la confirmación ---
+                pnlBajaPermitida.Visible = turnosPendientes == 0;
+                pnlBajaBloqueada.Visible = turnosPendientes > 0;
+                btnConfirmarBaja.Visible = turnosPendientes == 0;
+
+                lblTurnosPendientes.Text = turnosPendientes.ToString();
+
+                // --- Actualizar y abrir el modal ---
+                upBajaMedico.Update();
+
+                ScriptManager.RegisterStartupScript(
+                    Page,
+                    Page.GetType(),
+                    "abrirModalBaja",
+                    "bootstrap.Modal.getOrCreateInstance(document.getElementById('modalBajaMedico')).show();",
+                    true
+                );
+            }
+
+            catch (Exception)
+            {
+                // --- Mostrar un mensaje si ocurre un error ---
+                lblErrorListado.Text =
+                    "No se pudieron consultar los datos del médico. Intente nuevamente.";
+                lblErrorListado.Visible = true;
+            }
+        }
+
+        // ============================================================
+        // CONFIRMAR BAJA LÓGICA DEL MÉDICO
+        // ============================================================
+        protected void btnConfirmarBaja_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                // --- Obtener el médico seleccionado ---
+                int idMedico = int.Parse(hfIdBaja.Value);
+
+                // --- Ejecutar la baja lógica ---
+                MedicoNegocio negocio = new MedicoNegocio();
+                negocio.desactivar(idMedico);
+
+                // --- Actualizar el listado ---
+                cargarMedicos();
+                upListado.Update();
+
+                // --- Cerrar el modal y mostrar confirmación ---
+                ScriptManager.RegisterStartupScript(
+                    Page,
+                    Page.GetType(),
+                    "bajaMedicoExitosa",
+                    "bootstrap.Modal.getOrCreateInstance(" +
+                    "document.getElementById('modalBajaMedico')).hide();" +
+                    "mostrarExitoListadoMedico('Médico desactivado correctamente.');",
+                    true
+                );
+            }
+            catch (ArgumentException ex)
+            {
+                // --- Mostrar el motivo por el que no se pudo desactivar ---
+                lblErrorListado.Text = ex.Message;
+                lblErrorListado.Visible = true;
+            }
+            catch (Exception)
+            {
+                // --- Mostrar un mensaje general si ocurre un error ---
+                lblErrorListado.Text =
+                    "No se pudo desactivar el médico. Intente nuevamente.";
+                lblErrorListado.Visible = true;
+            }
+        }
+
     }
 }
+
