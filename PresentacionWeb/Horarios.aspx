@@ -21,15 +21,37 @@
                 </div>
     
                 <!-- Buscador -->
-                <div class="row g-3 mb-4">
+                <div class="row g-3 mb-4 align-items-end">
+
+                    <!-- Filtro por médico -->
                     <div class="col-md-6 col-lg-4">
+                        <asp:Label Text="Médico" runat="server"/>
                         <div class="input-group search-box">
                             <span class="input-group-text bg-light border-end-0">
                                 <i class="fa-solid fa-magnifying-glass"></i>
-                            </span>
-                            <asp:TextBox ID="txtBuscarMedico" runat="server" CssClass="form-control bg-light border-start-0" Placeholder="Buscar por médico..."></asp:TextBox>
-                            <asp:TextBox ID="txtBuscarDiaSemana" runat="server" CssClass="form-control bg-light border-start-0" Placeholder="Buscar por día..."></asp:TextBox>
+                            </span>    
+                            <asp:TextBox ID="txtBuscarMedico" runat="server" CssClass="form-control bg-light border-start-0" Placeholder="Nombre o apellido del médico..."></asp:TextBox>
                         </div>
+                    </div>
+
+                    <!-- Filtro por día -->
+                    <div class="col-md-6 col-lg-4">
+                        <asp:Label Text="Día de la semana" runat="server"/>
+                        <asp:DropDownList ID="ddlDiaSemana" runat="server" CssClass="form-select">
+                            <asp:ListItem Text="Todos los días" Value="" />
+                            <asp:ListItem Text="Lunes" Value="1" />
+                            <asp:ListItem Text="Martes" Value="2" />
+                            <asp:ListItem Text="Miércoles" Value="3" />
+                            <asp:ListItem Text="Jueves" Value="4" />
+                            <asp:ListItem Text="Viernes" Value="5" />
+                            <asp:ListItem Text="Sábado" Value="6" />
+                            <asp:ListItem Text="Domingo" Value="7" />
+                        </asp:DropDownList>
+                    </div>
+
+                    <!-- Botón Buscar -->
+                    <div class="col-md-12 col-lg-4">
+                        <asp:Button ID="btnBuscar" runat="server" Text="Buscar" CssClass="btn btn-primary w-100 py-2 rounded-3 shadow-sm" OnClick="btnBuscar_Click" />
                     </div>
                 </div>
     

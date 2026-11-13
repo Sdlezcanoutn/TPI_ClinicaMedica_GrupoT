@@ -13,5 +13,10 @@ namespace PresentacionWeb
         {
 
         }
+
+        protected void btnBuscar_Click(object sender, EventArgs e)
+        {
+            //Agregar la lógica
+        }
     }
 }
