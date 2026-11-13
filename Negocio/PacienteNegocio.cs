@@ -20,7 +20,7 @@ namespace Negocio
                 datos.setearConsulta(
                     "SELECT Id_Paciente, Nombre, Apellido, DNI, Fecha_Nacimiento, Telefono, Email, Direccion, Estado FROM PACIENTES WHERE Estado = 1"
                 );
-                
+
                 datos.ejecutarLectura();
 
                 while (datos.Lector.Read())
@@ -31,7 +31,7 @@ namespace Negocio
                     aux.Nombre = (string)datos.Lector["Nombre"];
                     aux.Apellido = (string)datos.Lector["Apellido"];
                     aux.DNI = (string)datos.Lector["DNI"];
-                    aux.Fecha_Nacimiento = (DateTime)datos.Lector["Fecha_Nacimiento"]; 
+                    aux.Fecha_Nacimiento = (DateTime)datos.Lector["Fecha_Nacimiento"];
 
                     aux.Telefono = datos.Lector["Telefono"] == DBNull.Value ? "" : (string)datos.Lector["Telefono"];
                     aux.Email = (string)datos.Lector["Email"];
@@ -52,7 +52,6 @@ namespace Negocio
                 datos.cerrarConexion();
             }
         }
-
         public void agregar(Paciente nuevo)
         {
             AccesoDatos datos = new AccesoDatos();
@@ -105,7 +104,6 @@ namespace Negocio
                 datos.cerrarConexion();
             }
         }
-
         public void eliminarLogico(int id)
         {
             AccesoDatos datos = new AccesoDatos();
@@ -114,6 +112,42 @@ namespace Negocio
                 datos.setearConsulta("UPDATE PACIENTES SET Estado = 0 WHERE Id_Paciente = @id");
                 datos.setearParametro("@id", id);
                 datos.ejecutarAccion();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                datos.cerrarConexion();
+            }
+        }
+
+        public bool existeDni(string dni, int? idActual = null)
+        {
+            AccesoDatos datos = new AccesoDatos();
+            try
+            {
+                string consulta = "SELECT COUNT(*) AS Cantidad FROM PACIENTES WHERE DNI = @DNI";
+                if (idActual.HasValue)
+                {
+                    consulta += " AND Id_Paciente != @Id";
+                }
+
+                datos.setearConsulta(consulta);
+                datos.setearParametro("@DNI", dni);
+                if (idActual.HasValue)
+                {
+                    datos.setearParametro("@Id", idActual.Value);
+                }
+
+                datos.ejecutarLectura();
+                if (datos.Lector.Read())
+                {
+                    int cantidad = Convert.ToInt32(datos.Lector["Cantidad"]);
+                    return cantidad > 0;
+                }
+                return false;
             }
             catch (Exception ex)
             {

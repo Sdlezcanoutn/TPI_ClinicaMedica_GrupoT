@@ -1,4 +1,5 @@
-﻿using Negocio;
+﻿using Dominio;
+using Negocio;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,7 +18,6 @@ namespace PresentacionWeb
                 CargarPacientes();
             }
         }
-
         private void CargarPacientes()
         {
             PacienteNegocio negocio = new PacienteNegocio();
@@ -32,7 +32,6 @@ namespace PresentacionWeb
                 Session.Add("error", ex.ToString());
             }
         }
-
         protected void btnAgregar_Click(object sender, EventArgs e)
         {
             Response.Redirect("FormPaciente.aspx");
@@ -44,7 +43,6 @@ namespace PresentacionWeb
             string id = btn.CommandArgument;
             Response.Redirect("FormPaciente.aspx?id=" + id);
         }
-
         protected void btnEliminar_Command(object sender, CommandEventArgs e)
         {
             try
@@ -60,6 +58,28 @@ namespace PresentacionWeb
                     // Recargamos la grilla para que desaparezca el paciente dado de baja
                     CargarPacientes();
                 }
+            }
+            catch (Exception ex)
+            {
+                Session.Add("error", ex.ToString());
+            }
+        }
+        protected void txtBuscar_TextChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                PacienteNegocio negocio = new PacienteNegocio();
+                List<Paciente> lista = negocio.listar();
+
+                // Filtramos la lista trayendo los que coincidan por DNI o por Apellido
+                string filtro = txtBuscar.Text.ToLower();
+                List<Paciente> listaFiltrada = lista.FindAll(x =>
+                    x.DNI.ToLower().Contains(filtro) ||
+                    x.Apellido.ToLower().Contains(filtro)
+                );
+
+                dgvPacientes.DataSource = listaFiltrada;
+                dgvPacientes.DataBind();
             }
             catch (Exception ex)
             {

@@ -27,7 +27,9 @@
                             <span class="input-group-text bg-light border-end-0">
                                 <i class="fa-solid fa-magnifying-glass"></i>
                             </span>
-                            <asp:TextBox ID="txtBuscar" runat="server" CssClass="form-control bg-light border-start-0" Placeholder="Buscar por DNI o Apellido..."></asp:TextBox>
+                            <asp:TextBox ID="txtBuscar" runat="server" CssClass="form-control bg-light border-start-0"
+                                Placeholder="Buscar por DNI o Apellido..." AutoPostBack="True" OnTextChanged="txtBuscar_TextChanged">
+                            </asp:TextBox>
                         </div>
                     </div>
                 </div>
