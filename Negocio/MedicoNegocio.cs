@@ -210,6 +210,154 @@ namespace Negocio
                 datos.cerrarConexion();
             }
         }
+
+        // ============================================================
+        // MODIFICACIÓN DE MÉDICOS Y SUS ESPECIALIDADES
+        // ============================================================
+        public void modificar(Medico medico)
+        {
+            // --- Validar que tenga al menos una especialidad ---
+            if (medico == null || medico.Especialidades == null ||
+                medico.Especialidades.Count == 0)
+            {
+                throw new ArgumentException(
+                    "El médico debe tener al menos una especialidad.");
+            }
+
+            // ====================================================
+            // VALIDAR DNI Y MATRÍCULA DUPLICADOS
+            // ====================================================
+
+            List<Medico> medicosRegistrados = listar();
+
+            // --- Buscar duplicados, excluyendo al médico que editamos ---
+            Medico medicoConDni = medicosRegistrados.Find(m =>
+                m.Id != medico.Id && m.DNI.Trim() == medico.DNI.Trim());
+
+            if (medicoConDni != null)
+            {
+                throw new ArgumentException(
+                    "Ya existe otro médico registrado con ese DNI.");
+            }
+
+            Medico medicoConMatricula = medicosRegistrados.Find(m =>
+                m.Id != medico.Id &&
+                string.Equals(m.Matricula.Trim(), medico.Matricula.Trim(),
+                    StringComparison.OrdinalIgnoreCase));
+
+            if (medicoConMatricula != null)
+            {
+                throw new ArgumentException(
+                    "Ya existe otro médico registrado con esa matrícula.");
+            }
+
+            // --- Preparar la conexión ---
+            AccesoDatos datos = new AccesoDatos();
+            bool transaccionIniciada = false;
+
+            try
+            {
+                datos.iniciarTransaccion();
+                transaccionIniciada = true;
+
+                // ====================================================
+                // 1. ACTUALIZAR LOS DATOS DEL MÉDICO
+                // ====================================================
+
+                datos.setearConsulta(
+                    "UPDATE MEDICOS SET " +
+                    "Nombre = @Nombre, Apellido = @Apellido, " +
+                    "DNI = @DNI, Matricula = @Matricula, " +
+                    "Telefono = @Telefono, Email = @Email " +
+                    "WHERE Id_Medico = @IdMedico AND Estado = 1"
+                );
+
+                datos.setearParametro("@Nombre", medico.Nombre);
+                datos.setearParametro("@Apellido", medico.Apellido);
+                datos.setearParametro("@DNI", medico.DNI);
+                datos.setearParametro("@Matricula", medico.Matricula);
+                datos.setearParametro("@Telefono",
+                    string.IsNullOrWhiteSpace(medico.Telefono)
+                        ? (object)DBNull.Value
+                        : medico.Telefono);
+                datos.setearParametro("@Email", medico.Email);
+                datos.setearParametro("@IdMedico", medico.Id);
+
+                datos.ejecutarAccionTransaccion();
+
+                // ====================================================
+                // 2. ACTUALIZAR LAS ESPECIALIDADES
+                // ====================================================
+
+
+                // --- Obtener las especialidades que tenía el médico ---
+                Medico medicoAnterior = medicosRegistrados.Find(m => m.Id == medico.Id);
+
+                if (medicoAnterior == null || !medicoAnterior.Estado)
+                    throw new ArgumentException("El médico no existe o está inactivo.");
+
+                // --- Quitar solamente las especialidades desmarcadas ---
+                foreach (Especialidad anterior in medicoAnterior.Especialidades)
+                {
+                    if (!medico.Especialidades.Exists(e => e.Id == anterior.Id))
+                    {
+                        datos.limpiarParametros();
+
+                        datos.setearConsulta(
+                            "IF EXISTS (SELECT 1 FROM TURNOS " +
+                            "WHERE Id_Medico = @IdMedico AND Id_Especialidad = @IdEspecialidad) " +
+                            "THROW 50001, 'No se puede quitar una especialidad con turnos registrados.', 1; " +
+                            "DELETE FROM MEDICOS_ESPECIALIDADES " +
+                            "WHERE Id_Medico = @IdMedico AND Id_Especialidad = @IdEspecialidad"
+                        );
+
+                        datos.setearParametro("@IdMedico", medico.Id);
+                        datos.setearParametro("@IdEspecialidad", anterior.Id);
+                        datos.ejecutarAccionTransaccion();
+                    }
+                }
+
+                // --- Agregar solamente las especialidades nuevas ---
+                foreach (Especialidad especialidad in medico.Especialidades)
+                {
+                    if (!medicoAnterior.Especialidades.Exists(e => e.Id == especialidad.Id))
+                    {
+                        datos.limpiarParametros();
+
+                        datos.setearConsulta(
+                            "INSERT INTO MEDICOS_ESPECIALIDADES " +
+                            "(Id_Medico, Id_Especialidad) " +
+                            "VALUES (@IdMedico, @IdEspecialidad)"
+                        );
+
+                        datos.setearParametro("@IdMedico", medico.Id);
+                        datos.setearParametro("@IdEspecialidad", especialidad.Id);
+                        datos.ejecutarAccionTransaccion();
+                    }
+                }
+
+
+                // ====================================================
+                // 3. CONFIRMAR LOS CAMBIOS
+                // ====================================================
+
+                datos.confirmarTransaccion();
+                transaccionIniciada = false;
+            }
+            catch
+            {
+                // --- Revertir todos los cambios si ocurre un error ---
+                if (transaccionIniciada)
+                    datos.cancelarTransaccion();
+
+                throw;
+            }
+            finally
+            {
+                datos.cerrarConexion();
+            }
+        }
+
     }
 }
 

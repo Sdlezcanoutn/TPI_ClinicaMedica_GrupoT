@@ -69,6 +69,15 @@ namespace PresentacionWeb
         protected global::System.Web.UI.UpdatePanel upMedico;
 
         /// <summary>
+        /// Control hfIdMedico.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.HiddenField hfIdMedico;
+
+        /// <summary>
         /// Control lblErrorMedico.
         /// </summary>
         /// <remarks>

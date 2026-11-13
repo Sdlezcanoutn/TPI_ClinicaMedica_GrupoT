@@ -60,6 +60,7 @@ namespace PresentacionWeb
                 dgvMedicos.Visible = false;
             }
         }
+
         // ============================================================
         // CARGA DE ESPECIALIDADES
         // ============================================================
@@ -93,8 +94,114 @@ namespace PresentacionWeb
                 cblEspecialidades.Items.Clear();
             }
         }
+
         // ============================================================
-        // ALTA DE MÉDICOS
+        // PREPARAR FORMULARIO PARA NUEVO MÉDICO
+        // ============================================================
+        protected void btnNuevoMedico_Click(object sender, EventArgs e)
+        {
+            // --- Limpiar el identificador del médico ---
+            hfIdMedico.Value = "";
+
+            // --- Limpiar los datos del formulario ---
+            txtNombreMedico.Text = "";
+            txtApellidoMedico.Text = "";
+            txtDniMedico.Text = "";
+            txtMatriculaMedico.Text = "";
+            txtTelefonoMedico.Text = "";
+            txtEmailMedico.Text = "";
+
+            // --- Restablecer las especialidades ---
+            cargarEspecialidades();
+            cblEspecialidades.ClearSelection();
+
+            // --- Preparar el formulario para el alta ---
+            lblErrorMedico.Visible = false;
+            btnGuardarMedico.Text = "Guardar Médico";
+
+            upMedico.Update();
+
+            // --- Abrir el formulario ---
+            ScriptManager.RegisterStartupScript(
+                Page,
+                Page.GetType(),
+                "abrirNuevoMedico",
+                "document.getElementById('tituloModalMedico').textContent = 'Nuevo Médico';" +
+                "bootstrap.Modal.getOrCreateInstance(document.getElementById('modalMedico')).show();",
+                true
+            );
+        }
+
+        // ============================================================
+        // CARGAR DATOS DEL MÉDICO PARA EDITAR
+        // ============================================================
+        protected void btnEditar_Click(object sender, EventArgs e)
+        {
+            // --- Obtener el ID del médico seleccionado ---
+            LinkButton boton = (LinkButton)sender;
+            int idMedico = int.Parse(boton.CommandArgument);
+
+            try
+            {
+                // --- Buscar el médico registrado ---
+                MedicoNegocio negocio = new MedicoNegocio();
+                Medico medico = negocio.listar().Find(m => m.Id == idMedico);
+
+                if (medico == null || !medico.Estado)
+                {
+                    lblErrorListado.Text = "El médico no existe o está inactivo.";
+                    lblErrorListado.Visible = true;
+                    return;
+                }
+
+                hfIdMedico.Value = medico.Id.ToString();
+
+                // --- Cargar sus datos en el formulario ---
+                txtNombreMedico.Text = medico.Nombre;
+                txtApellidoMedico.Text = medico.Apellido;
+                txtDniMedico.Text = medico.DNI;
+                txtMatriculaMedico.Text = medico.Matricula;
+                txtTelefonoMedico.Text = medico.Telefono;
+                txtEmailMedico.Text = medico.Email;
+
+                // --- Cargar las especialidades disponibles ---
+                cargarEspecialidades();
+
+                // --- Marcar las especialidades asignadas al médico ---
+                foreach (ListItem item in cblEspecialidades.Items)
+                {
+                    int idEspecialidad = int.Parse(item.Value);
+
+                    item.Selected = medico.Especialidades.Exists(
+                        especialidad => especialidad.Id == idEspecialidad);
+                }
+
+                // --- Preparar el formulario para edición ---
+                lblErrorMedico.Visible = false;
+                btnGuardarMedico.Text = "Guardar Cambios";
+
+                // --- Actualizar el contenido del formulario ---
+                upMedico.Update();
+
+                // --- Abrir el formulario de edición ---
+                ScriptManager.RegisterStartupScript(
+                    Page,
+                    Page.GetType(),
+                    "abrirEditarMedico",
+                    "prepararEdicionMedico();",
+                    true
+                );
+            }
+            catch (Exception)
+            {
+                lblErrorListado.Text =
+                    "No se pudieron cargar los datos del médico. Intente nuevamente.";
+                lblErrorListado.Visible = true;
+            }
+        }
+
+        // ============================================================
+        // ALTA Y MODIFICACIÓN DE MÉDICOS
         // ============================================================
         protected void btnGuardarMedico_Click(object sender, EventArgs e)
         {
@@ -178,7 +285,7 @@ namespace PresentacionWeb
             medico.Especialidades = especialidades;
 
             // ========================================================
-            // 4. REGISTRAR EL MÉDICO EN LA BASE DE DATOS
+            // 4. REGISTRAR O MODIFICAR EL MÉDICO EN LA BASE DE DATOS
             // ========================================================
 
             try
@@ -186,8 +293,22 @@ namespace PresentacionWeb
                 // --- Crear instancia de la capa de negocio ---
                 MedicoNegocio negocio = new MedicoNegocio();
 
-                // --- Registrar el médico junto con sus especialidades ---
-                negocio.agregar(medico);
+                bool esEdicion = !string.IsNullOrEmpty(hfIdMedico.Value);
+
+                if (esEdicion)
+                {
+                    // --- Modificar el médico seleccionado ---
+                    medico.Id = int.Parse(hfIdMedico.Value);
+                    negocio.modificar(medico);
+                }
+                else
+                {
+                    // --- Registrar un médico nuevo ---
+                    negocio.agregar(medico);
+                }
+
+                // --- Limpiar el identificador después de guardar ---
+                hfIdMedico.Value = "";
 
                 // --- Actualizar el listado de médicos ---
                 cargarMedicos();
@@ -208,7 +329,8 @@ namespace PresentacionWeb
                     upMedico,
                     upMedico.GetType(),
                     "guardarExito",
-                    "mostrarExitoMedico();",
+                    esEdicion ? "mostrarExitoMedico('Médico modificado correctamente.');"
+                              : "mostrarExitoMedico('Médico registrado correctamente.');",
                     true
                 );
             }
@@ -233,6 +355,5 @@ namespace PresentacionWeb
             lblErrorMedico.Text = mensaje;
             lblErrorMedico.Visible = true;
         }
-
     }
 }

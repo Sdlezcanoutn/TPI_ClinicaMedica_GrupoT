@@ -2,7 +2,6 @@
 
 <asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
 
-
     <style>
         /* ============================================================
            SELECTOR DE ESPECIALIDADES
@@ -93,9 +92,12 @@
                         <p class="text-muted small m-0 mt-1">Administración del cuerpo médico y especialidades asignadas</p>
                     </div>
                     <div class="mt-3 mt-md-0">
+
                         <!-- Botón para abrir el formulario de alta de médicos -->
-                        <asp:Button ID="btnAgregar" runat="server" Text="+ Nuevo Médico" CssClass="btn btn-clinica-primary px-4 py-2 rounded-3 shadow-sm"
-                            OnClientClick="bootstrap.Modal.getOrCreateInstance(document.getElementById('modalMedico')).show(); return false;" />
+                        <asp:Button ID="btnAgregar" runat="server"
+                            Text="+ Nuevo Médico"
+                            CssClass="btn btn-clinica-primary px-4 py-2 rounded-3 shadow-sm"
+                            OnClientClick="prepararNuevoMedico(); return false;" />
                     </div>
                 </div>
 
@@ -114,9 +116,8 @@
                 <asp:Label
                     ID="lblErrorListado"
                     runat="server"
-                    CssClass="alert alert-danger d-block mb-3"
-                    Visible="false">
-                </asp:Label>
+                    CssClass="text-danger small"
+                    Visible="false" />
 
                 <!-- ============================================================ -->
                 <!-- LISTADO DE MÉDICOS Y MENSAJES DE CONFIRMACIÓN -->
@@ -146,7 +147,11 @@
                                     </asp:TemplateField>
                                     <asp:TemplateField HeaderText="Acciones" ItemStyle-CssClass="text-end" HeaderStyle-CssClass="text-end">
                                         <ItemTemplate>
-                                            <asp:LinkButton ID="btnEditar" runat="server" CssClass="btn btn-sm btn-outline-secondary me-1">
+
+                                            <asp:LinkButton ID="btnEditar" runat="server"
+                                                CssClass="btn btn-sm btn-outline-secondary me-1"
+                                                CommandArgument='<%# Eval("Id") %>'
+                                                OnClick="btnEditar_Click">
                                         <i class="fa-solid fa-pen-to-square me-1"></i> Editar
                                             </asp:LinkButton>
                                             <asp:LinkButton ID="btnEliminar" runat="server" CssClass="btn btn-sm btn-outline-danger">
@@ -193,13 +198,17 @@
                 <asp:UpdatePanel ID="upMedico" runat="server" UpdateMode="Conditional">
                     <ContentTemplate>
 
-                        <asp:Label
-                            ID="lblErrorMedico"
-                            runat="server"
-                            CssClass="alert alert-danger d-block py-2 px-3 mb-2"
-                            Visible="false" />
+                        <asp:HiddenField ID="hfIdMedico" runat="server" />
 
                         <div class="modal-body">
+
+                            <!-- Mensaje de error del formulario -->
+                            <asp:Label
+                                ID="lblErrorMedico"
+                                runat="server"
+                                CssClass="text-danger small d-block mb-3"
+                                Visible="false" />
+
                             <div class="row g-2">
 
                                 <!-- Nombre -->
@@ -282,7 +291,6 @@
                                             CssClass="lista-especialidades-medico"
                                             RepeatLayout="Table"
                                             RepeatDirection="Vertical" />
-
                                     </div>
 
                                     <!-- Especialidades seleccionadas -->
@@ -433,7 +441,7 @@
     // ============================================================
     // CONFIRMACIÓN DE REGISTRO DE MÉDICO
     // ============================================================
-    function mostrarExitoMedico() {
+    function mostrarExitoMedico(texto) {
         // --- Cerrar el formulario ---
         const modal = bootstrap.Modal.getOrCreateInstance(
             document.getElementById("modalMedico")
@@ -442,13 +450,64 @@
 
         // --- Mostrar el mensaje de confirmación ---
         const mensaje = document.getElementById("mensajeExito");
-        mensaje.textContent = "Médico registrado correctamente.";
+        mensaje.textContent = texto;
         mensaje.classList.remove("d-none");
 
         // --- Ocultar el mensaje después de 4 segundos ---
         setTimeout(function () {
             mensaje.classList.add("d-none");
         }, 4000);
+    }
+
+    // ============================================================
+    // PREPARAR FORMULARIO PARA NUEVO MÉDICO
+    // ============================================================
+    function prepararNuevoMedico() {
+
+        // --- Limpiar el identificador del médico ---
+        document.getElementById('<%= hfIdMedico.ClientID %>').value = '';
+
+        // --- Limpiar los datos del formulario ---
+        limpiarFormularioMedico();
+
+        // --- Restablecer el título y el botón ---
+        document.getElementById('tituloModalMedico').textContent = 'Nuevo Médico';
+        document.getElementById('<%= btnGuardarMedico.ClientID %>').value = 'Guardar Médico';
+
+        // --- Abrir el formulario ---
+        bootstrap.Modal.getOrCreateInstance(
+            document.getElementById('modalMedico')
+        ).show();
+    }
+
+    // ============================================================
+    // PREPARAR FORMULARIO PARA EDITAR MÉDICO
+    // ============================================================
+    function prepararEdicionMedico() {
+
+        // --- Restablecer el título y el botón ---
+        document.getElementById('tituloModalMedico').textContent = 'Editar Médico';
+        document.getElementById('<%= btnGuardarMedico.ClientID %>').value = 'Guardar Cambios';
+
+        // --- Actualizar las especialidades seleccionadas ---
+        actualizarEspecialidadesSeleccionadas();
+
+        // --- Abrir el formulario ---
+        bootstrap.Modal.getOrCreateInstance(
+            document.getElementById('modalMedico')
+        ).show();
+    }
+
+    // ============================================================
+    // OCULTAR MENSAJES DE ERROR
+    // ============================================================
+    function ocultarError() {
+        var mensaje = document.getElementById('<%= lblErrorMedico.ClientID %>');
+
+        if (mensaje) {
+            mensaje.textContent = '';
+            mensaje.style.display = 'none';
+        }
     }
 
     // ============================================================
@@ -472,13 +531,7 @@
 
         // --- Limpiar el buscador de especialidades ---
         document.getElementById('txtBuscarEspecialidadMedico').value = '';
-
-        // --- Ocultar el mensaje de error ---
-        const error = document.getElementById('<%= lblErrorMedico.ClientID %>');
-        if (error) {
-            error.style.display = 'none';
-        }
-
+        
         // --- Cerrar el desplegable de especialidades ---
         document.getElementById('panelEspecialidades').style.display = 'none';
 
@@ -489,7 +542,14 @@
         // --- Limpiar al cerrar con Cancelar o la X ---
         document.getElementById('modalMedico')
             .addEventListener('hidden.bs.modal', limpiarFormularioMedico);
-</script>
 
+        // --- Ocultar errores al abrir el modal ---
+        document.getElementById('modalMedico')
+            .addEventListener('show.bs.modal', ocultarError);
+
+        // --- Ocultar errores al modificar los campos del formulario ---
+        document.getElementById('modalMedico')
+            .addEventListener('input', ocultarError);
+</script>
 
 </asp:Content>
