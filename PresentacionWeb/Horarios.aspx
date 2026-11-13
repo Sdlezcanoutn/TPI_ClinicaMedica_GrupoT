@@ -61,10 +61,15 @@
                         CssClass="table table-custom align-middle mb-0" GridLines="None">
                         <Columns>
                             <asp:BoundField DataField="Id" HeaderText="ID" ItemStyle-CssClass="fw-semibold text-secondary" HeaderStyle-Width="80px" />
-                            <asp:BoundField DataField="Medico" HeaderText="Medico" />
+                            <asp:TemplateField HeaderText="Médico">
+                                <ItemTemplate>
+                                    <%# Eval("Medico.Nombre") %>
+                                    <%# Eval("Medico.Apellido") %>
+                                </ItemTemplate>
+                            </asp:TemplateField>
                             <asp:BoundField DataField="Dia_Semana" HeaderText="Día" />
-                            <asp:BoundField DataField="Hora_Entrada" HeaderText="Hora de Entrada" />
-                            <asp:BoundField DataField="Hora_Salida" HeaderText="Hora de Salida" />
+                            <asp:BoundField DataField="Hora_Entrada" HeaderText="Hora de Entrada" DataFormatString="{0:HH:mm}" />
+                            <asp:BoundField DataField="Hora_Salida" HeaderText="Hora de Salida" DataFormatString="{0:HH:mm}"/>
                             <asp:BoundField DataField="Estado" HeaderText="Estado" />
                             <asp:TemplateField HeaderText="Acciones" ItemStyle-CssClass="text-end" HeaderStyle-CssClass="text-end">
                                 <ItemTemplate>
@@ -80,7 +85,7 @@
                         <EmptyDataTemplate>
                             <div class="text-center py-5 text-muted">
                                 <i class="fa-solid fa-folder-open fs-2 mb-2 d-block text-secondary opacity-50"></i>
-                                <p class="m-0 fw-medium">No hay especialidades registradas por el momento.</p>
+                                <p class="m-0 fw-medium">No hay horarios de trabajo registrados por el momento.</p>
                             </div>
                         </EmptyDataTemplate>
                     </asp:GridView>
