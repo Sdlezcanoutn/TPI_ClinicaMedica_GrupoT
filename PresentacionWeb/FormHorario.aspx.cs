@@ -16,6 +16,12 @@ namespace PresentacionWeb
             if (!IsPostBack)
             {
                 cargarMedicos();
+
+                int id;
+                if (int.TryParse(Request.QueryString["id"], out id))
+                {
+                    cargarHorario(id);
+                }
             }
         }
         private void cargarMedicos()
@@ -38,8 +44,29 @@ namespace PresentacionWeb
             ddlMedico.Items.Insert(0,
                 new ListItem("Seleccione un médico", ""));
         }
+        private void cargarHorario(int id)
+        {
+            HorarioTrabajoNegocio negocio = new HorarioTrabajoNegocio();
+
+            HorarioTrabajo horario = negocio.listar()
+                .FirstOrDefault(h => h.Id == id);
+
+            if (horario == null)
+            {
+                lblMensaje.Text = "No se encontró el horario.";
+                btnGuardar.Enabled = false;
+                return;
+            }
+
+            ddlMedico.SelectedValue = horario.Medico.Id.ToString();
+            ddlDiaSemana.SelectedValue = horario.Dia_Semana;
+
+            txtHoraEntrada.Text = horario.Hora_Entrada.ToString("HH:mm");
+            txtHoraSalida.Text = horario.Hora_Salida.ToString("HH:mm");
+        }
         protected void btnGuardar_Click(object sender, EventArgs e)
         {
+            //Validaciones
             if (ddlMedico.SelectedValue == "")
             {
                 lblMensaje.Text = "Seleccione un médico.";
@@ -78,12 +105,42 @@ namespace PresentacionWeb
 
             lblMensaje.Text = "";
 
-            // Siguiente paso: crear el objeto HorarioTrabajo
-            // y guardarlo mediante HorarioTrabajoNegocio.
+            //Lógica para guardar el registro
+            try
+            {
+                HorarioTrabajo horario = new HorarioTrabajo();
+
+                horario.Medico = new Medico();
+                horario.Medico.Id = int.Parse(ddlMedico.SelectedValue);
+
+                horario.Dia_Semana = ddlDiaSemana.SelectedValue;
+                horario.Hora_Entrada = entrada;
+                horario.Hora_Salida = salida;
+
+                HorarioTrabajoNegocio negocio = new HorarioTrabajoNegocio();
+                int id;
+
+                if (int.TryParse(Request.QueryString["id"], out id))
+                {
+                    horario.Id = id;
+                    negocio.modificar(horario);
+                }
+                else
+                {
+                    negocio.agregar(horario);
+                }
+
+                Response.Redirect("~/Horarios.aspx", false);
+                Context.ApplicationInstance.CompleteRequest();
+            }
+            catch (Exception ex)
+            {
+                lblMensaje.Text = "Error al guardar el horario: " + ex.Message;
+            }
         }
         protected void btnCancelar_Click(object sender, EventArgs e)
         {
-            Response.Redirect("Medicos.aspx", false);
+            Response.Redirect("~/Horarios.aspx", false);
         }
     }
 }

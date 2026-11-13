@@ -16,7 +16,7 @@
                         <p class="text-muted small m-0 mt-1">Listado y administración de horarios de atención médica</p>
                     </div>
                     <div class="mt-3 mt-md-0">
-                        <asp:Button ID="btnAgregar" runat="server" Text="+ Nuevo Horario" CssClass="btn btn-clinica-primary px-4 py-2 rounded-3 shadow-sm" />
+                        <asp:Button ID="btnAgregar" runat="server" Text="+ Nuevo Horario" CssClass="btn btn-clinica-primary px-4 py-2 rounded-3 shadow-sm" OnClick="btnAgregar_Click" />
                     </div>
                 </div>
     
@@ -57,7 +57,7 @@
     
                 <!-- Tabla -->
                 <div class="table-responsive">
-                    <asp:GridView ID="dgvHorarios" runat="server" AutoGenerateColumns="False" 
+                    <asp:GridView ID="dgvHorarios" runat="server" DataKeyNames="Id" AutoGenerateColumns="False" 
                         CssClass="table table-custom align-middle mb-0" GridLines="None">
                         <Columns>
                             <asp:BoundField DataField="Id" HeaderText="ID" ItemStyle-CssClass="fw-semibold text-secondary" HeaderStyle-Width="80px" />
@@ -73,10 +73,13 @@
                             <asp:BoundField DataField="Estado" HeaderText="Estado" />
                             <asp:TemplateField HeaderText="Acciones" ItemStyle-CssClass="text-end" HeaderStyle-CssClass="text-end">
                                 <ItemTemplate>
-                                    <asp:LinkButton ID="btnEditar" runat="server" CssClass="btn btn-sm btn-outline-secondary me-1">
+                                    <asp:LinkButton ID="btnEditar" runat="server" CommandArgument='<%# Eval("Id") %>' 
+                                        OnClick="btnEditar_Click" CssClass="btn btn-sm btn-outline-secondary me-1">
                                         <i class="fa-solid fa-pen-to-square me-1"></i> Editar
                                     </asp:LinkButton>
-                                    <asp:LinkButton ID="btnEliminar" runat="server" CssClass="btn btn-sm btn-outline-danger">
+                                    <asp:LinkButton ID="btnEliminar" runat="server" CommandArgument='<%# Eval("Id") %>'
+                                        OnClick="btnEditar_Click" CssClass="btn btn-sm btn-outline-danger"
+                                        OnClientClick="return confirm('¿Está seguro de que desea desactivar este horario?');">
                                         <i class="fa-solid fa-trash me-1"></i> Eliminar
                                     </asp:LinkButton>
                                 </ItemTemplate>

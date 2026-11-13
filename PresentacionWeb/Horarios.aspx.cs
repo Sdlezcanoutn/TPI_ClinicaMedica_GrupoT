@@ -38,5 +38,38 @@ namespace PresentacionWeb
         {
             //Agregar la lógica
         }
+
+        protected void btnAgregar_Click(object sender, EventArgs e)
+        {
+            Response.Redirect("~/FormHorario.aspx");
+        }
+
+        protected void btnEditar_Click(object sender, EventArgs e)
+        {
+            LinkButton boton = (LinkButton)sender;
+
+            int id = int.Parse(boton.CommandArgument);
+
+            Response.Redirect("~/FormHorario.aspx?id=" + id);
+        }
+
+        protected void btnEliminar_Click(object sender, EventArgs e)
+        {
+            LinkButton boton = (LinkButton)sender;
+
+            int id = int.Parse(boton.CommandArgument);
+
+            try
+            {
+                HorarioTrabajoNegocio negocio = new HorarioTrabajoNegocio();
+                negocio.eliminar(id);
+
+                cargar();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex.Message);
+            }
+        }
     }
 }
