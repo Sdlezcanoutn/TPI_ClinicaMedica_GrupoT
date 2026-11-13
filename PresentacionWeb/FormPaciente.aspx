@@ -3,12 +3,15 @@
 <asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
     <div class="container-fluid px-4 px-lg-5 my-5">
         <div style="max-width: 800px; margin: 0 auto;">
-            
+
             <div class="card border-0 shadow-sm rounded-4 bg-white p-4 p-md-5">
                 <div class="mb-4 pb-3 border-bottom">
                     <h2 class="fw-bold text-dark m-0">Nuevo Paciente</h2>
                     <p class="text-muted small m-0 mt-1">Complete los datos personales para registrar al paciente en el sistema</p>
                 </div>
+
+                <!-- Etiqueta para mostrar los errores de validación -->
+                <asp:Label ID="lblMensaje" runat="server" CssClass="text-danger fw-semibold mb-3 d-block"></asp:Label>
 
                 <!-- Formulario -->
                 <div class="row g-3">

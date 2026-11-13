@@ -43,27 +43,57 @@ namespace PresentacionWeb
         {
             try
             {
-                Paciente paciente = new Paciente();
+                // Limpiamos el mensaje de error al empezar a validar
+                lblMensaje.Text = "";
+
+                // Validaciones básicas de campos vacíos
+                if (string.IsNullOrWhiteSpace(txtNombre.Text) ||
+                    string.IsNullOrWhiteSpace(txtApellido.Text) ||
+                    string.IsNullOrWhiteSpace(txtDni.Text) ||
+                    string.IsNullOrWhiteSpace(txtFechaNacimiento.Text) ||
+                    string.IsNullOrWhiteSpace(txtEmail.Text))
+                {
+                    lblMensaje.Text = "Por favor, complete todos los campos obligatorios (Nombre, Apellido, DNI, Fecha de Nacimiento y Email).";
+                    return;
+                }
+
+                // Validación de formato de DNI (solo números)
+                if (!long.TryParse(txtDni.Text.Trim(), out _))
+                {
+                    lblMensaje.Text = "El DNI ingresado no es válido. Debe contener únicamente números.";
+                    return;
+                }
+
                 PacienteNegocio negocio = new PacienteNegocio();
 
-                paciente.Nombre = txtNombre.Text;
-                paciente.Apellido = txtApellido.Text;
-                paciente.DNI = txtDni.Text;
+                // Control de registros duplicados por DNI
+                int? idActual = Request.QueryString["id"] != null ? int.Parse(Request.QueryString["id"]) : (int?)null;
+
+                if (negocio.existeDni(txtDni.Text.Trim(), idActual))
+                {
+                    lblMensaje.Text = "Ya existe un paciente registrado con el número de DNI ingresado.";
+                    return;
+                }
+
+                // Carga de datos y guardado
+                Paciente paciente = new Paciente();
+                paciente.Nombre = txtNombre.Text.Trim();
+                paciente.Apellido = txtApellido.Text.Trim();
+                paciente.DNI = txtDni.Text.Trim();
 
                 if (DateTime.TryParse(txtFechaNacimiento.Text, out DateTime fecha))
                 {
                     paciente.Fecha_Nacimiento = fecha;
                 }
 
-                paciente.Telefono = txtTelefono.Text;
-                paciente.Email = txtEmail.Text;
-                paciente.Direccion = txtDireccion.Text;
+                paciente.Telefono = txtTelefono.Text.Trim();
+                paciente.Email = txtEmail.Text.Trim();
+                paciente.Direccion = txtDireccion.Text.Trim();
 
-                // Verificamos si estamos editando o agregando
-                if (Request.QueryString["id"] != null)
+                if (idActual.HasValue)
                 {
-                    paciente.Id = int.Parse(Request.QueryString["id"]);
-                    negocio.modificar(paciente); 
+                    paciente.Id = idActual.Value;
+                    negocio.modificar(paciente);
                 }
                 else
                 {
