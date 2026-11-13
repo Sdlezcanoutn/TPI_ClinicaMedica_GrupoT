@@ -151,6 +151,7 @@ namespace PresentacionWeb
                 {
                     lblErrorListado.Text = "El médico no existe o está inactivo.";
                     lblErrorListado.Visible = true;
+                    upListado.Update();
                     return;
                 }
 
@@ -197,6 +198,7 @@ namespace PresentacionWeb
                 lblErrorListado.Text =
                     "No se pudieron cargar los datos del médico. Intente nuevamente.";
                 lblErrorListado.Visible = true;
+                upListado.Update();
             }
         }
 
@@ -376,6 +378,7 @@ namespace PresentacionWeb
                 {
                     lblErrorListado.Text = "El médico no existe o está inactivo.";
                     lblErrorListado.Visible = true;
+                    upListado.Update();
                     return;
                 }
 

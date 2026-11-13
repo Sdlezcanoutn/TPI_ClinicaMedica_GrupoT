@@ -113,17 +113,17 @@
                     </div>
                 </div>
 
-                <asp:Label
-                    ID="lblErrorListado"
-                    runat="server"
-                    CssClass="text-danger small"
-                    Visible="false" />
-
                 <!-- ============================================================ -->
                 <!-- LISTADO DE MÉDICOS Y MENSAJES DE CONFIRMACIÓN -->
                 <!-- ============================================================ -->
                 <asp:UpdatePanel ID="upListado" runat="server" UpdateMode="Conditional">
                     <ContentTemplate>
+
+                        <asp:Label
+                            ID="lblErrorListado"
+                            runat="server"
+                            CssClass="text-danger small"
+                            Visible="false" />
 
                         <!-- Mensaje de registro exitoso -->
                         <div id="mensajeExito"
@@ -142,18 +142,23 @@
                                     <asp:BoundField DataField="Email" HeaderText="Email" />
                                     <asp:TemplateField HeaderText="Estado">
                                         <ItemTemplate>
-                                            <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1 fw-medium">Activo</span>
+
+                                            <span class='<%# Convert.ToBoolean(Eval("Estado")) ? "badge bg-success" : "badge bg-secondary" %>'>
+                                                <%# Convert.ToBoolean(Eval("Estado")) ? "Activo" : "Inactivo" %> </span>
+
                                         </ItemTemplate>
                                     </asp:TemplateField>
                                     <asp:TemplateField HeaderText="Acciones" ItemStyle-CssClass="text-end" HeaderStyle-CssClass="text-end">
                                         <ItemTemplate>
 
+
                                             <asp:LinkButton ID="btnEditar" runat="server"
                                                 CssClass="btn btn-sm btn-outline-secondary me-1"
                                                 CommandArgument='<%# Eval("Id") %>'
                                                 OnClick="btnEditar_Click">
-                                        <i class="fa-solid fa-pen-to-square me-1"></i> Editar
+                                                <i class="fa-solid fa-pen-to-square me-1"></i> Editar
                                             </asp:LinkButton>
+
                                             <asp:LinkButton ID="btnEliminar" runat="server"
                                                 CssClass="btn btn-sm btn-outline-danger"
                                                 CommandArgument='<%# Eval("Id") %>'
