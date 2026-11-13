@@ -119,6 +119,7 @@
     <Content Include="Content\estilos.css" />
     <Content Include="Default.aspx" />
     <Content Include="favicon.ico" />
+    <Content Include="FormHorario.aspx" />
     <Content Include="FormPaciente.aspx" />
     <Content Include="Global.asax" />
     <Content Include="Horarios.aspx" />
@@ -211,6 +212,13 @@
     </Compile>
     <Compile Include="Default.aspx.designer.cs">
       <DependentUpon>Default.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="FormHorario.aspx.cs">
+      <DependentUpon>FormHorario.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="FormHorario.aspx.designer.cs">
+      <DependentUpon>FormHorario.aspx</DependentUpon>
     </Compile>
     <Compile Include="FormPaciente.aspx.cs">
       <DependentUpon>FormPaciente.aspx</DependentUpon>
