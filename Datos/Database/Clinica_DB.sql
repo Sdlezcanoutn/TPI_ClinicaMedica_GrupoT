@@ -2,13 +2,17 @@
    Script unificado de creación de base de datos y tablas.
    Base de datos: CLINICA_DB
 */
-
+-- ============================================================
+-- DATOS DE BASE DE DATOS
+-- ============================================================
 IF DB_ID(N'CLINICA_DB') IS NULL
     CREATE DATABASE CLINICA_DB;
 GO
 USE CLINICA_DB;
 GO
-
+-- ============================================================
+-- CREACIÓN DE TABLAS
+-- ============================================================
 CREATE TABLE PERFILES (
     Id_Perfil INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
     Nombre NVARCHAR(50) NOT NULL UNIQUE
@@ -133,7 +137,9 @@ CREATE TABLE HISTORIAL_TURNOS (
     CONSTRAINT FK_Historial_Estados FOREIGN KEY (Id_Estado_Turno_Anterior) REFERENCES ESTADOS_TURNO(Id_Estado_Turno)
 );
 GO
-
+-- ============================================================
+-- DATOS DE PRUEBA
+-- ============================================================
 -- Datos de catálogo mínimos para probar la lectura desde la aplicación
 INSERT INTO PERFILES (Nombre) VALUES (N'Administrador'), (N'Recepcionista'), (N'Médico');
 INSERT INTO ESTADOS_TURNO (Nombre) VALUES
@@ -142,10 +148,52 @@ INSERT INTO ESPECIALIDADES (Nombre, Descripcion) VALUES
   (N'Clínica médica', N'Atención clínica general'),
   (N'Cardiología', N'Atención cardiovascular'),
   (N'Dermatología', N'Atención dermatológica');
+-- Médico de prueba sin usuario asociado
+IF NOT EXISTS (
+    SELECT 1 FROM MEDICOS WHERE Matricula = 'TEST-001'
+)
+BEGIN
+    INSERT INTO MEDICOS
+        (Id_Usuario, Nombre, Apellido, DNI, Matricula, Telefono, Email)
+    VALUES
+        (NULL, 'Juan', 'Perez', '99999991', 'TEST-001',
+         '1112345678', 'medico.prueba@example.com');
+END;
+GO
+
+-- Horario de prueba: lunes de 09:00 a 13:00
+DECLARE @IdMedico INT;
+
+SELECT @IdMedico = Id_Medico
+FROM MEDICOS
+WHERE Matricula = 'TEST-001';
+
+IF @IdMedico IS NOT NULL
+   AND NOT EXISTS (
+       SELECT 1
+       FROM HORARIOS_TRABAJO
+       WHERE Id_Medico = @IdMedico
+         AND Dia_Semana = 1
+         AND Hora_Entrada = '09:00:00'
+         AND Hora_Salida = '13:00:00'
+   )
+BEGIN
+    INSERT INTO HORARIOS_TRABAJO
+        (Id_Medico, Dia_Semana, Hora_Entrada, Hora_Salida)
+    VALUES
+        (@IdMedico, 1, '09:00:00', '13:00:00');
+END;
 GO
 -- Consulta sugerida para el checkpoint:
 SELECT Id_Especialidad, Nombre, Descripcion, Estado FROM ESPECIALIDADES ORDER BY Nombre;
 GO
+
+SELECT Id_Medico, Nombre, Apellido, Matricula, Estado
+FROM MEDICOS;
+
+SELECT Id_Horario_Trabajo, Id_Medico, Dia_Semana,
+       Hora_Entrada, Hora_Salida, Estado
+FROM HORARIOS_TRABAJO;
 /* PENDIENTE EN NEGOCIO / IMPLEMENTACIÓN:
  - Validar turnos no vencidos, duración de 1 hora y horarios de atención vigentes.
  - Evitar superposición de turnos del médico y del paciente, con transacción y concurrencia.
