@@ -184,7 +184,6 @@ BEGIN
         (@IdMedico, 1, '09:00:00', '13:00:00');
 END;
 GO
-GO
 -- Consulta sugerida para el checkpoint:
 SELECT Id_Especialidad, Nombre, Descripcion, Estado FROM ESPECIALIDADES ORDER BY Nombre;
 GO
