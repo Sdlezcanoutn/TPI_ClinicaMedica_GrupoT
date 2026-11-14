@@ -117,6 +117,7 @@
     <Content Include="Content\bootstrap.rtl.min.css" />
     <Content Include="Content\Site.css" />
     <Content Include="Content\estilos.css" />
+    <Content Include="Content\especialidades.css" />
     <Content Include="Default.aspx" />
     <Content Include="favicon.ico" />
     <Content Include="FormHorario.aspx" />
