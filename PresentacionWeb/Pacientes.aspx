@@ -16,7 +16,10 @@
                         <p class="text-muted small m-0 mt-1">Administración de historias clínicas y datos personales</p>
                     </div>
                     <div class="mt-3 mt-md-0">
-                        <asp:Button ID="btnAgregar" runat="server" Text="+ Nuevo Paciente" CssClass="btn btn-clinica-primary px-4 py-2 rounded-3 shadow-sm" OnClick="btnAgregar_Click" />
+                        <asp:Button ID="btnAgregar" runat="server"
+                            Text="+ Nuevo Paciente"
+                            CssClass="btn btn-clinica-primary px-4 py-2 rounded-3 shadow-sm"
+                            OnClientClick="prepararNuevoPaciente(); return false;" />
                     </div>
                 </div>
 
@@ -27,49 +30,261 @@
                             <span class="input-group-text bg-light border-end-0">
                                 <i class="fa-solid fa-magnifying-glass"></i>
                             </span>
-                            <asp:TextBox ID="txtBuscar" runat="server" CssClass="form-control bg-light border-start-0"
-                                Placeholder="Buscar por DNI o Apellido..." AutoPostBack="True" OnTextChanged="txtBuscar_TextChanged">
-                            </asp:TextBox>
+                            <asp:TextBox ID="txtBuscar" runat="server"
+                                CssClass="form-control bg-light border-start-0"
+                                Placeholder="Buscar por DNI o Apellido..."
+                                AutoPostBack="True"
+                                OnTextChanged="txtBuscar_TextChanged" />
                         </div>
                     </div>
                 </div>
 
-                <!-- Tabla de Pacientes -->
-                <div class="table-responsive">
-                    <asp:GridView ID="dgvPacientes" runat="server" AutoGenerateColumns="False"
-                        CssClass="table table-custom align-middle mb-0" GridLines="None">
-                        <Columns>
-                            <asp:BoundField DataField="DNI" HeaderText="DNI" ItemStyle-CssClass="fw-semibold text-secondary" HeaderStyle-Width="110px" />
-                            <asp:BoundField DataField="Nombre" HeaderText="Nombre" />
-                            <asp:BoundField DataField="Apellido" HeaderText="Apellido" />
-                            <asp:BoundField DataField="Telefono" HeaderText="Teléfono" />
-                            <asp:BoundField DataField="Email" HeaderText="Email" />
-                            <asp:TemplateField HeaderText="Acciones" ItemStyle-CssClass="text-end" HeaderStyle-CssClass="text-end">
-                                <ItemTemplate>
-                                    <asp:LinkButton ID="btnEditar" runat="server" CssClass="btn btn-sm btn-outline-secondary me-1"
-                                        CommandName="Editar" CommandArgument='<%# Eval("Id") %>' OnClick="btnEditar_Click">
-                                        <i class="fa-solid fa-pen-to-square me-1"></i>Editar
-                                    </asp:LinkButton>
-                                    <asp:LinkButton ID="btnEliminar" runat="server" CssClass="btn btn-sm btn-outline-danger"
-                                        CommandName="Eliminar" CommandArgument='<%# Eval("Id") %>' OnCommand="btnEliminar_Command"
-                                        OnClientClick="return confirm('¿Estás seguro de que querés dar de baja a este paciente?');">
-                                        <i class="fa-solid fa-trash me-1"></i>Eliminar
-                                    </asp:LinkButton>
-                                </ItemTemplate>
-                            </asp:TemplateField>
-                        </Columns>
-                        <EmptyDataTemplate>
-                            <div class="text-center py-5 text-muted">
-                                <i class="fa-solid fa-user-slash fs-2 mb-2 d-block text-secondary opacity-50"></i>
-                                <p class="m-0 fw-medium">No hay pacientes registrados en el sistema.</p>
-                            </div>
-                        </EmptyDataTemplate>
-                    </asp:GridView>
-                </div>
+                <!-- Listado y alertas -->
+                <asp:UpdatePanel ID="upListado" runat="server" UpdateMode="Conditional">
+                    <ContentTemplate>
+
+                        <asp:Label ID="lblErrorListado" runat="server"
+                            CssClass="text-danger small d-block mb-2"
+                            Visible="false" />
+
+                        <div id="mensajeExitoPaciente" class="alert alert-success d-none mb-3" role="alert"></div>
+
+                        <!-- Tabla de Pacientes -->
+                        <div class="table-responsive">
+                            <asp:GridView ID="dgvPacientes" runat="server" AutoGenerateColumns="False"
+                                CssClass="table table-custom align-middle mb-0" GridLines="None">
+                                <Columns>
+                                    <asp:BoundField DataField="DNI" HeaderText="DNI" ItemStyle-CssClass="fw-semibold text-secondary" HeaderStyle-Width="110px" />
+                                    <asp:BoundField DataField="Nombre" HeaderText="Nombre" />
+                                    <asp:BoundField DataField="Apellido" HeaderText="Apellido" />
+                                    <asp:BoundField DataField="Telefono" HeaderText="Teléfono" />
+                                    <asp:BoundField DataField="Email" HeaderText="Email" />
+                                    <asp:BoundField DataField="Direccion" HeaderText="Dirección" />
+                                    <asp:TemplateField HeaderText="Acciones" ItemStyle-CssClass="text-end" HeaderStyle-CssClass="text-end">
+                                        <ItemTemplate>
+                                            <asp:LinkButton ID="btnEditar" runat="server"
+                                                CssClass="btn btn-sm btn-outline-secondary me-1"
+                                                CommandArgument='<%# Eval("Id") %>'
+                                                OnClick="btnEditar_Click">
+                                                <i class="fa-solid fa-pen-to-square me-1"></i>Editar
+                                            </asp:LinkButton>
+
+                                            <asp:LinkButton ID="btnEliminar" runat="server"
+                                                CssClass="btn btn-sm btn-outline-danger"
+                                                CommandArgument='<%# Eval("Id") %>'
+                                                OnClick="btnEliminar_Click">
+                                                <i class="fa-solid fa-user-xmark me-1"></i>Desactivar
+                                            </asp:LinkButton>
+                                        </ItemTemplate>
+                                    </asp:TemplateField>
+                                </Columns>
+                                <EmptyDataTemplate>
+                                    <div class="text-center py-5 text-muted">
+                                        <i class="fa-solid fa-user-slash fs-2 mb-2 d-block text-secondary opacity-50"></i>
+                                        <p class="m-0 fw-medium">No hay pacientes registrados en el sistema.</p>
+                                    </div>
+                                </EmptyDataTemplate>
+                            </asp:GridView>
+                        </div>
+
+                    </ContentTemplate>
+                </asp:UpdatePanel>
 
             </div>
-
         </div>
     </div>
+
+    <!-- Modal Alta / Edición de Paciente -->
+    <div class="modal fade" id="modalPaciente" tabindex="-1"
+        aria-labelledby="tituloModalPaciente" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold" id="tituloModalPaciente">Nuevo Paciente</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+
+                <asp:UpdatePanel ID="upPaciente" runat="server" UpdateMode="Conditional">
+                    <ContentTemplate>
+
+                        <asp:HiddenField ID="hfIdPaciente" runat="server" />
+
+                        <div class="modal-body">
+
+                            <asp:Label ID="lblErrorPaciente" runat="server"
+                                CssClass="text-danger small d-block mb-3"
+                                Visible="false" />
+
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Nombre *</label>
+                                    <asp:TextBox ID="txtNombrePaciente" runat="server" CssClass="form-control" MaxLength="100" />
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label">Apellido *</label>
+                                    <asp:TextBox ID="txtApellidoPaciente" runat="server" CssClass="form-control" MaxLength="100" />
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label">DNI *</label>
+                                    <asp:TextBox ID="txtDniPaciente" runat="server" CssClass="form-control" MaxLength="8" />
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label">Fecha de nacimiento *</label>
+                                    <asp:TextBox ID="txtFechaNacimientoPaciente" runat="server" TextMode="Date" CssClass="form-control" />
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label">Teléfono</label>
+                                    <asp:TextBox ID="txtTelefonoPaciente" runat="server" CssClass="form-control" MaxLength="30" />
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label">Correo electrónico *</label>
+                                    <asp:TextBox ID="txtEmailPaciente" runat="server" CssClass="form-control" MaxLength="254" />
+                                </div>
+
+                                <div class="col-12">
+                                    <label class="form-label">Dirección</label>
+                                    <asp:TextBox ID="txtDireccionPaciente" runat="server" CssClass="form-control" MaxLength="200" />
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <asp:Button ID="btnGuardarPaciente" runat="server"
+                                Text="Guardar Paciente"
+                                CssClass="btn btn-clinica-primary"
+                                OnClick="btnGuardarPaciente_Click" />
+                        </div>
+
+                    </ContentTemplate>
+                </asp:UpdatePanel>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Baja Lógica de Paciente -->
+    <div class="modal fade" id="modalBajaPaciente" tabindex="-1"
+        aria-labelledby="tituloModalBajaPaciente" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+
+                <asp:UpdatePanel ID="upBajaPaciente" runat="server" UpdateMode="Conditional">
+                    <ContentTemplate>
+
+                        <asp:HiddenField ID="hfIdBajaPaciente" runat="server" />
+
+                        <div class="modal-header">
+                            <h5 class="modal-title fw-bold" id="tituloModalBajaPaciente">Desactivar paciente</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                        </div>
+
+                        <div class="modal-body">
+                            <p class="mb-2">
+                                Paciente: <strong>
+                                    <asp:Label ID="lblNombreBajaPaciente" runat="server" /></strong>
+                            </p>
+                            <p class="text-muted mb-0">
+                                ¿Confirmás que querés dar de baja a este paciente?
+                            </p>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <asp:Button ID="btnConfirmarBajaPaciente" runat="server"
+                                Text="Confirmar baja"
+                                CssClass="btn btn-danger"
+                                OnClick="btnConfirmarBajaPaciente_Click" />
+                        </div>
+
+                    </ContentTemplate>
+                </asp:UpdatePanel>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+    // Muestra el cartel verde de confirmación en el listado y lo oculta a los 4 segundos
+    function mostrarAlertaPaciente(texto) {
+        const alerta = document.getElementById("mensajeExitoPaciente");
+        if (!alerta) return;
+
+        alerta.textContent = texto;
+        alerta.classList.remove("d-none");
+
+        setTimeout(function () {
+            alerta.classList.add("d-none");
+        }, 4000);
+    }
+
+    // Cierra el modal de alta/edición tras guardar y dispara el mensaje de éxito
+    function mostrarExitoPaciente(texto) {
+        const modalEl = document.getElementById("modalPaciente");
+        const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+        modal.hide();
+        mostrarAlertaPaciente(texto);
+    }
+
+    // Limpia y oculta errores previos del formulario para que no queden colgados
+    function ocultarErrorPaciente() {
+        const lbl = document.getElementById("<%= lblErrorPaciente.ClientID %>");
+        if (lbl) {
+            lbl.textContent = "";
+            lbl.style.display = "none";
+        }
+    }
+
+    // Resetea inputs y el HiddenField del ID (vuelve a modo alta limpio)
+    function limpiarFormularioPaciente() {
+        document.getElementById("<%= hfIdPaciente.ClientID %>").value = "";
+        document.getElementById("<%= txtNombrePaciente.ClientID %>").value = "";
+        document.getElementById("<%= txtApellidoPaciente.ClientID %>").value = "";
+        document.getElementById("<%= txtDniPaciente.ClientID %>").value = "";
+        document.getElementById("<%= txtFechaNacimientoPaciente.ClientID %>").value = "";
+        document.getElementById("<%= txtTelefonoPaciente.ClientID %>").value = "";
+        document.getElementById("<%= txtEmailPaciente.ClientID %>").value = "";
+        document.getElementById("<%= txtDireccionPaciente.ClientID %>").value = "";
+        ocultarErrorPaciente();
+    }
+
+    // Abre el modal configurado para crear un paciente nuevo
+    function prepararNuevoPaciente() {
+        limpiarFormularioPaciente();
+        document.getElementById("tituloModalPaciente").textContent = "Nuevo Paciente";
+        document.getElementById("<%= btnGuardarPaciente.ClientID %>").value = "Guardar Paciente";
+
+        bootstrap.Modal.getOrCreateInstance(
+            document.getElementById("modalPaciente")
+        ).show();
+    }
+
+    // Abre el modal en modo edición (los campos ya se cargaron desde el code-behind)
+    function prepararEdicionPaciente() {
+        document.getElementById("tituloModalPaciente").textContent = "Editar Paciente";
+        document.getElementById("<%= btnGuardarPaciente.ClientID %>").value = "Guardar Cambios";
+
+        bootstrap.Modal.getOrCreateInstance(
+            document.getElementById("modalPaciente")
+        ).show();
+    }
+
+    // Registra eventos del modal para limpiar al cerrar y borrar errores al abrir o escribir
+    (function () {
+        const modalPaciente = document.getElementById("modalPaciente");
+        if (modalPaciente) {
+            modalPaciente.addEventListener("hidden.bs.modal", limpiarFormularioPaciente);
+            modalPaciente.addEventListener("show.bs.modal", ocultarErrorPaciente);
+            modalPaciente.addEventListener("input", ocultarErrorPaciente);
+        }
+    })();
+    </script>
 
 </asp:Content>
