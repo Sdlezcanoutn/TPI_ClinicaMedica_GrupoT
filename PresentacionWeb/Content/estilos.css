@@ -333,7 +333,19 @@ form > div, main, .body-content {
     background-color: #f1f3f5;
 }
 
-/* Texto inicial del combo cerrado en gris clarito cuando está en value="0" */
+/* Color normal cuando tienen valor */
+.form-select,
+.form-control,
+.form-control::-webkit-datetime-edit,
+.form-control::-webkit-datetime-edit-fields-wrapper,
+.form-control::-webkit-datetime-edit-text,
+.form-control::-webkit-datetime-edit-hour-field,
+.form-control::-webkit-datetime-edit-minute-field,
+.form-control::-webkit-datetime-edit-ampm-field {
+    color: #212529;
+}
+
+/* Texto inicial del combo cerrado en gris clarito solo cuando está sin seleccionar */
 .form-select.placeholder-select {
     color: #9aa0a6 !important;
 }
@@ -343,7 +355,7 @@ form > div, main, .body-content {
     color: #212529;
 }
 
-/* Texto vacío en inputs de hora/fecha en gris clarito */
+/* Texto vacío en inputs de hora/fecha en gris clarito solo cuando están vacíos */
 .form-control.placeholder-time,
 .form-control.placeholder-time::-webkit-datetime-edit,
 .form-control.placeholder-time::-webkit-datetime-edit-fields-wrapper,
@@ -353,5 +365,3 @@ form > div, main, .body-content {
 .form-control.placeholder-time::-webkit-datetime-edit-ampm-field {
     color: #9aa0a6 !important;
 }
-
-

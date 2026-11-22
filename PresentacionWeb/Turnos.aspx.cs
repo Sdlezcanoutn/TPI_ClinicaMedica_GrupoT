@@ -14,7 +14,8 @@ namespace PresentacionWeb
         private class TurnoFila
         {
             public int Id { get; set; }
-            public string FechaHora { get; set; }
+            public string Fecha { get; set; }
+            public string Hora { get; set; }
             public string Paciente { get; set; }
             public string Medico { get; set; }
             public string Especialidad { get; set; }
@@ -139,7 +140,8 @@ namespace PresentacionWeb
                 List<TurnoFila> filas = lista.Select(t => new TurnoFila
                 {
                     Id = t.Id,
-                    FechaHora = $"{t.Fecha:dd/MM/yyyy} {t.Hora_Inicio:HH:mm} - {t.Hora_Fin:HH:mm}",
+                    Fecha = t.Fecha.ToString("dd/MM/yyyy"),
+                    Hora = $"{t.Hora_Inicio:HH:mm} - {t.Hora_Fin:HH:mm}",
                     Paciente = t.Paciente != null ? $"{t.Paciente.Apellido}, {t.Paciente.Nombre}" : "",
                     Medico = t.Medico != null ? $"{t.Medico.Apellido}, {t.Medico.Nombre}" : "",
                     Especialidad = t.Especialidad != null ? t.Especialidad.Nombre : "",
@@ -249,6 +251,29 @@ namespace PresentacionWeb
                 "mostrarModalTurno();",
                 true
             );
+        }
+        protected string ObtenerClaseBadgeEstado(string estado)
+        {
+            if (string.IsNullOrWhiteSpace(estado))
+                return "badge bg-success";
+
+            switch (estado.Trim().ToLower())
+            {
+                case "nuevo":
+                    return "badge bg-success";
+
+                case "reprogramado":
+                    return "badge bg-warning text-dark";
+
+                case "cancelado":
+                case "no asistió":
+                case "no asistio":
+                case "cerrado":
+                    return "badge bg-danger";
+
+                default:
+                    return "badge bg-secondary";
+            }
         }
     }
 }

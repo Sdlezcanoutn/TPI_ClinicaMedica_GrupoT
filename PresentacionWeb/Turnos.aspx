@@ -54,13 +54,14 @@
                             <asp:GridView ID="dgvTurnos" runat="server" AutoGenerateColumns="False"
                                 CssClass="table table-custom align-middle mb-0" GridLines="None">
                                 <Columns>
-                                    <asp:BoundField DataField="FechaHora" HeaderText="Fecha y Hora" ItemStyle-CssClass="fw-semibold text-secondary" HeaderStyle-Width="175px" />
+                                    <asp:BoundField DataField="Fecha" HeaderText="Fecha" ItemStyle-CssClass="fw-semibold text-secondary" HeaderStyle-Width="130px" />
+                                    <asp:BoundField DataField="Hora" HeaderText="Hora" ItemStyle-CssClass="fw-semibold text-secondary" HeaderStyle-Width="135px" />
                                     <asp:BoundField DataField="Paciente" HeaderText="Paciente" />
                                     <asp:BoundField DataField="Medico" HeaderText="Médico" />
                                     <asp:BoundField DataField="Especialidad" HeaderText="Especialidad" />
-                                    <asp:TemplateField HeaderText="Estado">
+                                    <asp:TemplateField HeaderText="Estado" HeaderStyle-Width="140px">
                                         <ItemTemplate>
-                                            <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle px-2 py-1 fw-medium">
+                                            <span class='<%# ObtenerClaseBadgeEstado(Eval("Estado").ToString()) %>'>
                                                 <%# Eval("Estado") %>
                                             </span>
                                         </ItemTemplate>
@@ -216,7 +217,7 @@
         }
     }
 
-    // Pone en gris clarito los combos en "0" y los inputs de hora/fecha cuando están vacíos
+    // Gris clarito solo si el combo está en "0"/vacío o si el input de fecha/hora está vacío
     function actualizarEstiloPlaceholderSelects() {
         const selectIds = [
             "<%= ddlPaciente.ClientID %>",
@@ -228,11 +229,8 @@
             const ddl = document.getElementById(id);
             if (!ddl) return;
 
-            if (ddl.value === "0" || ddl.selectedIndex === 0) {
-                ddl.classList.add("placeholder-select");
-            } else {
-                ddl.classList.remove("placeholder-select");
-            }
+            const estaVacio = !ddl.value || ddl.value === "0" || ddl.selectedIndex <= 0;
+            ddl.classList.toggle("placeholder-select", estaVacio);
         });
 
         const inputIds = [
@@ -245,11 +243,29 @@
             const inp = document.getElementById(id);
             if (!inp) return;
 
-            if (!inp.value) {
-                inp.classList.add("placeholder-time");
-            } else {
-                inp.classList.remove("placeholder-time");
-            }
+            const estaVacio = !inp.value || inp.value.trim() === "";
+            inp.classList.toggle("placeholder-time", estaVacio);
+        });
+    }
+
+    function engancharEventosCamposTurno() {
+        const campoIds = [
+            "<%= ddlPaciente.ClientID %>",
+            "<%= ddlEspecialidad.ClientID %>",
+            "<%= ddlMedico.ClientID %>",
+            "<%= txtHoraInicio.ClientID %>",
+            "<%= txtHoraFin.ClientID %>",
+            "<%= txtFechaTurno.ClientID %>"
+        ];
+
+        campoIds.forEach(function (id) {
+            const el = document.getElementById(id);
+            if (!el || el.dataset.placeholderBound === "1") return;
+
+            el.dataset.placeholderBound = "1";
+            el.addEventListener("change", actualizarEstiloPlaceholderSelects);
+            el.addEventListener("input", actualizarEstiloPlaceholderSelects);
+            el.addEventListener("blur", actualizarEstiloPlaceholderSelects);
         });
     }
 
@@ -263,10 +279,16 @@
         if (ddlEsp) ddlEsp.selectedIndex = 0;
         if (ddlMed) ddlMed.selectedIndex = 0;
 
-        document.getElementById("<%= txtFechaTurno.ClientID %>").value = "";
-        document.getElementById("<%= txtHoraInicio.ClientID %>").value = "";
-        document.getElementById("<%= txtHoraFin.ClientID %>").value = "";
-        document.getElementById("<%= txtMotivoConsulta.ClientID %>").value = "";
+        const txtFecha = document.getElementById("<%= txtFechaTurno.ClientID %>");
+        const txtInicio = document.getElementById("<%= txtHoraInicio.ClientID %>");
+        const txtFin = document.getElementById("<%= txtHoraFin.ClientID %>");
+        const txtMotivo = document.getElementById("<%= txtMotivoConsulta.ClientID %>");
+
+        if (txtFecha) txtFecha.value = "";
+        if (txtInicio) txtInicio.value = "";
+        if (txtFin) txtFin.value = "";
+        if (txtMotivo) txtMotivo.value = "";
+
         ocultarErrorTurno();
         actualizarEstiloPlaceholderSelects();
     }
@@ -282,42 +304,36 @@
         ).show();
     }
 
-    // Reabre el modal cuando ocurre un postback dentro del UpdatePanel (ej. cambio de especialidad o error de validación)
+    // Reabre el modal cuando ocurre un postback dentro del UpdatePanel
     function mostrarModalTurno() {
+        engancharEventosCamposTurno();
         actualizarEstiloPlaceholderSelects();
         bootstrap.Modal.getOrCreateInstance(
             document.getElementById("modalTurno")
         ).show();
     }
 
-    // Limpia al cerrar, oculta errores al abrir/escribir y actualiza el gris de combos e inputs
     (function () {
         const modalTurno = document.getElementById("modalTurno");
         if (modalTurno) {
             modalTurno.addEventListener("hidden.bs.modal", limpiarFormularioTurno);
             modalTurno.addEventListener("show.bs.modal", function () {
                 ocultarErrorTurno();
+                engancharEventosCamposTurno();
                 actualizarEstiloPlaceholderSelects();
             });
             modalTurno.addEventListener("input", ocultarErrorTurno);
         }
 
-        [
-            "<%= ddlPaciente.ClientID %>",
-            "<%= ddlEspecialidad.ClientID %>",
-            "<%= ddlMedico.ClientID %>",
-            "<%= txtHoraInicio.ClientID %>",
-            "<%= txtHoraFin.ClientID %>",
-            "<%= txtFechaTurno.ClientID %>"
-        ].forEach(function (id) {
-            const el = document.getElementById(id);
-            if (el) {
-                el.addEventListener("change", actualizarEstiloPlaceholderSelects);
-                el.addEventListener("input", actualizarEstiloPlaceholderSelects);
-            }
-        });
-
+        engancharEventosCamposTurno();
         actualizarEstiloPlaceholderSelects();
+
+        if (window.Sys && Sys.WebForms && Sys.WebForms.PageRequestManager) {
+            Sys.WebForms.PageRequestManager.getInstance().add_endRequest(function () {
+                engancharEventosCamposTurno();
+                actualizarEstiloPlaceholderSelects();
+            });
+        }
     })();
     </script>
 
