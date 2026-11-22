@@ -2,6 +2,8 @@
 
 <asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
 
+<%@ Import Namespace="PresentacionWeb.Helpers" %>
+
     <!-- CONTENEDOR -->
     <div class="container-fluid px-4 px-lg-5 my-5">
         <div style="max-width: 1500px; margin: 0 auto;">
@@ -67,10 +69,18 @@
                                     <%# Eval("Medico.Apellido") %>
                                 </ItemTemplate>
                             </asp:TemplateField>
-                            <asp:BoundField DataField="Dia_Semana" HeaderText="Día" />
+                            <asp:TemplateField HeaderText="Día">
+                                <ItemTemplate>
+                                    <%# FormatoHelper.ObtenerNombreDia(Convert.ToInt32(Eval("Dia_Semana"))) %>
+                                </ItemTemplate>
+                            </asp:TemplateField>
                             <asp:BoundField DataField="Hora_Entrada" HeaderText="Hora de Entrada" DataFormatString="{0:HH:mm}" />
                             <asp:BoundField DataField="Hora_Salida" HeaderText="Hora de Salida" DataFormatString="{0:HH:mm}"/>
-                            <asp:BoundField DataField="Estado" HeaderText="Estado" />
+                            <asp:TemplateField HeaderText="Estado">
+                                <ItemTemplate>
+                                    <%# FormatoHelper.ObtenerEstado(Convert.ToBoolean(Eval("Estado"))) %>
+                                </ItemTemplate>
+                            </asp:TemplateField>
                             <asp:TemplateField HeaderText="Acciones" ItemStyle-CssClass="text-end" HeaderStyle-CssClass="text-end">
                                 <ItemTemplate>
                                     <asp:LinkButton ID="btnEditar" runat="server" CommandArgument='<%# Eval("Id") %>' 
