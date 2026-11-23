@@ -1,10 +1,12 @@
-﻿using System;
+﻿using Dominio;
+using Negocio;
+using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-using Negocio;
 
 namespace PresentacionWeb
 {
@@ -24,12 +26,31 @@ namespace PresentacionWeb
 
             try
             {
-                dgvHorarios.DataSource = negocio.listar();
+                List<HorarioTrabajo> horarios = negocio.listar();
+
+                // Filtro por nombre o apellido del médico
+                string medico = txtBuscarMedico.Text.Trim();
+
+                if (!string.IsNullOrEmpty(medico))
+                {
+                    CompareInfo comparador = CultureInfo.GetCultureInfo("es-AR").CompareInfo;
+
+                    horarios = horarios.FindAll(h => 
+                        comparador.IndexOf(h.Medico.Nombre + " " + h.Medico.Apellido, medico,
+                        CompareOptions.IgnoreCase | CompareOptions.IgnoreNonSpace) >= 0
+                        );
+                }
+
+                //Filtro por día de la semana
+                string dia = ddlDiaSemana.SelectedValue;
+
+                horarios = horarios.FindAll(h => h.Dia_Semana == dia);
+
+                dgvHorarios.DataSource = horarios;
                 dgvHorarios.DataBind();
             }
             catch (Exception ex)
             {
-                // Temporalmente, para identificar errores.
                 System.Diagnostics.Debug.WriteLine(ex.Message);
             }
         }
@@ -37,6 +58,7 @@ namespace PresentacionWeb
         protected void btnBuscar_Click(object sender, EventArgs e)
         {
             //Agregar la lógica
+            //cargar();
         }
 
         protected void btnAgregar_Click(object sender, EventArgs e)
