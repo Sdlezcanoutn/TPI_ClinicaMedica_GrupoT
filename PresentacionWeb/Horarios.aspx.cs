@@ -57,7 +57,17 @@ namespace PresentacionWeb
                 System.Diagnostics.Debug.WriteLine(ex.Message);
             }
         }
-
+        /* ============================================================
+           EVENTOS DE FILTROS
+           ============================================================ */
+        protected void txtBuscarMedico_TextChanged(object sender, EventArgs e)
+        {
+            cargar();
+        }
+        protected void ddlDiaSemana_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            cargar();
+        }
         protected void btnBuscar_Click(object sender, EventArgs e)
         {
             cargar();

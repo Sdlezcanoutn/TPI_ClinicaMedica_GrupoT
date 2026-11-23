@@ -32,14 +32,15 @@
                             <span class="input-group-text bg-light border-end-0">
                                 <i class="fa-solid fa-magnifying-glass"></i>
                             </span>    
-                            <asp:TextBox ID="txtBuscarMedico" runat="server" CssClass="form-control bg-light border-start-0" Placeholder="Nombre o apellido del médico..."></asp:TextBox>
+                            <asp:TextBox ID="txtBuscarMedico" runat="server" CssClass="form-control bg-light border-start-0" Placeholder="Nombre o apellido del médico..." AutoPostBack="true" OnTextChanged="txtBuscarMedico_TextChanged">
+                            </asp:TextBox>
                         </div>
                     </div>
 
                     <!-- Filtro por día -->
                     <div class="col-md-6 col-lg-4">
                         <asp:Label Text="Día de la semana" runat="server"/>
-                        <asp:DropDownList ID="ddlDiaSemana" runat="server" CssClass="form-select">
+                        <asp:DropDownList ID="ddlDiaSemana" runat="server" CssClass="form-select" AutoPostBack="true" OnSelectedIndexChanged="ddlDiaSemana_SelectedIndexChanged">
                             <asp:ListItem Text="Todos los días" Value="" />
                             <asp:ListItem Text="Lunes" Value="1" />
                             <asp:ListItem Text="Martes" Value="2" />
