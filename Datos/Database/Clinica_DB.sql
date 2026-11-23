@@ -203,3 +203,36 @@ FROM HORARIOS_TRABAJO;
  - Reprogramación: registrar valores anteriores en HISTORIAL_TURNOS y resetear EmailEnviado=0.
  - Las tablas se crean una sola vez; no re-ejecutar este script completo sobre la misma BD.
 */
+
+-- ============================================================
+-- CARGA INICIAL DE ESPECIALIDADES
+-- ============================================================
+INSERT INTO ESPECIALIDADES (Nombre, Descripcion, Estado)
+SELECT v.Nombre, v.Descripcion, 1
+FROM (VALUES
+    (N'Clínica médica', N'Atención integral de adultos, grupos familiares y derivación inicial.'),
+    (N'Cardiología', N'Atención cardiovascular'),
+    (N'Dermatología', N'Atención dermatológica'),
+    (N'Ginecología', N'Atención ginecológica'),
+    (N'Endocrinología', N'Atención del sistema hormonal y metabolismo'),
+    (N'Gastroenterología', N'Atención del aparato digestivo, hígado y vías biliares.'),
+    (N'Infectología', N'Atención de enfermedades infecciosas y vacunas.'),
+    (N'Nefrología', N'Atención de riñones y vías urinarias superiores.'),
+    (N'Neumonología', N'Atención del aparato respiratorio y pulmones'),
+    (N'Neurología', N'Atención del sistema nervioso central y periférico.'),
+    (N'Oncología', N'Atención de tumores y cáncer.'),
+    (N'Reumatología', N'Atención de enfermedades autoinmunes y del tejido conectivo / musculoesquelético.'),
+    (N'Cirugía general', N'Atención de intervenciones abdominales, partes blandas y digestivas frecuentes.'),
+    (N'Traumatología y ortopedia', N'Atención de huesos, articulaciones, músculos y lesiones físicas.'),
+    (N'Urología', N'Atención de tracto urinario y aparato reproductor masculino.'),
+    (N'Oftalmología', N'Atención de salud visual y cirugía ocular.'),
+    (N'Otorrinolaringología', N'Atención del oído, nariz, senos paranasales y garganta.'),
+    (N'Neurocirugía', N'Atención de intervenciones quirúrgicas en cerebro, columna y nervios periféricos.'),
+    (N'Cirugía cardiovascular, torácica y plástico/reparadora', N'Atención de procedimientos especializados por región o reconstrucción.'),
+    (N'Pediatría y neonatología', N'Atención de recién nacidos, niños y adolescentes.'),
+    (N'Psiquiatría', N'Atención, diagnóstico y tratamiento farmacológico/clínico de trastornos de salud mental.'),
+    (N'Diagnóstico por imágenes y laboratorio', N'Atención de estudios radiológicos, ecografías, análisis clínicos y biopsias.')
+) AS v(Nombre, Descripcion)
+WHERE NOT EXISTS (
+    SELECT 1 FROM ESPECIALIDADES e WHERE e.Nombre = v.Nombre
+);

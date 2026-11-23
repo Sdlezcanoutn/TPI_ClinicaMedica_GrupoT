@@ -279,17 +279,25 @@ form > div, main, .body-content {
 }
 
 /* Componentes reutilizables */
+/* Botón principal azul institucional */
 .btn-clinica-primary {
-    background-color: #2c3036;
-    color: #ffffff;
-    border: 1px solid #1a1d20;
+    background-color: #18628a !important;
+    border-color: #18628a !important;
+    color: #ffffff !important;
     font-weight: 500;
     transition: all 0.2s ease;
 }
 
-.btn-clinica-primary:hover {
-    background-color: #3b4048;
-    color: #ffffff;
+.btn-clinica-primary:hover,
+.btn-clinica-primary:focus {
+ background-color: #124c6b !important;
+ border-color: #124c6b !important;
+ color: #ffffff !important;
+}    
+
+/* Texto inicial de combos en gris más clarito */
+.form-select option[value="0"] {
+    color: #9aa0a6;
 }
 
 .search-box .input-group-text {
@@ -323,4 +331,37 @@ form > div, main, .body-content {
 
 .table-custom tbody tr:hover {
     background-color: #f1f3f5;
+}
+
+/* Color normal cuando tienen valor */
+.form-select,
+.form-control,
+.form-control::-webkit-datetime-edit,
+.form-control::-webkit-datetime-edit-fields-wrapper,
+.form-control::-webkit-datetime-edit-text,
+.form-control::-webkit-datetime-edit-hour-field,
+.form-control::-webkit-datetime-edit-minute-field,
+.form-control::-webkit-datetime-edit-ampm-field {
+    color: #212529;
+}
+
+/* Texto inicial del combo cerrado en gris clarito solo cuando está sin seleccionar */
+.form-select.placeholder-select {
+    color: #9aa0a6 !important;
+}
+
+/* Cuando se despliega la lista, mantener texto legible */
+.form-select option {
+    color: #212529;
+}
+
+/* Texto vacío en inputs de hora/fecha en gris clarito solo cuando están vacíos */
+.form-control.placeholder-time,
+.form-control.placeholder-time::-webkit-datetime-edit,
+.form-control.placeholder-time::-webkit-datetime-edit-fields-wrapper,
+.form-control.placeholder-time::-webkit-datetime-edit-text,
+.form-control.placeholder-time::-webkit-datetime-edit-hour-field,
+.form-control.placeholder-time::-webkit-datetime-edit-minute-field,
+.form-control.placeholder-time::-webkit-datetime-edit-ampm-field {
+    color: #9aa0a6 !important;
 }
