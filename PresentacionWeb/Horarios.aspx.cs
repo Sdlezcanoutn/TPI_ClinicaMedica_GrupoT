@@ -44,7 +44,10 @@ namespace PresentacionWeb
                 //Filtro por día de la semana
                 string dia = ddlDiaSemana.SelectedValue;
 
-                horarios = horarios.FindAll(h => h.Dia_Semana == dia);
+                if (!string.IsNullOrEmpty(dia))
+                {
+                    horarios = horarios.FindAll(h => h.Dia_Semana == dia);
+                }
 
                 dgvHorarios.DataSource = horarios;
                 dgvHorarios.DataBind();
@@ -57,8 +60,7 @@ namespace PresentacionWeb
 
         protected void btnBuscar_Click(object sender, EventArgs e)
         {
-            //Agregar la lógica
-            //cargar();
+            cargar();
         }
 
         protected void btnAgregar_Click(object sender, EventArgs e)
