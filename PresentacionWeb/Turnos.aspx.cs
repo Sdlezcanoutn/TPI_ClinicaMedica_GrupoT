@@ -62,6 +62,29 @@ namespace PresentacionWeb
             ddlEspecialidad.DataBind();
             ddlEspecialidad.Items.Insert(0, new ListItem("-- Seleccione una especialidad --", "0"));
 
+            ddlFiltroEspecialidad.DataSource = especialidadesActivas;
+            ddlFiltroEspecialidad.DataValueField = "Id";
+            ddlFiltroEspecialidad.DataTextField = "Nombre";
+            ddlFiltroEspecialidad.DataBind();
+            ddlFiltroEspecialidad.Items.Insert(0, new ListItem("Todas las especialidades", "0"));
+
+            MedicoNegocio medicoNegocio = new MedicoNegocio();
+            List<Medico> todosMedicosActivos = medicoNegocio.listar()
+                .Where(m => m.Estado)
+                .OrderBy(m => m.Apellido)
+                .ThenBy(m => m.Nombre)
+                .ToList();
+
+            ddlFiltroMedico.DataSource = todosMedicosActivos.Select(m => new
+            {
+                m.Id,
+                Texto = $"{m.Apellido}, {m.Nombre}"
+            }).ToList();
+            ddlFiltroMedico.DataValueField = "Id";
+            ddlFiltroMedico.DataTextField = "Texto";
+            ddlFiltroMedico.DataBind();
+            ddlFiltroMedico.Items.Insert(0, new ListItem("Todos los médicos", "0"));
+
             CargarMedicosPorEspecialidad(0);
         }
 
@@ -110,7 +133,7 @@ namespace PresentacionWeb
             );
         }
 
-        private void CargarTurnos(string filtro = "")
+        private void CargarTurnos(string filtro = "", int idEspecialidad = 0, int idMedico = 0, DateTime? fechaFiltro = null)
         {
             TurnoNegocio negocio = new TurnoNegocio();
 
@@ -137,6 +160,22 @@ namespace PresentacionWeb
                     );
                 }
 
+                if (idEspecialidad > 0)
+                {
+                    lista = lista.FindAll(t => t.Especialidad != null && t.Especialidad.Id == idEspecialidad);
+                }
+
+                if (idMedico > 0)
+                {
+                    lista = lista.FindAll(t => t.Medico != null && t.Medico.Id == idMedico);
+                }
+
+                if (fechaFiltro.HasValue)
+                {
+                    DateTime fechaBuscada = fechaFiltro.Value.Date;
+                    lista = lista.FindAll(t => t.Fecha.Date == fechaBuscada);
+                }
+
                 List<TurnoFila> filas = lista.Select(t => new TurnoFila
                 {
                     Id = t.Id,
@@ -160,9 +199,46 @@ namespace PresentacionWeb
             }
         }
 
+        private void AplicarFiltrosListado()
+        {
+            int idEspecialidad = int.TryParse(ddlFiltroEspecialidad.SelectedValue, out int espId) ? espId : 0;
+            int idMedico = int.TryParse(ddlFiltroMedico.SelectedValue, out int medId) ? medId : 0;
+
+            DateTime? fechaFiltro = null;
+            if (!string.IsNullOrWhiteSpace(txtFiltroFecha.Text) &&
+                DateTime.TryParseExact(
+                    txtFiltroFecha.Text.Trim(),
+                    "yyyy-MM-dd",
+                    CultureInfo.InvariantCulture,
+                    DateTimeStyles.None,
+                    out DateTime fechaParseada))
+            {
+                fechaFiltro = fechaParseada.Date;
+            }
+
+            CargarTurnos(txtBuscar.Text, idEspecialidad, idMedico, fechaFiltro);
+        }
+
         protected void txtBuscar_TextChanged(object sender, EventArgs e)
         {
-            CargarTurnos(txtBuscar.Text);
+            AplicarFiltrosListado();
+            upListadoTurnos.Update();
+        }
+
+        protected void FiltroListado_Changed(object sender, EventArgs e)
+        {
+            AplicarFiltrosListado();
+            upListadoTurnos.Update();
+        }
+
+        protected void btnLimpiarFiltros_Click(object sender, EventArgs e)
+        {
+            txtBuscar.Text = string.Empty;
+            ddlFiltroEspecialidad.SelectedIndex = 0;
+            ddlFiltroMedico.SelectedIndex = 0;
+            txtFiltroFecha.Text = string.Empty;
+
+            CargarTurnos();
             upListadoTurnos.Update();
         }
 
@@ -213,7 +289,7 @@ namespace PresentacionWeb
                 TurnoNegocio negocio = new TurnoNegocio();
                 negocio.agregar(nuevo);
 
-                CargarTurnos(txtBuscar.Text);
+                AplicarFiltrosListado();
                 upListadoTurnos.Update();
 
                 lblErrorTurno.Visible = false;
@@ -252,6 +328,7 @@ namespace PresentacionWeb
                 true
             );
         }
+
         protected string ObtenerClaseBadgeEstado(string estado)
         {
             if (string.IsNullOrWhiteSpace(estado))
