@@ -163,8 +163,8 @@
                                     <label class="form-label">Médico *</label>
                                     <asp:DropDownList ID="ddlMedico" runat="server"
                                         CssClass="form-select"
-                                        AutoPostBack="true"
-                                        OnSelectedIndexChanged="DisponibilidadTurno_Changed" />
+                                        AutoPostBack="True"
+                                        OnSelectedIndexChanged="ddlMedico_SelectedIndexChanged" />
                                 </div>
 
                                 <div class="col-md-6">
@@ -172,32 +172,15 @@
                                     <asp:TextBox ID="txtFechaTurno" runat="server"
                                         CssClass="form-control"
                                         TextMode="Date"
-                                        AutoPostBack="true"
-                                        OnTextChanged="DisponibilidadTurno_Changed" />
+                                        AutoPostBack="True"
+                                        OnTextChanged="txtFechaTurno_TextChanged" />
                                 </div>
 
                                 <div class="col-12">
-                                    <label class="form-label">Horarios disponibles (cada 15 min)</label>
-                                    <asp:DropDownList ID="ddlHorariosDisponibles" runat="server"
-                                        CssClass="form-select"
-                                        AutoPostBack="true"
-                                        OnSelectedIndexChanged="ddlHorariosDisponibles_SelectedIndexChanged" />
-                                    <asp:Label ID="lblInfoDisponibilidad" runat="server"
-                                        CssClass="form-text text-muted d-block mt-1" />
-                                </div>
-
-                                <div class="col-md-6">
-                                    <label class="form-label">Hora inicio *</label>
-                                    <asp:TextBox ID="txtHoraInicio" runat="server"
-                                        CssClass="form-control"
-                                        TextMode="Time" />
-                                </div>
-
-                                <div class="col-md-6">
-                                    <label class="form-label">Hora fin *</label>
-                                    <asp:TextBox ID="txtHoraFin" runat="server"
-                                        CssClass="form-control"
-                                        TextMode="Time" />
+                                    <label class="form-label">Horario disponible (60 min) *</label>
+                                    <asp:DropDownList ID="ddlHorarioDisponible" runat="server" CssClass="form-select">
+                                        <asp:ListItem Text="-- Seleccione médico y fecha --" Value="0" />
+                                    </asp:DropDownList>
                                 </div>
 
                                 <div class="col-12">
@@ -259,13 +242,13 @@
         }
     }
 
-    // Gris clarito solo si el combo está en "0"/vacío o si el input de fecha/hora está vacío
+    // Gris clarito solo si el combo está en "0"/vacío o si el input de fecha está vacío
     function actualizarEstiloPlaceholderSelects() {
         const selectIds = [
             "<%= ddlPaciente.ClientID %>",
             "<%= ddlEspecialidad.ClientID %>",
             "<%= ddlMedico.ClientID %>",
-            "<%= ddlHorariosDisponibles.ClientID %>"
+            "<%= ddlHorarioDisponible.ClientID %>"
         ];
 
         selectIds.forEach(function (id) {
@@ -276,19 +259,11 @@
             ddl.classList.toggle("placeholder-select", estaVacio);
         });
 
-        const inputIds = [
-            "<%= txtHoraInicio.ClientID %>",
-            "<%= txtHoraFin.ClientID %>",
-            "<%= txtFechaTurno.ClientID %>"
-        ];
-
-        inputIds.forEach(function (id) {
-            const inp = document.getElementById(id);
-            if (!inp) return;
-
-            const estaVacio = !inp.value || inp.value.trim() === "";
-            inp.classList.toggle("placeholder-time", estaVacio);
-        });
+        const inpFecha = document.getElementById("<%= txtFechaTurno.ClientID %>");
+        if (inpFecha) {
+            const estaVacio = !inpFecha.value || inpFecha.value.trim() === "";
+            inpFecha.classList.toggle("placeholder-time", estaVacio);
+        }
     }
 
     function engancharEventosCamposTurno() {
@@ -296,8 +271,7 @@
             "<%= ddlPaciente.ClientID %>",
             "<%= ddlEspecialidad.ClientID %>",
             "<%= ddlMedico.ClientID %>",
-            "<%= txtHoraInicio.ClientID %>",
-            "<%= txtHoraFin.ClientID %>",
+            "<%= ddlHorarioDisponible.ClientID %>",
             "<%= txtFechaTurno.ClientID %>"
         ];
 
@@ -317,24 +291,18 @@
         const ddlPac = document.getElementById("<%= ddlPaciente.ClientID %>");
         const ddlEsp = document.getElementById("<%= ddlEspecialidad.ClientID %>");
         const ddlMed = document.getElementById("<%= ddlMedico.ClientID %>");
-        const ddlSlots = document.getElementById("<%= ddlHorariosDisponibles.ClientID %>");
+        const ddlHor = document.getElementById("<%= ddlHorarioDisponible.ClientID %>");
 
         if (ddlPac) ddlPac.selectedIndex = 0;
         if (ddlEsp) ddlEsp.selectedIndex = 0;
         if (ddlMed) ddlMed.selectedIndex = 0;
-        if (ddlSlots) ddlSlots.selectedIndex = 0;
+        if (ddlHor) ddlHor.selectedIndex = 0;
 
         const txtFecha = document.getElementById("<%= txtFechaTurno.ClientID %>");
-        const txtInicio = document.getElementById("<%= txtHoraInicio.ClientID %>");
-        const txtFin = document.getElementById("<%= txtHoraFin.ClientID %>");
         const txtMotivo = document.getElementById("<%= txtMotivoConsulta.ClientID %>");
-        const lblSlots = document.getElementById("<%= lblInfoDisponibilidad.ClientID %>");
 
         if (txtFecha) txtFecha.value = "";
-        if (txtInicio) txtInicio.value = "";
-        if (txtFin) txtFin.value = "";
         if (txtMotivo) txtMotivo.value = "";
-        if (lblSlots) lblSlots.textContent = "";
 
         ocultarErrorTurno();
         actualizarEstiloPlaceholderSelects();
