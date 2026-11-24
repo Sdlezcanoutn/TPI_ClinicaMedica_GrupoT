@@ -111,8 +111,8 @@
                     <div class="stat-etiqueta-azul">Profesionales y Especialistas</div>
                 </div>
                 <div class="col-12 col-md-4">
-                    <div class="stat-numero-azul">15 min</div>
-                    <div class="stat-etiqueta-azul">Módulos de Atención Ágil</div>
+                    <div class="stat-numero-azul">+35</div>
+                    <div class="stat-etiqueta-azul">Especialidades médicas</div>
                 </div>
             </div>
         </div>
@@ -208,35 +208,38 @@
                     <img src="/Images/slide-5.jpg" class="workflow-img" alt="Equipamiento e infraestructura de GSH Clínica Médica">
                 </div>
                 <div class="col-lg-7">
-                    <div class="p-4 p-lg-5">
-                        <span class="badge bg-info-subtle text-info-emphasis mb-2 px-3 py-2">Gestión Ágil</span>
-                        <h3 class="fw-bold text-dark mb-2">Cómo organizamos la atención diaria</h3>
-                        <p class="text-muted mb-4">
-                            Un circuito claro para coordinar profesionales, especialidades y disponibilidad horaria sin superposiciones.
-                        </p>
-
                         <div class="d-flex flex-column gap-3">
-                            <div class="d-flex align-items-start gap-3">
-                                <span class="step-badge">1</span>
-                                <div>
-                                    <h6 class="fw-bold text-dark mb-1">Registro y especialidades</h6>
-                                    <p class="text-muted small mb-0">Alta de pacientes, gestión de médicos activos y asignación de áreas médicas.</p>
-                                </div>
-                            </div>
+                            <div class="p-4 p-lg-5">
+                                <span class="badge bg-info-subtle text-info-emphasis mb-2 px-3 py-2">Experiencia del Paciente</span>
+                                <h3 class="fw-bold text-dark mb-2">Un acompañamiento claro en cada etapa</h3>
+                                <p class="text-muted mb-4">
+                                    Cuidamos cada detalle para que tu consulta sea ordenada, puntual y respaldada por profesionales de confianza.
+                                </p>
 
-                            <div class="d-flex align-items-start gap-3">
-                                <span class="step-badge">2</span>
-                                <div>
-                                    <h6 class="fw-bold text-dark mb-1">Disponibilidad en bloques de 15 minutos</h6>
-                                    <p class="text-muted small mb-0">Cálculo automático de horarios libres según los días y franjas de trabajo de cada profesional.</p>
-                                </div>
-                            </div>
+                                <div class="d-flex flex-column gap-3">
+                                    <div class="d-flex align-items-start gap-3">
+                                        <span class="step-badge">1</span>
+                                        <div>
+                                            <h6 class="fw-bold text-dark mb-1">Orientación y especialidad indicada</h6>
+                                            <p class="text-muted small mb-0">Te conectamos con el área médica adecuada según tu motivo de consulta y necesidades.</p>
+                                        </div>
+                                    </div>
 
-                            <div class="d-flex align-items-start gap-3">
-                                <span class="step-badge">3</span>
-                                <div>
-                                    <h6 class="fw-bold text-dark mb-1">Reserva, reprogramación y seguimiento</h6>
-                                    <p class="text-muted small mb-0">Control centralizado de turnos y estados para agilizar la atención en consultorio.</p>
+                                    <div class="d-flex align-items-start gap-3">
+                                        <span class="step-badge">2</span>
+                                        <div>
+                                            <h6 class="fw-bold text-dark mb-1">Horarios claros y sin esperas innecesarias</h6>
+                                            <p class="text-muted small mb-0">Organización precisa de agendas para respetar tu tiempo y facilitar la coordinación.</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="d-flex align-items-start gap-3">
+                                        <span class="step-badge">3</span>
+                                        <div>
+                                            <h6 class="fw-bold text-dark mb-1">Seguimiento cercano y continuidad</h6>
+                                            <p class="text-muted small mb-0">Acompañamiento médico continuo para evolucionar con tranquilidad en cada control.</p>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
