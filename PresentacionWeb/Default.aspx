@@ -10,6 +10,7 @@
                 <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
                 <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
                 <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
+                <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="3" aria-label="Slide 4"></button>
             </div>
 
             <div class="carousel-inner">
@@ -44,6 +45,16 @@
                     </div>
                 </div>
 
+                <!-- Slide 4 -->
+                <div class="carousel-item" data-bs-interval="2500">
+                    <img src="/Images/slide-4.jpg" class="d-block w-100 carousel-img" alt="Acompañamiento y Cercanía">
+                    <div class="carousel-caption hero-caption-wide">
+                        <span class="badge badge-violeta text-dark mb-2 px-3 py-2">Cuidado Integral</span>
+                        <h2 class="fw-bold text-white fs-3">Acompañamiento cercano en cada consulta</h2>
+                        <p class="text-light mb-0">Agenda ágil, seguimiento médico y atención pensada para cada paciente.</p>
+                    </div>
+                </div>
+
             </div>
 
             <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
@@ -60,19 +71,53 @@
     <!-- CONTENEDOR PARA EL DASHBOARD -->
     <div class="container-fluid px-4 px-lg-5 mb-5">
 
-        <!-- Banner Bienvenida -->
-        <div class="my-5">
-            <div class="row">
-                <div class="col-xl-9">
+        <!-- Banner Bienvenida e Historia -->
+        <div class="my-4 py-3">
+            <div class="row align-items-center g-4 g-lg-5">
+                <div class="col-lg-8">
                     <h2 class="fw-bold text-dark display-6 mb-2">Te damos la bienvenida a la medicina del futuro, centrada en vos y con el sentido humano de siempre
                     </h2>
                     <div class="divider-line mb-4"></div>
-                    <p class="text-muted fs-5 lh-base mb-3">
-                        Hace más de 170 años que transformamos la salud con innovación, excelencia y compromiso. Ese legado nos impulsa a seguir siendo pioneros en cuidados y tratamientos de vanguardia, marcando el rumbo de la medicina en la Argentina.
-                    </p>
+
+                    <div class="row g-4 bienvenida-columna-texto">
+                        <div class="col-md-6">
+                            <p class="mb-0">
+                                Hace más de <strong>170 años</strong> que transformamos la salud con <strong>innovación, excelencia y compromiso</strong>. Ese legado nos impulsa a seguir siendo pioneros en cuidados de vanguardia y atención integral en toda la Argentina.
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="mb-0">
+                                Combinamos <strong>equipos multidisciplinarios</strong>, consultorios equipados y una gestión organizada para que cada consulta sea ágil y segura, acompañando a cada paciente con calidez y precisión clínica.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="rounded-3 overflow-hidden shadow-sm">
+                        <img src="/Images/slide-9.jpg" class="welcome-photo" alt="Instalaciones de GSH Clínica Médica">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contadores Institucionales en Azul -->
+            <div class="row text-center g-4 mt-4 pt-3">
+                <div class="col-6 col-md-4">
+                    <div class="stat-numero-azul">+170</div>
+                    <div class="stat-etiqueta-azul">Años de Trayectoria</div>
+                </div>
+                <div class="col-6 col-md-4">
+                    <div class="stat-numero-azul">+120</div>
+                    <div class="stat-etiqueta-azul">Profesionales y Especialistas</div>
+                </div>
+                <div class="col-12 col-md-4">
+                    <div class="stat-numero-azul">15 min</div>
+                    <div class="stat-etiqueta-azul">Módulos de Atención Ágil</div>
                 </div>
             </div>
         </div>
+
+        <hr class="seccion-divisor" />
 
         <!-- Tarjetas de Acceso Directo -->
         <div class="row g-4">
@@ -160,8 +205,54 @@
                     </div>
                 </div>
             </div>
-
         </div>
+
+        <hr class="seccion-divisor" />
+
+        <!-- Franja Visual: Flujo de Atención -->
+        <div class="workflow-card border-0 shadow-sm overflow-hidden mt-5">
+            <div class="row g-0 align-items-center">
+                <div class="col-lg-5">
+                    <img src="/Images/slide-5.jpg" class="workflow-img" alt="Equipamiento e infraestructura de GSH Clínica Médica">
+                </div>
+                <div class="col-lg-7">
+                    <div class="p-4 p-lg-5">
+                        <span class="badge bg-info-subtle text-info-emphasis mb-2 px-3 py-2">Gestión Ágil</span>
+                        <h3 class="fw-bold text-dark mb-2">Cómo organizamos la atención diaria</h3>
+                        <p class="text-muted mb-4">
+                            Un circuito claro para coordinar profesionales, especialidades y disponibilidad horaria sin superposiciones.
+                        </p>
+
+                        <div class="d-flex flex-column gap-3">
+                            <div class="d-flex align-items-start gap-3">
+                                <span class="step-badge">1</span>
+                                <div>
+                                    <h6 class="fw-bold text-dark mb-1">Registro y especialidades</h6>
+                                    <p class="text-muted small mb-0">Alta de pacientes, gestión de médicos activos y asignación de áreas médicas.</p>
+                                </div>
+                            </div>
+
+                            <div class="d-flex align-items-start gap-3">
+                                <span class="step-badge">2</span>
+                                <div>
+                                    <h6 class="fw-bold text-dark mb-1">Disponibilidad en bloques de 15 minutos</h6>
+                                    <p class="text-muted small mb-0">Cálculo automático de horarios libres según los días y franjas de trabajo de cada profesional.</p>
+                                </div>
+                            </div>
+
+                            <div class="d-flex align-items-start gap-3">
+                                <span class="step-badge">3</span>
+                                <div>
+                                    <h6 class="fw-bold text-dark mb-1">Reserva, reprogramación y seguimiento</h6>
+                                    <p class="text-muted small mb-0">Control centralizado de turnos y estados para agilizar la atención en consultorio.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
 
     </div>
 

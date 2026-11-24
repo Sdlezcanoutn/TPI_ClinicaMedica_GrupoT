@@ -161,6 +161,11 @@ namespace Negocio
                 throw new ArgumentException("La especialidad seleccionada no existe o está inactiva.");
             }
 
+            if (!EstaDentroDeHorarioLaboral(medico.Id, fechaSolo, horaInicio, horaFin))
+            {
+                throw new ArgumentException("El horario seleccionado está fuera del horario laboral del médico para ese día.");
+            }
+
             // Evitar superposición de turnos (mismo médico o mismo paciente) en turnos no cancelados
             bool haySuperposicion = listar().Any(t =>
                 t.Fecha.Date == fechaSolo &&
@@ -205,6 +210,119 @@ namespace Negocio
             {
                 datos.cerrarConexion();
             }
+        }
+
+        public class SlotHorario
+        {
+            public TimeSpan HoraInicio { get; set; }
+            public TimeSpan HoraFin { get; set; }
+            public string Etiqueta => $"{HoraInicio:hh\\:mm} - {HoraFin:hh\\:mm}";
+        }
+
+        private int NormalizarDiaSemanaSql(string diaSemanaTexto)
+        {
+            if (!int.TryParse(diaSemanaTexto, out int valor))
+                return -1;
+
+            // Si está en 1..7 (ej. 1=Lunes..7=Domingo en ISO/SQL), convertir 7 -> 0 (Domingo)
+            // y 1..6 -> 1..6 (Lunes..Sábado) para alinear con DayOfWeek (Domingo=0..Sábado=6).
+            if (valor >= 1 && valor <= 7)
+                return valor == 7 ? 0 : valor;
+
+            // Si ya viene en 0..6 (Domingo=0..Sábado=6)
+            if (valor >= 0 && valor <= 6)
+                return valor;
+
+            return -1;
+        }
+
+        private bool EstaDentroDeHorarioLaboral(int idMedico, DateTime fecha, TimeSpan horaInicio, TimeSpan horaFin)
+        {
+            int diaBuscado = (int)fecha.Date.DayOfWeek;
+            HorarioTrabajoNegocio horarioNegocio = new HorarioTrabajoNegocio();
+
+            List<HorarioTrabajo> horariosMedico = horarioNegocio.listar()
+                .Where(h => h.Estado &&
+                            h.Medico != null &&
+                            h.Medico.Id == idMedico &&
+                            NormalizarDiaSemanaSql(h.Dia_Semana) == diaBuscado)
+                .ToList();
+
+            if (horariosMedico.Count == 0)
+                return false;
+
+            return horariosMedico.Any(h =>
+            {
+                TimeSpan entrada = h.Hora_Entrada.TimeOfDay;
+                TimeSpan salida = h.Hora_Salida.TimeOfDay;
+                return horaInicio >= entrada && horaFin <= salida;
+            });
+        }
+
+        public List<SlotHorario> obtenerHorariosDisponibles(int idMedico, DateTime fecha, int duracionMinutos = 15)
+        {
+            List<SlotHorario> disponibles = new List<SlotHorario>();
+
+            if (idMedico <= 0 || duracionMinutos <= 0 || fecha.Date < DateTime.Today)
+                return disponibles;
+
+            int diaBuscado = (int)fecha.Date.DayOfWeek;
+            HorarioTrabajoNegocio horarioNegocio = new HorarioTrabajoNegocio();
+
+            List<HorarioTrabajo> franjas = horarioNegocio.listar()
+                .Where(h => h.Estado &&
+                            h.Medico != null &&
+                            h.Medico.Id == idMedico &&
+                            NormalizarDiaSemanaSql(h.Dia_Semana) == diaBuscado)
+                .ToList();
+
+            if (franjas.Count == 0)
+                return disponibles;
+
+            List<Turno> turnosOcupados = listar()
+                .Where(t => t.Medico != null &&
+                            t.Medico.Id == idMedico &&
+                            t.Fecha.Date == fecha.Date &&
+                            t.Estado != null &&
+                            !string.Equals(t.Estado.Nombre, "Cancelado", StringComparison.OrdinalIgnoreCase))
+                .ToList();
+
+            TimeSpan duracion = TimeSpan.FromMinutes(duracionMinutos);
+            TimeSpan ahora = DateTime.Now.TimeOfDay;
+            bool esHoy = fecha.Date == DateTime.Today;
+
+            foreach (HorarioTrabajo franja in franjas)
+            {
+                TimeSpan actual = franja.Hora_Entrada.TimeOfDay;
+                TimeSpan finFranja = franja.Hora_Salida.TimeOfDay;
+
+                while (actual + duracion <= finFranja)
+                {
+                    TimeSpan finSlot = actual + duracion;
+
+                    bool yaPaso = esHoy && actual <= ahora;
+                    bool ocupado = turnosOcupados.Any(t =>
+                        actual < t.Hora_Fin.TimeOfDay &&
+                        finSlot > t.Hora_Inicio.TimeOfDay);
+
+                    if (!yaPaso && !ocupado)
+                    {
+                        bool yaAgregado = disponibles.Any(s => s.HoraInicio == actual && s.HoraFin == finSlot);
+                        if (!yaAgregado)
+                        {
+                            disponibles.Add(new SlotHorario
+                            {
+                                HoraInicio = actual,
+                                HoraFin = finSlot
+                            });
+                        }
+                    }
+
+                    actual = actual.Add(duracion);
+                }
+            }
+
+            return disponibles.OrderBy(s => s.HoraInicio).ToList();
         }
     }
 }

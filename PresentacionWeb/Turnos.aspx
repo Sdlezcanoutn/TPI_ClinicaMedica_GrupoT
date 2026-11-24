@@ -23,25 +23,52 @@
                     </div>
                 </div>
 
-                <!-- Buscador y Filtro por Paciente / Médico -->
-                <div class="row g-3 mb-4">
-                    <div class="col-md-6 col-lg-4">
-                        <div class="input-group search-box">
-                            <span class="input-group-text bg-light border-end-0">
-                                <i class="fa-solid fa-magnifying-glass"></i>
-                            </span>
-                            <asp:TextBox ID="txtBuscar" runat="server"
-                                CssClass="form-control bg-light border-start-0"
-                                Placeholder="Buscar por Paciente o Médico..."
-                                AutoPostBack="True"
-                                OnTextChanged="txtBuscar_TextChanged" />
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Listado y alertas -->
+                <!-- Listado, filtros y alertas -->
                 <asp:UpdatePanel ID="upListadoTurnos" runat="server" UpdateMode="Conditional">
                     <ContentTemplate>
+
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6 col-lg-3">
+                                <div class="input-group search-box">
+                                    <span class="input-group-text bg-light border-end-0">
+                                        <i class="fa-solid fa-magnifying-glass"></i>
+                                    </span>
+                                    <asp:TextBox ID="txtBuscar" runat="server"
+                                        CssClass="form-control bg-light border-start-0"
+                                        Placeholder="Buscar por Paciente o Médico..."
+                                        AutoPostBack="true"
+                                        OnTextChanged="txtBuscar_TextChanged" />
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 col-lg-3">
+                                <asp:DropDownList ID="ddlFiltroEspecialidad" runat="server"
+                                    CssClass="form-select bg-light"
+                                    AutoPostBack="true"
+                                    OnSelectedIndexChanged="FiltroListado_Changed" />
+                            </div>
+
+                            <div class="col-md-6 col-lg-3">
+                                <asp:DropDownList ID="ddlFiltroMedico" runat="server"
+                                    CssClass="form-select bg-light"
+                                    AutoPostBack="true"
+                                    OnSelectedIndexChanged="FiltroListado_Changed" />
+                            </div>
+
+                            <div class="col-md-6 col-lg-3 d-flex gap-2">
+                                <asp:TextBox ID="txtFiltroFecha" runat="server"
+                                    TextMode="Date"
+                                    CssClass="form-control bg-light"
+                                    AutoPostBack="true"
+                                    OnTextChanged="FiltroListado_Changed" />
+                                <asp:LinkButton ID="btnLimpiarFiltros" runat="server"
+                                    CssClass="btn btn-outline-secondary"
+                                    ToolTip="Limpiar filtros"
+                                    OnClick="btnLimpiarFiltros_Click">
+                                    <i class="fa-solid fa-rotate-left"></i>
+                                </asp:LinkButton>
+                            </div>
+                        </div>
 
                         <asp:Label ID="lblErrorListadoTurno" runat="server"
                             CssClass="text-danger small d-block mb-2"
@@ -134,14 +161,29 @@
 
                                 <div class="col-md-6">
                                     <label class="form-label">Médico *</label>
-                                    <asp:DropDownList ID="ddlMedico" runat="server" CssClass="form-select" />
+                                    <asp:DropDownList ID="ddlMedico" runat="server"
+                                        CssClass="form-select"
+                                        AutoPostBack="true"
+                                        OnSelectedIndexChanged="DisponibilidadTurno_Changed" />
                                 </div>
 
                                 <div class="col-md-6">
                                     <label class="form-label">Fecha *</label>
                                     <asp:TextBox ID="txtFechaTurno" runat="server"
                                         CssClass="form-control"
-                                        TextMode="Date" />
+                                        TextMode="Date"
+                                        AutoPostBack="true"
+                                        OnTextChanged="DisponibilidadTurno_Changed" />
+                                </div>
+
+                                <div class="col-12">
+                                    <label class="form-label">Horarios disponibles (cada 15 min)</label>
+                                    <asp:DropDownList ID="ddlHorariosDisponibles" runat="server"
+                                        CssClass="form-select"
+                                        AutoPostBack="true"
+                                        OnSelectedIndexChanged="ddlHorariosDisponibles_SelectedIndexChanged" />
+                                    <asp:Label ID="lblInfoDisponibilidad" runat="server"
+                                        CssClass="form-text text-muted d-block mt-1" />
                                 </div>
 
                                 <div class="col-md-6">
@@ -222,7 +264,8 @@
         const selectIds = [
             "<%= ddlPaciente.ClientID %>",
             "<%= ddlEspecialidad.ClientID %>",
-            "<%= ddlMedico.ClientID %>"
+            "<%= ddlMedico.ClientID %>",
+            "<%= ddlHorariosDisponibles.ClientID %>"
         ];
 
         selectIds.forEach(function (id) {
@@ -274,20 +317,24 @@
         const ddlPac = document.getElementById("<%= ddlPaciente.ClientID %>");
         const ddlEsp = document.getElementById("<%= ddlEspecialidad.ClientID %>");
         const ddlMed = document.getElementById("<%= ddlMedico.ClientID %>");
+        const ddlSlots = document.getElementById("<%= ddlHorariosDisponibles.ClientID %>");
 
         if (ddlPac) ddlPac.selectedIndex = 0;
         if (ddlEsp) ddlEsp.selectedIndex = 0;
         if (ddlMed) ddlMed.selectedIndex = 0;
+        if (ddlSlots) ddlSlots.selectedIndex = 0;
 
         const txtFecha = document.getElementById("<%= txtFechaTurno.ClientID %>");
         const txtInicio = document.getElementById("<%= txtHoraInicio.ClientID %>");
         const txtFin = document.getElementById("<%= txtHoraFin.ClientID %>");
         const txtMotivo = document.getElementById("<%= txtMotivoConsulta.ClientID %>");
+        const lblSlots = document.getElementById("<%= lblInfoDisponibilidad.ClientID %>");
 
         if (txtFecha) txtFecha.value = "";
         if (txtInicio) txtInicio.value = "";
         if (txtFin) txtFin.value = "";
         if (txtMotivo) txtMotivo.value = "";
+        if (lblSlots) lblSlots.textContent = "";
 
         ocultarErrorTurno();
         actualizarEstiloPlaceholderSelects();
