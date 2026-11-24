@@ -64,6 +64,12 @@ namespace Negocio
         }
         public void agregar(HorarioTrabajo horario)
         {
+            // Validar superposición horaria
+            if (existeSuperposicion(horario))
+                throw new InvalidOperationException(
+                    "El médico ya tiene un horario superpuesto para ese día."
+                );
+
             AccesoDatos datos = new AccesoDatos();
 
             try
@@ -88,6 +94,12 @@ namespace Negocio
         }
         public void modificar(HorarioTrabajo horario)
         {
+            // Validar superposición horaria
+            if (existeSuperposicion(horario))
+                throw new InvalidOperationException(
+                    "El médico ya tiene un horario superpuesto para ese día."
+                );
+
             AccesoDatos datos = new AccesoDatos();
 
             try
@@ -126,6 +138,37 @@ namespace Negocio
 
                 datos.setearParametro("@Id", id);
                 datos.ejecutarAccion();
+            }
+            finally
+            {
+                datos.cerrarConexion();
+            }
+        }
+        private bool existeSuperposicion(HorarioTrabajo horario)
+        {
+            AccesoDatos datos = new AccesoDatos();
+
+            try
+            {
+                datos.setearConsulta(
+                    "SELECT TOP 1 1 FROM HORARIOS_TRABAJO " +
+                    "WHERE Id_Medico = @IdMedico " +
+                    "AND Dia_Semana = @DiaSemana " +
+                    "AND Estado = 1 " +
+                    "AND Id_Horario_Trabajo <> @IdHorario " +
+                    "AND Hora_Entrada < @HoraSalida " +
+                    "AND Hora_Salida > @HoraEntrada"
+                );
+
+                datos.setearParametro("@IdMedico", horario.Medico.Id);
+                datos.setearParametro("@DiaSemana", byte.Parse(horario.Dia_Semana));
+                datos.setearParametro("@IdHorario", horario.Id);
+                datos.setearParametro("@HoraEntrada", horario.Hora_Entrada.TimeOfDay);
+                datos.setearParametro("@HoraSalida", horario.Hora_Salida.TimeOfDay);
+
+                datos.ejecutarLectura();
+
+                return datos.Lector.Read();
             }
             finally
             {

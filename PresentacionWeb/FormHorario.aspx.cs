@@ -133,6 +133,10 @@ namespace PresentacionWeb
                 Response.Redirect("~/Horarios.aspx", false);
                 Context.ApplicationInstance.CompleteRequest();
             }
+            catch (InvalidOperationException ex)
+            {
+                lblMensaje.Text = ex.Message;
+            }
             catch (Exception ex)
             {
                 lblMensaje.Text = "Error al guardar el horario: " + ex.Message;
