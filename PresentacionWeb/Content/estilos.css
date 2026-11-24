@@ -221,7 +221,121 @@ form > div, main, .body-content {
     border-radius: 20px !important;
     box-shadow: 0 20px 40px -10px rgba(15, 23, 42, 0.08), 0 10px 20px -15px rgba(15, 23, 42, 0.04) !important;
 }
-  
+
+.dashboard-glass-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.dashboard-glass-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 0.75rem 1.5rem rgba(15, 23, 42, 0.08) !important;
+}
+
+.badge-violeta {
+    background-color: #F5E59A;
+    color: #ffffff;
+}
+
+.welcome-photo {
+    width: 100%;
+    height: 295px;
+    object-fit: cover;
+    object-position: center;
+}
+
+.stat-numero-azul {
+    font-size: clamp(2.1rem, 3.2vw, 3rem);
+    font-weight: 300;
+    line-height: 1.1;
+    color: #1d5fa7;
+    letter-spacing: -0.02em;
+}
+
+.stat-etiqueta-azul {
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #2b6cb0;
+    margin-top: 0.45rem;
+}
+
+.bienvenida-columna-texto p {
+    font-size: 1rem;
+    line-height: 1.65;
+    color: #475569;
+}
+
+.seccion-divisor {
+    border: 0;
+    border-top: 1px solid #e2e8f0;
+    opacity: 1;
+    margin: 3.5rem 0;
+}
+
+.workflow-card {
+    background-color: #ffffff;
+    border-radius: 1rem;
+    border: 1px solid #eef2f6;
+}
+
+.workflow-img {
+    width: 100%;
+    height: 100%;
+    min-height: 290px;
+    max-height: 340px;
+    object-fit: cover;
+    object-position: center;
+}
+
+.step-badge {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: #e0f2fe;
+    color: #0369a1;
+    font-weight: 700;
+    font-size: 0.9rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.acceso-card {
+    background-color: #ffffff;
+    border: 1px solid #e6ecf2;
+    border-radius: 0.85rem;
+    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.acceso-card:hover {
+    transform: translateY(-3px);
+    border-color: #cbd5e1;
+    box-shadow: 0 0.65rem 1.4rem rgba(15, 23, 42, 0.06);
+}
+
+.acceso-icono {
+    color: #1d5fa7;
+    font-size: 1.35rem;
+}
+
+.acceso-link {
+    color: #1d5fa7;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    transition: gap 0.2s ease, color 0.2s ease;
+}
+
+.acceso-link:hover {
+    color: #0f3d73;
+    gap: 0.55rem;
+}
+
 /* Footer */
 .footer-institucional {
     font-weight: 300;
