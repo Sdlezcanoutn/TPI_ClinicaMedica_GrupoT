@@ -150,40 +150,13 @@ namespace PresentacionWeb
         protected global::System.Web.UI.WebControls.TextBox txtFechaTurno;
 
         /// <summary>
-        /// Control ddlHorariosDisponibles.
+        /// Control ddlHorarioDisponible.
         /// </summary>
         /// <remarks>
         /// Campo generado automáticamente.
         /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.DropDownList ddlHorariosDisponibles;
-
-        /// <summary>
-        /// Control lblInfoDisponibilidad.
-        /// </summary>
-        /// <remarks>
-        /// Campo generado automáticamente.
-        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblInfoDisponibilidad;
-
-        /// <summary>
-        /// Control txtHoraInicio.
-        /// </summary>
-        /// <remarks>
-        /// Campo generado automáticamente.
-        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtHoraInicio;
-
-        /// <summary>
-        /// Control txtHoraFin.
-        /// </summary>
-        /// <remarks>
-        /// Campo generado automáticamente.
-        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtHoraFin;
+        protected global::System.Web.UI.WebControls.DropDownList ddlHorarioDisponible;
 
         /// <summary>
         /// Control txtMotivoConsulta.
