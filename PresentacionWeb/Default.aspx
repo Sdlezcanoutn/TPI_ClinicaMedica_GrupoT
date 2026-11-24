@@ -120,90 +120,82 @@
         <hr class="seccion-divisor" />
 
         <!-- Tarjetas de Acceso Directo -->
-        <div class="row g-4">
+        <div class="my-4 py-2">
+            <div class="mb-4">
+                <span class="text-uppercase small fw-semibold text-muted" style="letter-spacing: 0.08em;">Gestión del sistema</span>
+                <h3 class="fw-bold text-dark mt-1 mb-0">Accesos principales</h3>
+            </div>
 
-            <!-- Turnos -->
-            <div class="col-md-6 col-xl-3">
-                <div class="card dashboard-glass-card border-0 shadow-sm rounded-3 h-100">
-                    <div class="card-body p-4 d-flex flex-column justify-content-between">
+            <div class="row g-4">
+
+                <!-- Turnos -->
+                <div class="col-md-6 col-xl-3">
+                    <div class="acceso-card p-4 h-100 d-flex flex-column justify-content-between">
                         <div>
                             <div class="d-flex align-items-center justify-content-between mb-3">
-                                <span class="p-3 bg-primary-subtle text-primary rounded-3">
-                                    <i class="fa-solid fa-calendar-check fs-4"></i>
-                                </span>
+                                <i class="fa-solid fa-calendar-check acceso-icono"></i>
                                 <span class="text-muted small">Agendamiento</span>
                             </div>
-                            <h5 class="fw-bold text-dark">Turnos</h5>
+                            <h5 class="fw-bold text-dark mb-2">Turnos</h5>
                             <p class="text-muted small mb-0">Administración de citas, horarios y atención a pacientes.</p>
                         </div>
-                        <div class="mt-4 pt-2 border-top">
-                            <a href="Turnos.aspx" class="btn btn-sm btn-outline-secondary w-100">Ir a Turnos →</a>
+                        <div class="mt-4 pt-3 border-top">
+                            <a href="Turnos.aspx" class="acceso-link">Ir a Turnos <span aria-hidden="true">→</span></a>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Pacientes -->
-            <div class="col-md-6 col-xl-3">
-                <div class="card dashboard-glass-card border-0 shadow-sm rounded-3 h-100">
-                    <div class="card-body p-4 d-flex flex-column justify-content-between">
+                <!-- Pacientes -->
+                <div class="col-md-6 col-xl-3">
+                    <div class="acceso-card p-4 h-100 d-flex flex-column justify-content-between">
                         <div>
                             <div class="d-flex align-items-center justify-content-between mb-3">
-                                <span class="p-3 bg-success-subtle text-success rounded-3">
-                                    <i class="fa-solid fa-user-group fs-4"></i>
-                                </span>
+                                <i class="fa-solid fa-user-group acceso-icono"></i>
                                 <span class="text-muted small">Registros</span>
                             </div>
-                            <h5 class="fw-bold text-dark">Pacientes</h5>
+                            <h5 class="fw-bold text-dark mb-2">Pacientes</h5>
                             <p class="text-muted small mb-0">Gestión de datos personales e historias clínicas.</p>
                         </div>
-                        <div class="mt-4 pt-2 border-top">
-                            <a href="Pacientes.aspx" class="btn btn-sm btn-outline-secondary w-100">Ir a Pacientes →</a>
+                        <div class="mt-4 pt-3 border-top">
+                            <a href="Pacientes.aspx" class="acceso-link">Ir a Pacientes <span aria-hidden="true">→</span></a>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Médicos -->
-            <div class="col-md-6 col-xl-3">
-                <div class="card dashboard-glass-card border-0 shadow-sm rounded-3 h-100">
-                    <div class="card-body p-4 d-flex flex-column justify-content-between">
+                <!-- Médicos -->
+                <div class="col-md-6 col-xl-3">
+                    <div class="acceso-card p-4 h-100 d-flex flex-column justify-content-between">
                         <div>
                             <div class="d-flex align-items-center justify-content-between mb-3">
-                                <span class="p-3 bg-info-subtle text-info-emphasis rounded-3">
-                                    <i class="fa-solid fa-user-doctor fs-4"></i>
-                                </span>
+                                <i class="fa-solid fa-user-doctor acceso-icono"></i>
                                 <span class="text-muted small">Personal</span>
                             </div>
-                            <h5 class="fw-bold text-dark">Médicos</h5>
+                            <h5 class="fw-bold text-dark mb-2">Médicos</h5>
                             <p class="text-muted small mb-0">Control del cuerpo médico, matrículas y estados.</p>
                         </div>
-                        <div class="mt-4 pt-2 border-top">
-                            <a href="Medicos.aspx" class="btn btn-sm btn-outline-secondary w-100">Ir a Médicos →</a>
+                        <div class="mt-4 pt-3 border-top">
+                            <a href="Medicos.aspx" class="acceso-link">Ir a Médicos <span aria-hidden="true">→</span></a>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Especialidades -->
-            <div class="col-md-6 col-xl-3">
-                <div class="card dashboard-glass-card border-0 shadow-sm rounded-3 h-100">
-                    <div class="card-body p-4 d-flex flex-column justify-content-between">
+                <!-- Especialidades -->
+                <div class="col-md-6 col-xl-3">
+                    <div class="acceso-card p-4 h-100 d-flex flex-column justify-content-between">
                         <div>
                             <div class="d-flex align-items-center justify-content-between mb-3">
-                                <span class="p-3 bg-warning-subtle text-warning-emphasis rounded-3">
-                                    <i class="fa-solid fa-stethoscope fs-4"></i>
-                                </span>
+                                <i class="fa-solid fa-stethoscope acceso-icono"></i>
                                 <span class="text-muted small">Catálogo</span>
                             </div>
-                            <h5 class="fw-bold text-dark">Especialidades</h5>
+                            <h5 class="fw-bold text-dark mb-2">Especialidades</h5>
                             <p class="text-muted small mb-0">Configuración de áreas médicas de la clínica.</p>
                         </div>
-                        <div class="mt-4 pt-2 border-top">
-                            <a href="Especialidades.aspx" class="btn btn-sm btn-outline-secondary w-100">Ir a Especialidades →</a>
+                        <div class="mt-4 pt-3 border-top">
+                            <a href="Especialidades.aspx" class="acceso-link">Ir a Especialidades <span aria-hidden="true">→</span></a>
                         </div>
                     </div>
                 </div>
+
             </div>
         </div>
 
