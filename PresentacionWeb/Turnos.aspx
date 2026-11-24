@@ -161,14 +161,29 @@
 
                                 <div class="col-md-6">
                                     <label class="form-label">Médico *</label>
-                                    <asp:DropDownList ID="ddlMedico" runat="server" CssClass="form-select" />
+                                    <asp:DropDownList ID="ddlMedico" runat="server"
+                                        CssClass="form-select"
+                                        AutoPostBack="true"
+                                        OnSelectedIndexChanged="DisponibilidadTurno_Changed" />
                                 </div>
 
                                 <div class="col-md-6">
                                     <label class="form-label">Fecha *</label>
                                     <asp:TextBox ID="txtFechaTurno" runat="server"
                                         CssClass="form-control"
-                                        TextMode="Date" />
+                                        TextMode="Date"
+                                        AutoPostBack="true"
+                                        OnTextChanged="DisponibilidadTurno_Changed" />
+                                </div>
+
+                                <div class="col-12">
+                                    <label class="form-label">Horarios disponibles (cada 15 min)</label>
+                                    <asp:DropDownList ID="ddlHorariosDisponibles" runat="server"
+                                        CssClass="form-select"
+                                        AutoPostBack="true"
+                                        OnSelectedIndexChanged="ddlHorariosDisponibles_SelectedIndexChanged" />
+                                    <asp:Label ID="lblInfoDisponibilidad" runat="server"
+                                        CssClass="form-text text-muted d-block mt-1" />
                                 </div>
 
                                 <div class="col-md-6">
@@ -249,7 +264,8 @@
         const selectIds = [
             "<%= ddlPaciente.ClientID %>",
             "<%= ddlEspecialidad.ClientID %>",
-            "<%= ddlMedico.ClientID %>"
+            "<%= ddlMedico.ClientID %>",
+            "<%= ddlHorariosDisponibles.ClientID %>"
         ];
 
         selectIds.forEach(function (id) {
@@ -301,20 +317,24 @@
         const ddlPac = document.getElementById("<%= ddlPaciente.ClientID %>");
         const ddlEsp = document.getElementById("<%= ddlEspecialidad.ClientID %>");
         const ddlMed = document.getElementById("<%= ddlMedico.ClientID %>");
+        const ddlSlots = document.getElementById("<%= ddlHorariosDisponibles.ClientID %>");
 
         if (ddlPac) ddlPac.selectedIndex = 0;
         if (ddlEsp) ddlEsp.selectedIndex = 0;
         if (ddlMed) ddlMed.selectedIndex = 0;
+        if (ddlSlots) ddlSlots.selectedIndex = 0;
 
         const txtFecha = document.getElementById("<%= txtFechaTurno.ClientID %>");
         const txtInicio = document.getElementById("<%= txtHoraInicio.ClientID %>");
         const txtFin = document.getElementById("<%= txtHoraFin.ClientID %>");
         const txtMotivo = document.getElementById("<%= txtMotivoConsulta.ClientID %>");
+        const lblSlots = document.getElementById("<%= lblInfoDisponibilidad.ClientID %>");
 
         if (txtFecha) txtFecha.value = "";
         if (txtInicio) txtInicio.value = "";
         if (txtFin) txtFin.value = "";
         if (txtMotivo) txtMotivo.value = "";
+        if (lblSlots) lblSlots.textContent = "";
 
         ocultarErrorTurno();
         actualizarEstiloPlaceholderSelects();

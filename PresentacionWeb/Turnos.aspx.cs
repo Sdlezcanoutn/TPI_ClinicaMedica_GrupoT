@@ -27,6 +27,7 @@ namespace PresentacionWeb
             if (!IsPostBack)
             {
                 CargarCombos();
+                CargarHorariosDisponiblesModal();
                 CargarTurnos();
             }
         }
@@ -121,6 +122,9 @@ namespace PresentacionWeb
         {
             int idEspecialidad = int.TryParse(ddlEspecialidad.SelectedValue, out int id) ? id : 0;
             CargarMedicosPorEspecialidad(idEspecialidad);
+            txtHoraInicio.Text = string.Empty;
+            txtHoraFin.Text = string.Empty;
+            CargarHorariosDisponiblesModal();
             lblErrorTurno.Visible = false;
             upTurno.Update();
 
@@ -128,6 +132,87 @@ namespace PresentacionWeb
                 this,
                 GetType(),
                 "reabrirTurnoEspecialidad",
+                "mostrarModalTurno();",
+                true
+            );
+        }
+
+        private void CargarHorariosDisponiblesModal()
+        {
+            ddlHorariosDisponibles.Items.Clear();
+            lblInfoDisponibilidad.Text = string.Empty;
+
+            int idMedico = int.TryParse(ddlMedico.SelectedValue, out int mId) ? mId : 0;
+            bool fechaValida = DateTime.TryParseExact(
+                txtFechaTurno.Text.Trim(),
+                "yyyy-MM-dd",
+                CultureInfo.InvariantCulture,
+                DateTimeStyles.None,
+                out DateTime fechaSeleccionada);
+
+            if (idMedico <= 0 || !fechaValida)
+            {
+                ddlHorariosDisponibles.Items.Insert(0, new ListItem("-- Seleccione médico y fecha --", ""));
+                lblInfoDisponibilidad.Text = "Elegí un médico y una fecha para ver los horarios libres cada 15 minutos.";
+                return;
+            }
+
+            TurnoNegocio turnoNegocio = new TurnoNegocio();
+            List<TurnoNegocio.SlotHorario> slots = turnoNegocio.obtenerHorariosDisponibles(idMedico, fechaSeleccionada.Date, 15);
+
+            if (slots.Count == 0)
+            {
+                ddlHorariosDisponibles.Items.Insert(0, new ListItem("-- Sin horarios disponibles --", ""));
+                lblInfoDisponibilidad.Text = "No hay franjas horarias libres para el médico en esa fecha.";
+                txtHoraInicio.Text = string.Empty;
+                txtHoraFin.Text = string.Empty;
+                return;
+            }
+
+            ddlHorariosDisponibles.Items.Insert(0, new ListItem("-- Seleccione un horario disponible --", ""));
+            foreach (TurnoNegocio.SlotHorario slot in slots)
+            {
+                string valor = $"{slot.HoraInicio:hh\\:mm}|{slot.HoraFin:hh\\:mm}";
+                ddlHorariosDisponibles.Items.Add(new ListItem(slot.Etiqueta, valor));
+            }
+
+            lblInfoDisponibilidad.Text = $"{slots.Count} bloque(s) de 15 min disponible(s).";
+        }
+
+        protected void DisponibilidadTurno_Changed(object sender, EventArgs e)
+        {
+            txtHoraInicio.Text = string.Empty;
+            txtHoraFin.Text = string.Empty;
+            CargarHorariosDisponiblesModal();
+            lblErrorTurno.Visible = false;
+            upTurno.Update();
+
+            ScriptManager.RegisterStartupScript(
+                this,
+                GetType(),
+                "reabrirTurnoDisponibilidad",
+                "mostrarModalTurno();",
+                true
+            );
+        }
+
+        protected void ddlHorariosDisponibles_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            string seleccionado = ddlHorariosDisponibles.SelectedValue;
+            if (!string.IsNullOrWhiteSpace(seleccionado) && seleccionado.Contains("|"))
+            {
+                string[] partes = seleccionado.Split('|');
+                txtHoraInicio.Text = partes[0];
+                txtHoraFin.Text = partes[1];
+            }
+
+            lblErrorTurno.Visible = false;
+            upTurno.Update();
+
+            ScriptManager.RegisterStartupScript(
+                this,
+                GetType(),
+                "reabrirTurnoSlot",
                 "mostrarModalTurno();",
                 true
             );
