@@ -10,6 +10,7 @@
                 <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
                 <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
                 <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
+                <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="3" aria-label="Slide 4"></button>
             </div>
 
             <div class="carousel-inner">
@@ -44,6 +45,16 @@
                     </div>
                 </div>
 
+                <!-- Slide 4 -->
+                <div class="carousel-item" data-bs-interval="2500">
+                    <img src="/Images/slide-4.jpg" class="d-block w-100 carousel-img" alt="Acompañamiento y Cercanía">
+                    <div class="carousel-caption hero-caption-wide">
+                        <span class="badge badge-violeta text-dark mb-2 px-3 py-2">Cuidado Integral</span>
+                        <h2 class="fw-bold text-white fs-3">Acompañamiento cercano en cada consulta</h2>
+                        <p class="text-light mb-0">Agenda ágil, seguimiento médico y atención pensada para cada paciente.</p>
+                    </div>
+                </div>
+
             </div>
 
             <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
@@ -62,14 +73,19 @@
 
         <!-- Banner Bienvenida -->
         <div class="my-5">
-            <div class="row">
-                <div class="col-xl-9">
+            <div class="row align-items-center g-4">
+                <div class="col-lg-8">
                     <h2 class="fw-bold text-dark display-6 mb-2">Te damos la bienvenida a la medicina del futuro, centrada en vos y con el sentido humano de siempre
                     </h2>
                     <div class="divider-line mb-4"></div>
                     <p class="text-muted fs-5 lh-base mb-3">
                         Hace más de 170 años que transformamos la salud con innovación, excelencia y compromiso. Ese legado nos impulsa a seguir siendo pioneros en cuidados y tratamientos de vanguardia, marcando el rumbo de la medicina en la Argentina.
                     </p>
+                </div>
+                <div class="col-lg-4">
+                    <div class="rounded-3 overflow-hidden shadow-sm">
+                        <img src="/Images/slide-9.jpg" class="welcome-photo" alt="Instalaciones de GSH Clínica Médica">
+                    </div>
                 </div>
             </div>
         </div>

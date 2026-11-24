@@ -221,7 +221,28 @@ form > div, main, .body-content {
     border-radius: 20px !important;
     box-shadow: 0 20px 40px -10px rgba(15, 23, 42, 0.08), 0 10px 20px -15px rgba(15, 23, 42, 0.04) !important;
 }
-  
+
+.dashboard-glass-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.dashboard-glass-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 0.75rem 1.5rem rgba(15, 23, 42, 0.08) !important;
+}
+
+.badge-violeta {
+    background-color: #F5E59A;
+    color: #ffffff;
+}
+
+.welcome-photo {
+    width: 100%;
+    height: 295px;
+    object-fit: cover;
+    object-position: center;
+}  
+
 /* Footer */
 .footer-institucional {
     font-weight: 300;
