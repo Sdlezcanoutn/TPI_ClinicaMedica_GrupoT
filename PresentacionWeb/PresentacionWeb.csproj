@@ -130,6 +130,8 @@
     <Content Include="Images\slide-2.jpg" />
     <Content Include="Images\slide-3.jpg" />
     <Content Include="Images\slide-4.jpg" />
+    <Content Include="Images\slide-5.jpg" />
+    <Content Include="Images\slide-9.jpg" />
     <Content Include="Scripts\bootstrap.bundle.js" />
     <Content Include="Scripts\bootstrap.bundle.min.js" />
     <Content Include="Scripts\bootstrap.esm.js" />
