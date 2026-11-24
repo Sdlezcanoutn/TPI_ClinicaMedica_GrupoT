@@ -1,11 +1,12 @@
-﻿using System;
+﻿using Dominio;
+using Negocio;
+using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-using Dominio;
-using Negocio;
 
 namespace PresentacionWeb
 {
@@ -25,6 +26,8 @@ namespace PresentacionWeb
                 // Cargar las especialidades disponibles para asignar.
                 cargarEspecialidades();
             }
+            // Mantener la apariencia del filtro seleccionado.
+            actualizarEstiloFiltro();
         }
 
         // ============================================================
@@ -41,12 +44,70 @@ namespace PresentacionWeb
                 lblErrorListado.Visible = false;
                 dgvMedicos.Visible = true;
 
-                // --- Obtener el listado de médicos desde la base de datos ---
-                List<Medico> lista = negocio.listar();
+                // --- Filtrar médicos según el estado seleccionado ---
+                bool mostrarActivos = hfEstado.Value == "1";
+
+                // Obtiene todos los médicos de la base de datos
+                List<Medico> todos = negocio.listar();
+
+                // Filtra según el botón seleccionado
+                List<Medico> lista = todos
+                    .Where(m => m.Estado == mostrarActivos)
+                    .ToList();
+
+                // Obtener el texto ingresado en el buscador.
+                string busqueda = txtBuscar.Text.Trim();
+
+                // Buscar por nombre, apellido o matrícula (sin distinguir mayúsculas, minúsculas ni tildes)
+                if (!string.IsNullOrEmpty(busqueda))
+                {
+                    CompareInfo comparador = CultureInfo.GetCultureInfo("es-AR").CompareInfo;
+
+                    lista = lista.Where(m =>
+                        comparador.IndexOf(
+                            m.NombreCompleto ?? "",
+                            busqueda,
+                            CompareOptions.IgnoreCase | CompareOptions.IgnoreNonSpace) >= 0
+                        ||
+                        comparador.IndexOf(
+                            m.Matricula ?? "",
+                            busqueda,
+                            CompareOptions.IgnoreCase | CompareOptions.IgnoreNonSpace) >= 0
+                    ).ToList();
+                }
 
                 // --- Asignar los datos y actualizar la tabla ---
                 dgvMedicos.DataSource = lista;
                 dgvMedicos.DataBind();
+
+                // Mostrar el mensaje correspondiente cuando no hay resultados.
+                if (lista.Count == 0)
+                {
+                    Label lblSinResultados = dgvMedicos.Controls[0]
+                        .Controls[0].FindControl("lblSinResultados") as Label;
+
+                    if (lblSinResultados != null)
+                    {
+                        if(todos.Count == 0)
+                        {
+                            lblSinResultados.Text =
+                                "No hay médicos registrados en el sistema.";
+                        }
+                        else if (!string.IsNullOrEmpty(busqueda))
+                        {
+                            lblSinResultados.Text =
+                                "No se encontraron médicos que coincidan con la búsqueda.";
+                        }
+                        else if (mostrarActivos)
+                        {
+                            lblSinResultados.Text = "No hay médicos activos.";
+                        }
+                        else
+                        {
+                            lblSinResultados.Text = "No hay médicos inactivos.";
+                        }
+                    }
+                }
             }
             catch (Exception)
             {
@@ -59,6 +120,56 @@ namespace PresentacionWeb
                 // --- Ocultar la tabla si falla la consulta ---
                 dgvMedicos.Visible = false;
             }
+        }
+
+        // ============================================================
+        // BÚSQUEDA DE MÉDICOS
+        // ============================================================
+        protected void btnBuscar_Click(object sender, EventArgs e)
+        {
+            cargarMedicos();
+            upListado.Update();
+        }
+
+        // ============================================================
+        // FILTRO POR ESTADO DE MÉDICOS
+        // ============================================================
+        protected void btnActivos_Click(object sender, EventArgs e)
+        {
+            // Seleccionar médicos activos.
+            hfEstado.Value = "1";
+
+            // Actualizar apariencia y listado.
+            actualizarEstiloFiltro();
+            cargarMedicos();
+            upListado.Update();
+        }
+
+        protected void btnInactivos_Click(object sender, EventArgs e)
+        {
+            // Seleccionar médicos inactivos.
+            hfEstado.Value = "0";
+
+            // Actualizar apariencia y listado.
+            actualizarEstiloFiltro();
+            cargarMedicos();
+            upListado.Update();
+        }
+
+        // ============================================================
+        // APARIENCIA DE LOS FILTROS
+        // ============================================================
+        private void actualizarEstiloFiltro()
+        {
+            bool mostrarActivos = hfEstado.Value == "1";
+
+            btnActivos.CssClass = mostrarActivos
+                ? "btn btn-filtro-activo"
+                : "btn btn-outline-secondary";
+
+            btnInactivos.CssClass = mostrarActivos
+                ? "btn btn-outline-secondary"
+                : "btn btn-filtro-activo";
         }
 
         // ============================================================
@@ -93,43 +204,6 @@ namespace PresentacionWeb
                 // Evitar mostrar especialidades incompletas si ocurre un error.
                 cblEspecialidades.Items.Clear();
             }
-        }
-
-        // ============================================================
-        // PREPARAR FORMULARIO PARA NUEVO MÉDICO
-        // ============================================================
-        protected void btnNuevoMedico_Click(object sender, EventArgs e)
-        {
-            // --- Limpiar el identificador del médico ---
-            hfIdMedico.Value = "";
-
-            // --- Limpiar los datos del formulario ---
-            txtNombreMedico.Text = "";
-            txtApellidoMedico.Text = "";
-            txtDniMedico.Text = "";
-            txtMatriculaMedico.Text = "";
-            txtTelefonoMedico.Text = "";
-            txtEmailMedico.Text = "";
-
-            // --- Restablecer las especialidades ---
-            cargarEspecialidades();
-            cblEspecialidades.ClearSelection();
-
-            // --- Preparar el formulario para el alta ---
-            lblErrorMedico.Visible = false;
-            btnGuardarMedico.Text = "Guardar Médico";
-
-            upMedico.Update();
-
-            // --- Abrir el formulario ---
-            ScriptManager.RegisterStartupScript(
-                Page,
-                Page.GetType(),
-                "abrirNuevoMedico",
-                "document.getElementById('tituloModalMedico').textContent = 'Nuevo Médico';" +
-                "bootstrap.Modal.getOrCreateInstance(document.getElementById('modalMedico')).show();",
-                true
-            );
         }
 
         // ============================================================
@@ -460,7 +534,93 @@ namespace PresentacionWeb
                 lblErrorListado.Visible = true;
             }
         }
+        // ============================================================
+        // PREPARAR REACTIVACIÓN DEL MÉDICO
+        // ============================================================
+        protected void btnReactivar_Click(object sender, EventArgs e)
+        {
+            LinkButton boton = (LinkButton)sender;
+            int idMedico = int.Parse(boton.CommandArgument);
 
+            try
+            {
+                MedicoNegocio negocio = new MedicoNegocio();
+                Medico medico = negocio.listar().Find(m => m.Id == idMedico);
+
+                if (medico == null || medico.Estado)
+                {
+                    lblErrorListado.Text = "El médico no existe o ya está activo.";
+                    lblErrorListado.Visible = true;
+                    upListado.Update();
+                    return;
+                }
+
+                hfIdReactivar.Value = idMedico.ToString();
+                lblNombreReactivar.Text = medico.NombreCompleto;
+
+                upReactivarMedico.Update();
+
+                ScriptManager.RegisterStartupScript(
+                    Page,
+                    Page.GetType(),
+                    "abrirModalReactivar",
+                    "bootstrap.Modal.getOrCreateInstance(document.getElementById('modalReactivarMedico')).show();",
+                    true
+                );
+            }
+            catch (Exception)
+            {
+                lblErrorListado.Text =
+                    "No se pudieron consultar los datos del médico. Intente nuevamente.";
+                lblErrorListado.Visible = true;
+                upListado.Update();
+            }
+        }
+
+        // ============================================================
+        // CONFIRMAR REACTIVACIÓN DEL MÉDICO
+        // ============================================================
+        protected void btnConfirmarReactivar_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                int idMedico = int.Parse(hfIdReactivar.Value);
+
+                MedicoNegocio negocio = new MedicoNegocio();
+                negocio.reactivar(idMedico);
+
+                // --- Actualizar listado ---
+                cargarMedicos();
+                upListado.Update();
+
+                // --- Limpiar selección ---
+                hfIdReactivar.Value = "";
+
+                // --- Cerrar modal y mostrar confirmación ---
+                ScriptManager.RegisterStartupScript(
+                    Page,
+                    Page.GetType(),
+                    "reactivacionMedicoExitosa",
+                    "bootstrap.Modal.getOrCreateInstance(" +
+                    "document.getElementById('modalReactivarMedico')).hide();" +
+                    "mostrarExitoListadoMedico('Médico reactivado correctamente.');",
+                    true
+                );
+            }
+            catch (ArgumentException ex)
+            {
+                lblErrorListado.Text = ex.Message;
+                lblErrorListado.Visible = true;
+                upListado.Update();
+            }
+            catch (Exception)
+            {
+                lblErrorListado.Text =
+                    "No se pudo reactivar el médico. Intente nuevamente.";
+                lblErrorListado.Visible = true;
+                upListado.Update();
+            }
+        }
     }
 }
 

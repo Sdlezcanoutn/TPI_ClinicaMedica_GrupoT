@@ -108,9 +108,41 @@
                             <span class="input-group-text bg-light border-end-0">
                                 <i class="fa-solid fa-magnifying-glass"></i>
                             </span>
-                            <asp:TextBox ID="txtBuscar" runat="server" CssClass="form-control bg-light border-start-0" Placeholder="Buscar por Nombre o Matrícula..."></asp:TextBox>
+                            <asp:TextBox ID="txtBuscar" runat="server"
+                                CssClass="form-control bg-light border-start-0"
+                                Placeholder="Buscar por nombre, apellido o matrícula..."
+                                AutoPostBack="false"
+                                oninput="programarBusqueda()"
+                                onkeydown="if (event.key === 'Enter') { event.preventDefault(); ejecutarBusqueda(); }">
+                            </asp:TextBox>
+
+                            <asp:LinkButton ID="btnBuscar" runat="server"
+                                OnClick="btnBuscar_Click"
+                                CssClass="boton-busqueda-oculto">
+                            </asp:LinkButton>
                         </div>
                     </div>
+                </div>
+
+                <!-- ============================================================ -->
+                <!-- FILTRO POR ESTADO DE MÉDICOS -->
+                <!-- ============================================================ -->
+                <div class="d-flex gap-2 mb-4">
+
+                    <asp:LinkButton ID="btnActivos" runat="server"
+                        CssClass="btn btn-filtro-activo"
+                        OnClick="btnActivos_Click">
+                        Activos
+                    </asp:LinkButton>
+
+                    <asp:LinkButton ID="btnInactivos" runat="server"
+                        CssClass="btn btn-outline-secondary"
+                        OnClick="btnInactivos_Click">
+                        Inactivos
+                    </asp:LinkButton>
+
+                    <asp:HiddenField ID="hfEstado" runat="server" Value="1" />
+
                 </div>
 
                 <!-- ============================================================ -->
@@ -140,43 +172,56 @@
                                     <asp:BoundField DataField="NombreCompleto" HeaderText="Médico" />
                                     <asp:BoundField DataField="Especialidad" HeaderText="Especialidad" />
                                     <asp:BoundField DataField="Email" HeaderText="Email" />
-                                    <asp:TemplateField HeaderText="Estado">
-                                        <ItemTemplate>
-
-                                            <span class='<%# Convert.ToBoolean(Eval("Estado")) ? "badge bg-success" : "badge bg-secondary" %>'>
-                                                <%# Convert.ToBoolean(Eval("Estado")) ? "Activo" : "Inactivo" %> </span>
-
-                                        </ItemTemplate>
-                                    </asp:TemplateField>
                                     <asp:TemplateField HeaderText="Acciones" ItemStyle-CssClass="text-end" HeaderStyle-CssClass="text-end">
                                         <ItemTemplate>
-
 
                                             <asp:LinkButton ID="btnEditar" runat="server"
                                                 CssClass="btn btn-sm btn-outline-secondary me-1"
                                                 CommandArgument='<%# Eval("Id") %>'
-                                                OnClick="btnEditar_Click">
-                                                <i class="fa-solid fa-pen-to-square me-1"></i> Editar
-                                            </asp:LinkButton>
+                                                OnClick="btnEditar_Click"
+                                                Visible='<%# Convert.ToBoolean(Eval("Estado")) %>'>
+        <i class="fa-solid fa-pen-to-square me-1"></i> Editar
+    </asp:LinkButton>
 
                                             <asp:LinkButton ID="btnEliminar" runat="server"
                                                 CssClass="btn btn-sm btn-outline-danger"
                                                 CommandArgument='<%# Eval("Id") %>'
-                                                OnClick="btnEliminar_Click">
-                                            <i class="fa-solid fa-user-xmark me-1"></i> Desactivar
-                                        </asp:LinkButton>
+                                                OnClick="btnEliminar_Click"
+                                                Visible='<%# Convert.ToBoolean(Eval("Estado")) %>'>
+                                                <i class="fa-solid fa-user-xmark me-1"></i> Desactivar
+                                            </asp:LinkButton>
+
+                                            <asp:LinkButton ID="btnReactivar" runat="server"
+                                                CssClass="btn btn-sm btn-outline-success"
+                                                CommandArgument='<%# Eval("Id") %>'
+                                                OnClick="btnReactivar_Click"
+                                                Visible='<%# !Convert.ToBoolean(Eval("Estado")) %>'>
+                                                <i class="fa-solid fa-rotate-left me-1"></i> Reactivar
+                                            </asp:LinkButton>
+
                                         </ItemTemplate>
+
                                     </asp:TemplateField>
                                 </Columns>
                                 <EmptyDataTemplate>
                                     <div class="text-center py-5 text-muted">
                                         <i class="fa-solid fa-user-doctor fs-2 mb-2 d-block text-secondary opacity-50"></i>
-                                        <p class="m-0 fw-medium">No hay médicos registrados en el sistema.</p>
+                                        <p class="m-0 fw-medium">
+                                            <asp:Label ID="lblSinResultados" runat="server"
+                                                Text="No hay médicos registrados por el momento." />
+                                        </p>
                                     </div>
                                 </EmptyDataTemplate>
                             </asp:GridView>
                         </div>
                     </ContentTemplate>
+
+                    <Triggers>
+                        <asp:AsyncPostBackTrigger
+                            ControlID="btnBuscar"
+                            EventName="Click" />
+                    </Triggers>
+
                 </asp:UpdatePanel>
             </div>
 
@@ -334,7 +379,6 @@
         </div>
     </div>
 
-
     <!-- ============================================================ -->
     <!-- MODAL DE BAJA LÓGICA DE MÉDICOS -->
     <!-- ============================================================ -->
@@ -413,6 +457,60 @@
                                 Text="Confirmar baja"
                                 CssClass="btn btn-danger"
                                 OnClick="btnConfirmarBaja_Click" />
+                        </div>
+
+                    </ContentTemplate>
+                </asp:UpdatePanel>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- MODAL DE REACTIVACIÓN DE MÉDICOS -->
+    <!-- ============================================================ -->
+    <div class="modal fade" id="modalReactivarMedico" tabindex="-1"
+        aria-labelledby="tituloModalReactivar" aria-hidden="true">
+
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title" id="tituloModalReactivar">Reactivar médico
+                </h5>
+                    <button type="button" class="btn-close"
+                        data-bs-dismiss="modal" aria-label="Cerrar">
+                    </button>
+                </div>
+
+                <asp:UpdatePanel ID="upReactivarMedico" runat="server"
+                    UpdateMode="Conditional">
+                    <ContentTemplate>
+
+                        <asp:HiddenField ID="hfIdReactivar" runat="server" />
+
+                        <div class="modal-body">
+                            <p>
+                                ¿Está seguro de que desea reactivar al médico
+                           
+                                <strong>
+                                    <asp:Label ID="lblNombreReactivar" runat="server" />
+                                </strong>?
+                       
+                            </p>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary"
+                                data-bs-dismiss="modal">
+                                Cancelar
+                       
+                            </button>
+
+                            <asp:Button ID="btnConfirmarReactivar" runat="server"
+                                Text="Confirmar reactivación"
+                                CssClass="btn btn-success"
+                                OnClick="btnConfirmarReactivar_Click" />
                         </div>
 
                     </ContentTemplate>
@@ -663,7 +761,26 @@
 
         // --- Ocultar errores al modificar los campos del formulario ---
         document.getElementById('modalMedico')
-            .addEventListener('input', ocultarError);
-</script>
+        .addEventListener('input', ocultarError);
+
+        // ============================================================
+        // BÚSQUEDA DINÁMICA DE MÉDICOS
+        // ============================================================
+        let temporizadorBusqueda;
+
+        function programarBusqueda() {
+            clearTimeout(temporizadorBusqueda);
+
+            temporizadorBusqueda = setTimeout(function () {
+                ejecutarBusqueda();
+            }, 400);
+        }
+
+        function ejecutarBusqueda() {
+            __doPostBack('<%= btnBuscar.UniqueID %>', '');
+        }
+    </script>
 
 </asp:Content>
+
+

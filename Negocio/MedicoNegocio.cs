@@ -1,7 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Datos;
 using Dominio;
-using Datos;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Negocio
 {
@@ -468,6 +469,43 @@ namespace Negocio
                     "No se pudo completar la baja del médico. Intente nuevamente.");
             }
 
+        }
+        // ============================================================
+        // REACTIVACIÓN DE MÉDICOS
+        // ============================================================
+        public void reactivar(int idMedico)
+        {
+            // Verificar que el médico exista y esté inactivo.
+            Medico medico = listar().FirstOrDefault(m => m.Id == idMedico);
+
+            if (medico == null)
+            {
+                throw new ArgumentException("El médico seleccionado no existe.");
+            }
+
+            if (medico.Estado)
+            {
+                throw new ArgumentException("El médico ya se encuentra activo.");
+            }
+
+            // Reactivar médico.
+            AccesoDatos datos = new AccesoDatos();
+
+            try
+            {
+                datos.setearConsulta(
+                    "UPDATE MEDICOS " +
+                    "SET Estado = 1 " +
+                    "WHERE Id_Medico = @Id AND Estado = 0"
+                );
+
+                datos.setearParametro("@Id", idMedico);
+                datos.ejecutarAccion();
+            }
+            finally
+            {
+                datos.cerrarConexion();
+            }
         }
     }
 }
