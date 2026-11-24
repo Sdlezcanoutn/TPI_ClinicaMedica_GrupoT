@@ -159,6 +159,37 @@
                                         OnSelectedIndexChanged="ddlEspecialidad_SelectedIndexChanged" />
                                 </div>
 
+                                <div class="col-12">
+                                    <asp:Panel ID="pnlSugerenciasTurno" runat="server" Visible="false"
+                                        CssClass="border rounded-3 p-3 bg-light">
+                                        <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center mb-2">
+                                            <span class="small fw-semibold text-dark">
+                                                <i class="fa-solid fa-clock me-1 text-primary"></i>
+                                                Próximos horarios sugeridos (60 min)
+                                            </span>
+                                            <span class="small text-muted">Tocá una opción para autocompletar</span>
+                                        </div>
+
+                                        <asp:Repeater ID="rptSugerenciasTurno" runat="server"
+                                            OnItemCommand="rptSugerenciasTurno_ItemCommand">
+                                            <ItemTemplate>
+                                                <asp:LinkButton ID="btnSugerencia" runat="server"
+                                                    CssClass="btn btn-sm btn-outline-primary me-2 mb-2 text-start"
+                                                    CommandName="SeleccionarSugerencia"
+                                                    CommandArgument='<%# Eval("Argumento") %>'>
+                               <div class="fw-semibold"><%# Eval("MedicoTexto") %></div>
+                               <div class="small"><%# Eval("FechaTexto") %> · <%# Eval("HorarioTexto") %></div>
+                                                </asp:LinkButton>
+                                            </ItemTemplate>
+                                        </asp:Repeater>
+
+                                        <asp:Label ID="lblSinSugerencias" runat="server"
+                                            CssClass="small text-muted d-block"
+                                            Visible="false"
+                                            Text="No hay horarios libres en los próximos 21 días para esta especialidad." />
+                                    </asp:Panel>
+                                </div>
+
                                 <div class="col-md-6">
                                     <label class="form-label">Médico *</label>
                                     <asp:DropDownList ID="ddlMedico" runat="server"
@@ -228,8 +259,23 @@
     // Cierra el modal tras guardar y dispara el aviso de éxito
     function mostrarExitoTurno(texto) {
         const modalEl = document.getElementById("modalTurno");
-        const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
-        modal.hide();
+        if (modalEl) {
+            const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+            modal.hide();
+
+            modalEl.classList.remove("show");
+            modalEl.style.display = "none";
+            modalEl.setAttribute("aria-hidden", "true");
+        }
+
+        document.body.classList.remove("modal-open");
+        document.body.style.removeProperty("overflow");
+        document.body.style.removeProperty("padding-right");
+
+        document.querySelectorAll(".modal-backdrop").forEach(function (backdrop) {
+            backdrop.remove();
+        });
+
         mostrarAlertaTurno(texto);
     }
 
@@ -304,6 +350,9 @@
         if (txtFecha) txtFecha.value = "";
         if (txtMotivo) txtMotivo.value = "";
 
+        const pnlSug = document.getElementById("<%= pnlSugerenciasTurno.ClientID %>");
+        if (pnlSug) pnlSug.style.display = "none";
+
         ocultarErrorTurno();
         actualizarEstiloPlaceholderSelects();
     }
@@ -323,9 +372,22 @@
     function mostrarModalTurno() {
         engancharEventosCamposTurno();
         actualizarEstiloPlaceholderSelects();
-        bootstrap.Modal.getOrCreateInstance(
-            document.getElementById("modalTurno")
-        ).show();
+
+        const modalEl = document.getElementById("modalTurno");
+        if (!modalEl) return;
+
+        modalEl.classList.add("show");
+        modalEl.style.display = "block";
+        modalEl.removeAttribute("aria-hidden");
+        document.body.classList.add("modal-open");
+
+        if (!document.querySelector(".modal-backdrop")) {
+            const backdrop = document.createElement("div");
+            backdrop.className = "modal-backdrop fade show";
+            document.body.appendChild(backdrop);
+        }
+
+        bootstrap.Modal.getOrCreateInstance(modalEl);
     }
 
     (function () {

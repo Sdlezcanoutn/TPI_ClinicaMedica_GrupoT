@@ -11,17 +11,9 @@ namespace PresentacionWeb
 {
     public partial class Turnos : System.Web.UI.Page
     {
-        private class TurnoFila
-        {
-            public int Id { get; set; }
-            public string Fecha { get; set; }
-            public string Hora { get; set; }
-            public string Paciente { get; set; }
-            public string Medico { get; set; }
-            public string Especialidad { get; set; }
-            public string Estado { get; set; }
-        }
+        #region Eventos de página y controles
 
+        // Se ejecuta al cargar la página; solo en la primera carga (!IsPostBack) inicializa combos, horarios y grilla
         protected void Page_Load(object sender, EventArgs e)
         {
             if (!IsPostBack)
@@ -32,97 +24,41 @@ namespace PresentacionWeb
             }
         }
 
-        private void CargarCombos()
+        // Filtra el listado cuando el usuario escribe o cambia el texto de búsqueda
+        protected void txtBuscar_TextChanged(object sender, EventArgs e)
         {
-            PacienteNegocio pacienteNegocio = new PacienteNegocio();
-            List<Paciente> pacientesActivos = pacienteNegocio.listar()
-                .Where(p => p.Estado)
-                .OrderBy(p => p.Apellido)
-                .ThenBy(p => p.Nombre)
-                .ToList();
-
-            ddlPaciente.DataSource = pacientesActivos.Select(p => new
-            {
-                p.Id,
-                Texto = $"{p.Apellido}, {p.Nombre} (DNI {p.DNI})"
-            }).ToList();
-            ddlPaciente.DataValueField = "Id";
-            ddlPaciente.DataTextField = "Texto";
-            ddlPaciente.DataBind();
-            ddlPaciente.Items.Insert(0, new ListItem("-- Seleccione un paciente --", "0"));
-
-            EspecialidadNegocio especialidadNegocio = new EspecialidadNegocio();
-            List<Especialidad> especialidadesActivas = especialidadNegocio.listar()
-                .Where(esp => esp.Estado)
-                .OrderBy(esp => esp.Nombre)
-                .ToList();
-
-            ddlEspecialidad.DataSource = especialidadesActivas;
-            ddlEspecialidad.DataValueField = "Id";
-            ddlEspecialidad.DataTextField = "Nombre";
-            ddlEspecialidad.DataBind();
-            ddlEspecialidad.Items.Insert(0, new ListItem("-- Seleccione una especialidad --", "0"));
-
-            ddlFiltroEspecialidad.DataSource = especialidadesActivas;
-            ddlFiltroEspecialidad.DataValueField = "Id";
-            ddlFiltroEspecialidad.DataTextField = "Nombre";
-            ddlFiltroEspecialidad.DataBind();
-            ddlFiltroEspecialidad.Items.Insert(0, new ListItem("Todas las especialidades", "0"));
-
-            MedicoNegocio medicoNegocio = new MedicoNegocio();
-            List<Medico> todosMedicosActivos = medicoNegocio.listar()
-                .Where(m => m.Estado)
-                .OrderBy(m => m.Apellido)
-                .ThenBy(m => m.Nombre)
-                .ToList();
-
-            ddlFiltroMedico.DataSource = todosMedicosActivos.Select(m => new
-            {
-                m.Id,
-                Texto = $"{m.Apellido}, {m.Nombre}"
-            }).ToList();
-            ddlFiltroMedico.DataValueField = "Id";
-            ddlFiltroMedico.DataTextField = "Texto";
-            ddlFiltroMedico.DataBind();
-            ddlFiltroMedico.Items.Insert(0, new ListItem("Todos los médicos", "0"));
-
-            CargarMedicosPorEspecialidad(0);
+            AplicarFiltrosListado();
+            upListadoTurnos.Update();
         }
 
-        private void CargarMedicosPorEspecialidad(int idEspecialidad)
+        // Filtra el listado cuando cambia especialidad, médico o fecha en los filtros
+        protected void FiltroListado_Changed(object sender, EventArgs e)
         {
-            MedicoNegocio medicoNegocio = new MedicoNegocio();
-            List<Medico> medicosActivos = medicoNegocio.listar()
-                .Where(m => m.Estado)
-                .ToList();
-
-            if (idEspecialidad > 0)
-            {
-                medicosActivos = medicosActivos
-                    .Where(m => m.Especialidades != null &&
-                                m.Especialidades.Any(esp => esp.Id == idEspecialidad))
-                    .ToList();
-            }
-
-            ddlMedico.DataSource = medicosActivos
-                .OrderBy(m => m.Apellido)
-                .ThenBy(m => m.Nombre)
-                .Select(m => new
-                {
-                    m.Id,
-                    Texto = $"{m.Apellido}, {m.Nombre} (Mat. {m.Matricula})"
-                }).ToList();
-            ddlMedico.DataValueField = "Id";
-            ddlMedico.DataTextField = "Texto";
-            ddlMedico.DataBind();
-            ddlMedico.Items.Insert(0, new ListItem("-- Seleccione un médico --", "0"));
+            AplicarFiltrosListado();
+            upListadoTurnos.Update();
         }
 
+        // Resetea todos los filtros del listado y vuelve a mostrar todos los turnos
+        protected void btnLimpiarFiltros_Click(object sender, EventArgs e)
+        {
+            txtBuscar.Text = string.Empty;
+            ddlFiltroEspecialidad.SelectedIndex = 0;
+            ddlFiltroMedico.SelectedIndex = 0;
+            txtFiltroFecha.Text = string.Empty;
+
+            CargarTurnos();
+            upListadoTurnos.Update();
+        }
+
+        // Al cambiar especialidad en el modal: filtra médicos, actualiza horarios, busca hasta 3 sugerencias y reabre el modal
         protected void ddlEspecialidad_SelectedIndexChanged(object sender, EventArgs e)
         {
             int idEspecialidad = int.TryParse(ddlEspecialidad.SelectedValue, out int id) ? id : 0;
+
             CargarMedicosPorEspecialidad(idEspecialidad);
             CargarHorariosDisponibles();
+            CargarSugerenciasEspecialidad(idEspecialidad);
+
             lblErrorTurno.Visible = false;
             upTurno.Update();
 
@@ -135,115 +71,79 @@ namespace PresentacionWeb
             );
         }
 
-        private void CargarTurnos(string filtro = "", int idEspecialidad = 0, int idMedico = 0, DateTime? fechaFiltro = null)
+        // Recalcula los horarios disponibles de 60 min cuando cambia el médico seleccionado
+        protected void ddlMedico_SelectedIndexChanged(object sender, EventArgs e)
         {
-            TurnoNegocio negocio = new TurnoNegocio();
+            CargarHorariosDisponibles();
+            lblErrorTurno.Visible = false;
+            upTurno.Update();
 
-            try
-            {
-                lblErrorListadoTurno.Visible = false;
-                dgvTurnos.Visible = true;
-
-                List<Turno> lista = negocio.listar();
-
-                if (!string.IsNullOrWhiteSpace(filtro))
-                {
-                    string texto = filtro.Trim().ToLower();
-                    lista = lista.FindAll(t =>
-                        (t.Paciente != null &&
-                         ((!string.IsNullOrEmpty(t.Paciente.Nombre) && t.Paciente.Nombre.ToLower().Contains(texto)) ||
-                          (!string.IsNullOrEmpty(t.Paciente.Apellido) && t.Paciente.Apellido.ToLower().Contains(texto)) ||
-                          (!string.IsNullOrEmpty(t.Paciente.DNI) && t.Paciente.DNI.ToLower().Contains(texto)))) ||
-                        (t.Medico != null &&
-                         ((!string.IsNullOrEmpty(t.Medico.Nombre) && t.Medico.Nombre.ToLower().Contains(texto)) ||
-                          (!string.IsNullOrEmpty(t.Medico.Apellido) && t.Medico.Apellido.ToLower().Contains(texto)))) ||
-                        (t.Especialidad != null &&
-                         !string.IsNullOrEmpty(t.Especialidad.Nombre) && t.Especialidad.Nombre.ToLower().Contains(texto))
-                    );
-                }
-
-                if (idEspecialidad > 0)
-                {
-                    lista = lista.FindAll(t => t.Especialidad != null && t.Especialidad.Id == idEspecialidad);
-                }
-
-                if (idMedico > 0)
-                {
-                    lista = lista.FindAll(t => t.Medico != null && t.Medico.Id == idMedico);
-                }
-
-                if (fechaFiltro.HasValue)
-                {
-                    DateTime fechaBuscada = fechaFiltro.Value.Date;
-                    lista = lista.FindAll(t => t.Fecha.Date == fechaBuscada);
-                }
-
-                List<TurnoFila> filas = lista.Select(t => new TurnoFila
-                {
-                    Id = t.Id,
-                    Fecha = t.Fecha.ToString("dd/MM/yyyy"),
-                    Hora = $"{t.Hora_Inicio:HH:mm} - {t.Hora_Fin:HH:mm}",
-                    Paciente = t.Paciente != null ? $"{t.Paciente.Apellido}, {t.Paciente.Nombre}" : "",
-                    Medico = t.Medico != null ? $"{t.Medico.Apellido}, {t.Medico.Nombre}" : "",
-                    Especialidad = t.Especialidad != null ? t.Especialidad.Nombre : "",
-                    Estado = t.Estado != null ? t.Estado.Nombre : "Nuevo"
-                }).ToList();
-
-                dgvTurnos.DataSource = filas;
-                dgvTurnos.DataBind();
-            }
-            catch (Exception ex)
-            {
-                Session["error"] = ex.ToString();
-                lblErrorListadoTurno.Text = "No se pudo cargar el listado de turnos. Intentá nuevamente.";
-                lblErrorListadoTurno.Visible = true;
-                dgvTurnos.Visible = false;
-            }
+            ScriptManager.RegisterStartupScript(
+                this,
+                GetType(),
+                "reabrirTurnoMedico",
+                "mostrarModalTurno();",
+                true
+            );
         }
 
-        private void AplicarFiltrosListado()
+        // Recalcula los horarios disponibles de 60 min cuando cambia la fecha elegida
+        protected void txtFechaTurno_TextChanged(object sender, EventArgs e)
         {
-            int idEspecialidad = int.TryParse(ddlFiltroEspecialidad.SelectedValue, out int espId) ? espId : 0;
-            int idMedico = int.TryParse(ddlFiltroMedico.SelectedValue, out int medId) ? medId : 0;
+            CargarHorariosDisponibles();
+            lblErrorTurno.Visible = false;
+            upTurno.Update();
 
-            DateTime? fechaFiltro = null;
-            if (!string.IsNullOrWhiteSpace(txtFiltroFecha.Text) &&
-                DateTime.TryParseExact(
-                    txtFiltroFecha.Text.Trim(),
-                    "yyyy-MM-dd",
-                    CultureInfo.InvariantCulture,
-                    DateTimeStyles.None,
-                    out DateTime fechaParseada))
+            ScriptManager.RegisterStartupScript(
+                this,
+                GetType(),
+                "reabrirTurnoFecha",
+                "mostrarModalTurno();",
+                true
+            );
+        }
+
+        // Autocompleta médico, fecha y horario cuando el usuario hace clic en una sugerencia del Repeater
+        protected void rptSugerenciasTurno_ItemCommand(object source, RepeaterCommandEventArgs e)
+        {
+            if (e.CommandName != "SeleccionarSugerencia")
+                return;
+
+            // CommandArgument viene armado como: idMedico|yyyy-MM-dd|horaInicio|horaFin
+            string[] partes = (e.CommandArgument?.ToString() ?? string.Empty).Split('|');
+            if (partes.Length != 4)
+                return;
+
+            string idMedico = partes[0];
+            string fechaIso = partes[1];
+            string horarioValor = $"{partes[2]}|{partes[3]}";
+
+            if (ddlMedico.Items.FindByValue(idMedico) != null)
             {
-                fechaFiltro = fechaParseada.Date;
+                ddlMedico.SelectedValue = idMedico;
             }
 
-            CargarTurnos(txtBuscar.Text, idEspecialidad, idMedico, fechaFiltro);
+            txtFechaTurno.Text = fechaIso;
+            CargarHorariosDisponibles();
+
+            if (ddlHorarioDisponible.Items.FindByValue(horarioValor) != null)
+            {
+                ddlHorarioDisponible.SelectedValue = horarioValor;
+            }
+
+            lblErrorTurno.Visible = false;
+            upTurno.Update();
+
+            ScriptManager.RegisterStartupScript(
+                this,
+                GetType(),
+                "seleccionarSugerenciaTurno",
+                "mostrarModalTurno();",
+                true
+            );
         }
 
-        protected void txtBuscar_TextChanged(object sender, EventArgs e)
-        {
-            AplicarFiltrosListado();
-            upListadoTurnos.Update();
-        }
-
-        protected void FiltroListado_Changed(object sender, EventArgs e)
-        {
-            AplicarFiltrosListado();
-            upListadoTurnos.Update();
-        }
-
-        protected void btnLimpiarFiltros_Click(object sender, EventArgs e)
-        {
-            txtBuscar.Text = string.Empty;
-            ddlFiltroEspecialidad.SelectedIndex = 0;
-            ddlFiltroMedico.SelectedIndex = 0;
-            txtFiltroFecha.Text = string.Empty;
-
-            CargarTurnos();
-            upListadoTurnos.Update();
-        }
-
+        // Valida los datos del modal, registra el nuevo turno en BD, refresca la grilla y muestra aviso de éxito
         protected void btnGuardarTurno_Click(object sender, EventArgs e)
         {
             int idPaciente = int.TryParse(ddlPaciente.SelectedValue, out int pId) ? pId : 0;
@@ -324,6 +224,187 @@ namespace PresentacionWeb
             }
         }
 
+        #endregion
+
+        #region Métodos auxiliares privados
+
+        // Carga pacientes activos, especialidades activas y médicos tanto para el modal como para los filtros
+        private void CargarCombos()
+        {
+            PacienteNegocio pacienteNegocio = new PacienteNegocio();
+            List<Paciente> pacientesActivos = pacienteNegocio.listar()
+                .Where(p => p.Estado)
+                .OrderBy(p => p.Apellido)
+                .ThenBy(p => p.Nombre)
+                .ToList();
+
+            ddlPaciente.DataSource = pacientesActivos.Select(p => new
+            {
+                p.Id,
+                Texto = $"{p.Apellido}, {p.Nombre} (DNI {p.DNI})"
+            }).ToList();
+            ddlPaciente.DataValueField = "Id";
+            ddlPaciente.DataTextField = "Texto";
+            ddlPaciente.DataBind();
+            ddlPaciente.Items.Insert(0, new ListItem("-- Seleccione un paciente --", "0"));
+
+            EspecialidadNegocio especialidadNegocio = new EspecialidadNegocio();
+            List<Especialidad> especialidadesActivas = especialidadNegocio.listar()
+                .Where(esp => esp.Estado)
+                .OrderBy(esp => esp.Nombre)
+                .ToList();
+
+            ddlEspecialidad.DataSource = especialidadesActivas;
+            ddlEspecialidad.DataValueField = "Id";
+            ddlEspecialidad.DataTextField = "Nombre";
+            ddlEspecialidad.DataBind();
+            ddlEspecialidad.Items.Insert(0, new ListItem("-- Seleccione una especialidad --", "0"));
+
+            ddlFiltroEspecialidad.DataSource = especialidadesActivas;
+            ddlFiltroEspecialidad.DataValueField = "Id";
+            ddlFiltroEspecialidad.DataTextField = "Nombre";
+            ddlFiltroEspecialidad.DataBind();
+            ddlFiltroEspecialidad.Items.Insert(0, new ListItem("Todas las especialidades", "0"));
+
+            MedicoNegocio medicoNegocio = new MedicoNegocio();
+            List<Medico> todosMedicosActivos = medicoNegocio.listar()
+                .Where(m => m.Estado)
+                .OrderBy(m => m.Apellido)
+                .ThenBy(m => m.Nombre)
+                .ToList();
+
+            ddlFiltroMedico.DataSource = todosMedicosActivos.Select(m => new
+            {
+                m.Id,
+                Texto = $"{m.Apellido}, {m.Nombre}"
+            }).ToList();
+            ddlFiltroMedico.DataValueField = "Id";
+            ddlFiltroMedico.DataTextField = "Texto";
+            ddlFiltroMedico.DataBind();
+            ddlFiltroMedico.Items.Insert(0, new ListItem("Todos los médicos", "0"));
+
+            CargarMedicosPorEspecialidad(0);
+        }
+
+        // Carga en ddlMedico solo los médicos activos (y si idEspecialidad > 0, filtrados por esa especialidad)
+        private void CargarMedicosPorEspecialidad(int idEspecialidad)
+        {
+            MedicoNegocio medicoNegocio = new MedicoNegocio();
+            List<Medico> medicosActivos = medicoNegocio.listar()
+                .Where(m => m.Estado)
+                .ToList();
+
+            if (idEspecialidad > 0)
+            {
+                medicosActivos = medicosActivos
+                    .Where(m => m.Especialidades != null &&
+                                m.Especialidades.Any(esp => esp.Id == idEspecialidad))
+                    .ToList();
+            }
+
+            ddlMedico.DataSource = medicosActivos
+                .OrderBy(m => m.Apellido)
+                .ThenBy(m => m.Nombre)
+                .Select(m => new
+                {
+                    m.Id,
+                    Texto = $"{m.Apellido}, {m.Nombre} (Mat. {m.Matricula})"
+                }).ToList();
+            ddlMedico.DataValueField = "Id";
+            ddlMedico.DataTextField = "Texto";
+            ddlMedico.DataBind();
+            ddlMedico.Items.Insert(0, new ListItem("-- Seleccione un médico --", "0"));
+        }
+
+        // Lista turnos aplicando filtros opcionales de texto, especialidad, médico y fecha, y arma las filas de la grilla
+        private void CargarTurnos(string filtro = "", int idEspecialidad = 0, int idMedico = 0, DateTime? fechaFiltro = null)
+        {
+            TurnoNegocio negocio = new TurnoNegocio();
+
+            try
+            {
+                lblErrorListadoTurno.Visible = false;
+                dgvTurnos.Visible = true;
+
+                List<Turno> lista = negocio.listar();
+
+                if (!string.IsNullOrWhiteSpace(filtro))
+                {
+                    string texto = filtro.Trim().ToLower();
+                    lista = lista.FindAll(t =>
+                        (t.Paciente != null &&
+                         ((!string.IsNullOrEmpty(t.Paciente.Nombre) && t.Paciente.Nombre.ToLower().Contains(texto)) ||
+                          (!string.IsNullOrEmpty(t.Paciente.Apellido) && t.Paciente.Apellido.ToLower().Contains(texto)) ||
+                          (!string.IsNullOrEmpty(t.Paciente.DNI) && t.Paciente.DNI.ToLower().Contains(texto)))) ||
+                        (t.Medico != null &&
+                         ((!string.IsNullOrEmpty(t.Medico.Nombre) && t.Medico.Nombre.ToLower().Contains(texto)) ||
+                          (!string.IsNullOrEmpty(t.Medico.Apellido) && t.Medico.Apellido.ToLower().Contains(texto)))) ||
+                        (t.Especialidad != null &&
+                         !string.IsNullOrEmpty(t.Especialidad.Nombre) && t.Especialidad.Nombre.ToLower().Contains(texto))
+                    );
+                }
+
+                if (idEspecialidad > 0)
+                {
+                    lista = lista.FindAll(t => t.Especialidad != null && t.Especialidad.Id == idEspecialidad);
+                }
+
+                if (idMedico > 0)
+                {
+                    lista = lista.FindAll(t => t.Medico != null && t.Medico.Id == idMedico);
+                }
+
+                if (fechaFiltro.HasValue)
+                {
+                    DateTime fechaBuscada = fechaFiltro.Value.Date;
+                    lista = lista.FindAll(t => t.Fecha.Date == fechaBuscada);
+                }
+
+                List<TurnoFila> filas = lista.Select(t => new TurnoFila
+                {
+                    Id = t.Id,
+                    Fecha = t.Fecha.ToString("dd/MM/yyyy"),
+                    Hora = $"{t.Hora_Inicio:HH:mm} - {t.Hora_Fin:HH:mm}",
+                    Paciente = t.Paciente != null ? $"{t.Paciente.Apellido}, {t.Paciente.Nombre}" : "",
+                    Medico = t.Medico != null ? $"{t.Medico.Apellido}, {t.Medico.Nombre}" : "",
+                    Especialidad = t.Especialidad != null ? t.Especialidad.Nombre : "",
+                    Estado = t.Estado != null ? t.Estado.Nombre : "Nuevo"
+                }).ToList();
+
+                dgvTurnos.DataSource = filas;
+                dgvTurnos.DataBind();
+            }
+            catch (Exception ex)
+            {
+                Session["error"] = ex.ToString();
+                lblErrorListadoTurno.Text = "No se pudo cargar el listado de turnos. Intentá nuevamente.";
+                lblErrorListadoTurno.Visible = true;
+                dgvTurnos.Visible = false;
+            }
+        }
+
+        // Lee los valores actuales de los controles de filtro y llama a CargarTurnos
+        private void AplicarFiltrosListado()
+        {
+            int idEspecialidad = int.TryParse(ddlFiltroEspecialidad.SelectedValue, out int espId) ? espId : 0;
+            int idMedico = int.TryParse(ddlFiltroMedico.SelectedValue, out int medId) ? medId : 0;
+
+            DateTime? fechaFiltro = null;
+            if (!string.IsNullOrWhiteSpace(txtFiltroFecha.Text) &&
+                DateTime.TryParseExact(
+                    txtFiltroFecha.Text.Trim(),
+                    "yyyy-MM-dd",
+                    CultureInfo.InvariantCulture,
+                    DateTimeStyles.None,
+                    out DateTime fechaParseada))
+            {
+                fechaFiltro = fechaParseada.Date;
+            }
+
+            CargarTurnos(txtBuscar.Text, idEspecialidad, idMedico, fechaFiltro);
+        }
+
+        // Muestra un mensaje de error dentro del modal y lo mantiene abierto
         private void MostrarErrorTurno(string mensaje)
         {
             lblErrorTurno.Text = mensaje;
@@ -339,6 +420,7 @@ namespace PresentacionWeb
             );
         }
 
+        // Devuelve la clase de badge Bootstrap según el estado del turno en la grilla
         protected string ObtenerClaseBadgeEstado(string estado)
         {
             if (string.IsNullOrWhiteSpace(estado))
@@ -363,12 +445,13 @@ namespace PresentacionWeb
             }
         }
 
+        // Convierte DayOfWeek de .NET (Domingo = 0) al formato de la BD (Lunes = 1 ... Domingo = 7)
         private int ConvertirDiaSemanaDb(DateTime fecha)
         {
-            // Lunes = 1 ... Sábado = 6, Domingo = 7
             return fecha.DayOfWeek == DayOfWeek.Sunday ? 7 : (int)fecha.DayOfWeek;
         }
 
+        // Calcula franjas libres de duracionMinutos (por defecto 60) para un médico y fecha, evitando turnos ya ocupados
         private List<(TimeSpan Inicio, TimeSpan Fin)> ObtenerHorariosDisponibles(
             int idMedico,
             DateTime fecha,
@@ -409,12 +492,14 @@ namespace PresentacionWeb
                 TimeSpan inicio = franja.Hora_Entrada.TimeOfDay;
                 TimeSpan finJornada = franja.Hora_Salida.TimeOfDay;
 
+                // Avanza de a bloques de duracionMinutos dentro de la jornada laboral
                 while (inicio + duracion <= finJornada)
                 {
                     TimeSpan finSlot = inicio + duracion;
 
                     bool yaPasoHoy = fecha.Date == DateTime.Today && inicio <= horaActual;
 
+                    // Verifica si choca con un turno existente del mismo médico o del mismo paciente
                     bool hayConflicto = turnosDia.Any(t =>
                         inicio < t.Hora_Fin.TimeOfDay &&
                         finSlot > t.Hora_Inicio.TimeOfDay &&
@@ -433,6 +518,7 @@ namespace PresentacionWeb
             return slotsDisponibles;
         }
 
+        // Llena ddlHorarioDisponible con los bloques libres de 60 min para el médico y la fecha elegidos
         private void CargarHorariosDisponibles()
         {
             ddlHorarioDisponible.Items.Clear();
@@ -475,22 +561,94 @@ namespace PresentacionWeb
             ddlHorarioDisponible.Items.Insert(0, new ListItem("-- Seleccione un horario --", "0"));
         }
 
-        protected void ddlMedico_SelectedIndexChanged(object sender, EventArgs e)
+        // Busca los primeros 3 bloques libres de 60 min en los próximos 21 días para médicos activos de la especialidad
+        private void CargarSugerenciasEspecialidad(int idEspecialidad)
         {
-            CargarHorariosDisponibles();
-            lblErrorTurno.Visible = false;
-            upTurno.Update();
+            if (idEspecialidad <= 0)
+            {
+                pnlSugerenciasTurno.Visible = false;
+                rptSugerenciasTurno.DataSource = null;
+                rptSugerenciasTurno.DataBind();
+                lblSinSugerencias.Visible = false;
+                return;
+            }
 
-            ScriptManager.RegisterStartupScript(this, GetType(), "reabrirTurnoMedico", "mostrarModalTurno();", true);
+            int idPaciente = int.TryParse(ddlPaciente.SelectedValue, out int pId) ? pId : 0;
+
+            MedicoNegocio medicoNegocio = new MedicoNegocio();
+            List<Medico> medicosEspecialidad = medicoNegocio.listar()
+                .Where(m => m.Estado &&
+                            m.Especialidades != null &&
+                            m.Especialidades.Any(esp => esp.Id == idEspecialidad))
+                .OrderBy(m => m.Apellido)
+                .ThenBy(m => m.Nombre)
+                .ToList();
+
+            var sugerencias = new List<SugerenciaTurnoItem>();
+            CultureInfo culturaAr = new CultureInfo("es-AR");
+
+            for (int offset = 0; offset < 21 && sugerencias.Count < 3; offset++)
+            {
+                DateTime fechaBuscada = DateTime.Today.AddDays(offset);
+
+                foreach (Medico medico in medicosEspecialidad)
+                {
+                    if (sugerencias.Count >= 3)
+                        break;
+
+                    var slots = ObtenerHorariosDisponibles(medico.Id, fechaBuscada, idPaciente, 60);
+                    foreach (var slot in slots)
+                    {
+                        if (sugerencias.Count >= 3)
+                            break;
+
+                        string horarioTxt = $"{slot.Inicio:hh\\:mm} - {slot.Fin:hh\\:mm}";
+                        string horarioVal = $"{slot.Inicio:hh\\:mm}|{slot.Fin:hh\\:mm}";
+                        string fechaTexto = culturaAr.TextInfo.ToTitleCase(
+                            fechaBuscada.ToString("ddd dd/MM", culturaAr));
+
+                        sugerencias.Add(new SugerenciaTurnoItem
+                        {
+                            MedicoTexto = $"{medico.Apellido}, {medico.Nombre}",
+                            FechaTexto = fechaTexto,
+                            HorarioTexto = horarioTxt,
+                            Argumento = $"{medico.Id}|{fechaBuscada:yyyy-MM-dd}|{horarioVal}"
+                        });
+                    }
+                }
+            }
+
+            pnlSugerenciasTurno.Visible = true;
+            rptSugerenciasTurno.DataSource = sugerencias;
+            rptSugerenciasTurno.DataBind();
+            lblSinSugerencias.Visible = sugerencias.Count == 0;
         }
 
-        protected void txtFechaTurno_TextChanged(object sender, EventArgs e)
-        {
-            CargarHorariosDisponibles();
-            lblErrorTurno.Visible = false;
-            upTurno.Update();
+        #endregion
 
-            ScriptManager.RegisterStartupScript(this, GetType(), "reabrirTurnoFecha", "mostrarModalTurno();", true);
+        #region Clases auxiliares privadas
+
+        // Modelo liviano para bindear cada fila de la grilla dgvTurnos
+        private class TurnoFila
+        {
+            public int Id { get; set; }
+            public string Fecha { get; set; }
+            public string Hora { get; set; }
+            public string Paciente { get; set; }
+            public string Medico { get; set; }
+            public string Especialidad { get; set; }
+            public string Estado { get; set; }
         }
+
+        // Modelo liviano para cada botón de sugerencia rápida en rptSugerenciasTurno
+        private class SugerenciaTurnoItem
+        {
+            public string MedicoTexto { get; set; }
+            public string FechaTexto { get; set; }
+            public string HorarioTexto { get; set; }
+            public string Argumento { get; set; }
+        }
+
+        #endregion
     }
 }
