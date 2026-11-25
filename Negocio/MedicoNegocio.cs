@@ -391,6 +391,49 @@ namespace Negocio
             }
         }
 
+        // ============================================================
+        // CONSULTAR ESPECIALIDADES CON TURNOS REGISTRADOS
+        // ============================================================
+        public List<Especialidad> listarEspecialidadesConTurnos(int idMedico)
+        {
+            List<Especialidad> lista = new List<Especialidad>();
+            AccesoDatos datos = new AccesoDatos();
+
+            try
+            {
+                // --- Consultar especialidades asignadas con turnos registrados ---
+                datos.setearConsulta(
+                    "SELECT DISTINCT E.Id_Especialidad, E.Nombre " +
+                    "FROM ESPECIALIDADES E " +
+                    "INNER JOIN MEDICOS_ESPECIALIDADES ME " +
+                    "ON E.Id_Especialidad = ME.Id_Especialidad " +
+                    "INNER JOIN TURNOS T " +
+                    "ON ME.Id_Medico = T.Id_Medico " +
+                    "AND ME.Id_Especialidad = T.Id_Especialidad " +
+                    "WHERE ME.Id_Medico = @IdMedico"
+                );
+
+                datos.setearParametro("@IdMedico", idMedico);
+                datos.ejecutarLectura();
+
+                // --- Obtener las especialidades que no se pueden quitar ---
+                while (datos.Lector.Read())
+                {
+                    Especialidad especialidad = new Especialidad();
+
+                    especialidad.Id = (int)datos.Lector["Id_Especialidad"];
+                    especialidad.Nombre = (string)datos.Lector["Nombre"];
+
+                    lista.Add(especialidad);
+                }
+
+                return lista;
+            }
+            finally
+            {
+                datos.cerrarConexion();
+            }
+        }
 
         // ============================================================
         // CONSULTAR TURNOS PENDIENTES DEL MÉDICO

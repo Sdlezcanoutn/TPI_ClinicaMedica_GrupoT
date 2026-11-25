@@ -325,6 +325,36 @@ namespace PresentacionWeb
                     }
 
                     medico.Id = id;
+
+                    // --- Consultar especialidades que no se pueden quitar ---
+                    List<Especialidad> especialidadesProtegidas =
+                        negocio.listarEspecialidadesConTurnos(id);
+
+                    List<string> especialidadesRestauradas = new List<string>();
+
+                    // --- Recuperar las especialidades protegidas desmarcadas ---
+                    foreach (Especialidad especialidad in especialidadesProtegidas)
+                    {
+                        ListItem item = cblEspecialidades.Items.FindByValue(
+                            especialidad.Id.ToString());
+
+                        if (item != null && !item.Selected)
+                        {
+                            item.Selected = true;
+                            especialidadesRestauradas.Add(especialidad.Nombre);
+                        }
+                    }
+
+                    // --- Informar las especialidades que no se pueden quitar ---
+                    if (especialidadesRestauradas.Count > 0)
+                    {
+                        mostrarErrorMedico(
+                            "No se pueden quitar las siguientes especialidades con turnos registrados: " +
+                            string.Join(", ", especialidadesRestauradas) + ".");
+
+                        return;
+                    }
+
                     negocio.modificar(medico);
                 }
                 else
