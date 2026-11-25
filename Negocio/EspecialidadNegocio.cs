@@ -212,17 +212,14 @@ namespace Negocio
 
             try
             {
-                // --- Consultar turnos futuros pendientes ---
+                // --- Consultar turnos pendientes ---
                 datos.setearConsulta(
                     "SELECT COUNT(*) AS Cantidad " +
                     "FROM TURNOS T " +
                     "INNER JOIN ESTADOS_TURNO E " +
                     "ON T.Id_Estado_Turno = E.Id_Estado_Turno " +
                     "WHERE T.Id_Especialidad = @IdEspecialidad " +
-                    "AND E.Nombre IN (N'Nuevo', N'Reprogramado') " +
-                    "AND (T.Fecha > CAST(GETDATE() AS DATE) " +
-                    "OR (T.Fecha = CAST(GETDATE() AS DATE) " +
-                    "AND T.Hora_Inicio > CAST(GETDATE() AS TIME)))"
+                    "AND E.Nombre IN (N'Nuevo', N'Reprogramado')"
                 );
 
                 datos.setearParametro("@IdEspecialidad", idEspecialidad);
@@ -258,6 +255,12 @@ namespace Negocio
             if (!especialidad.Estado)
             {
                 throw new ArgumentException("La especialidad ya se encuentra dada de baja.");
+            }
+
+            // --- Validar que no tenga turnos pendientes ---
+            if (contarTurnosPendientes(id) > 0)
+            {
+                throw new ArgumentException("No se puede dar de baja una especialidad con turnos pendientes.");
             }
 
             // --- Desactivar especialidad ---

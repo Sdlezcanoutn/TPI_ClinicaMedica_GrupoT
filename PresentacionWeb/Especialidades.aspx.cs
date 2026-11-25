@@ -289,9 +289,28 @@ namespace PresentacionWeb
             hfIdBaja.Value = especialidad.Id.ToString();
             lblNombreBaja.Text = especialidad.Nombre;
 
+            // --- Adaptar mensaje según los turnos pendientes ---
+            lblTextoBaja.Text = turnosPendientes == 0
+                ? "¿Está seguro de que desea dar de baja la especialidad "
+                : "No se puede dar de baja la especialidad ";
+
+            lblPuntuacionBaja.Text = turnosPendientes == 0
+                ? "?"
+                : ".";
+
+            // --- Informar si existen turnos pendientes ---
             lblTurnosPendientes.Text = turnosPendientes == 0
                 ? "Esta especialidad no tiene turnos pendientes."
-                : "Turnos pendientes: " + turnosPendientes;
+                : "Turnos pendientes: " + turnosPendientes +
+                  ".<br />Deben resolverse antes de confirmar la baja.";
+
+            // --- Adaptar el modal según los turnos pendientes ---
+            btnConfirmarBaja.Visible = turnosPendientes == 0;
+            divInformacionBaja.Visible = turnosPendientes == 0;
+
+            btnCancelarBaja.InnerText = turnosPendientes == 0
+                ? "Cancelar"
+                : "Cerrar";
 
             upBajaEspecialidad.Update();
 

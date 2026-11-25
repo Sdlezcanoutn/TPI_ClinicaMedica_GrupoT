@@ -105,6 +105,15 @@ namespace PresentacionWeb
         protected global::System.Web.UI.WebControls.HiddenField hfIdBaja;
 
         /// <summary>
+        /// Control lblTextoBaja.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblTextoBaja;
+
+        /// <summary>
         /// Control lblNombreBaja.
         /// </summary>
         /// <remarks>
@@ -114,6 +123,15 @@ namespace PresentacionWeb
         protected global::System.Web.UI.WebControls.Label lblNombreBaja;
 
         /// <summary>
+        /// Control lblPuntuacionBaja.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblPuntuacionBaja;
+
+        /// <summary>
         /// Control lblTurnosPendientes.
         /// </summary>
         /// <remarks>
@@ -121,6 +139,24 @@ namespace PresentacionWeb
         /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Label lblTurnosPendientes;
+
+        /// <summary>
+        /// Control divInformacionBaja.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl divInformacionBaja;
+
+        /// <summary>
+        /// Control btnCancelarBaja.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlButton btnCancelarBaja;
 
         /// <summary>
         /// Control btnConfirmarBaja.
