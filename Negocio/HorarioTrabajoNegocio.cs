@@ -73,25 +73,33 @@ namespace Negocio
 
             // Validar horas y día de la semana
             validarDatosHorario(horario);
-
-            // Validar médico activo
-            if (!existeMedicoActivo(horario.Medico.Id))
-            {
-                throw new InvalidOperationException(
-                    "El médico no existe o se encuentra inactivo."
-                );
-            }
-
-            // Validar superposición horaria
-            if (existeSuperposicion(horario))
-                throw new InvalidOperationException(
-                    "El médico ya tiene un horario superpuesto para ese día."
-                );
-
+            
             AccesoDatos datos = new AccesoDatos();
 
             try
             {
+                datos.iniciarTransaccion();
+
+                // Bloquear los horarios del médico
+                bloquearHorariosMedico(horario.Medico.Id, datos);
+
+                // Validar médico activo
+                if (!existeMedicoActivo(horario.Medico.Id, datos))
+                {
+                    throw new InvalidOperationException(
+                        "El médico no existe o se encuentra inactivo."
+                    );
+                }
+
+                // Validar superposición horaria
+                if (existeSuperposicion(horario, datos))
+                    throw new InvalidOperationException(
+                        "El médico ya tiene un horario superpuesto para ese día."
+                    );
+
+                // Limpiar parámetros y preparar INSERT
+                datos.limpiarParametros();
+
                 datos.setearConsulta(
                     "INSERT INTO HORARIOS_TRABAJO " +
                     "(Id_Medico, Dia_Semana, Hora_Entrada, Hora_Salida) " +
@@ -103,7 +111,13 @@ namespace Negocio
                 datos.setearParametro("@HoraEntrada", horario.Hora_Entrada.TimeOfDay);
                 datos.setearParametro("@HoraSalida", horario.Hora_Salida.TimeOfDay);
 
-                datos.ejecutarAccion();
+                datos.ejecutarAccionTransaccion();
+                datos.confirmarTransaccion();
+            }
+            catch
+            {
+                datos.cancelarTransaccion();
+                throw;
             }
             finally
             {
@@ -121,32 +135,39 @@ namespace Negocio
 
             // Validar horas y día de la semana
             validarDatosHorario(horario);
-
-            // Validar si el horario existe en la base de datos y está activo
-            if (horario.Id <= 0 || !existeHorarioActivo(horario.Id))
-            {
-                throw new InvalidOperationException(
-                    "El horario no existe o se encuentra inactivo."
-                );
-            }
-
-            // Validar médico activo
-            if (!existeMedicoActivo(horario.Medico.Id)){
-                throw new InvalidOperationException(
-                    "El médico no existe o se encuentra inactivo."
-                );
-            }
-
-            // Validar superposición horaria
-            if (existeSuperposicion(horario))
-                throw new InvalidOperationException(
-                    "El médico ya tiene un horario superpuesto para ese día."
-                );
-
+            
             AccesoDatos datos = new AccesoDatos();
 
             try
             {
+                datos.iniciarTransaccion();
+
+                // Bloquear los horarios del médico
+                bloquearHorariosMedico(horario.Medico.Id, datos);
+
+                // Validar si el horario existe en la base de datos y está activo
+                if (horario.Id <= 0 || !existeHorarioActivo(horario.Id, datos))
+                {
+                    throw new InvalidOperationException(
+                        "El horario no existe o se encuentra inactivo."
+                    );
+                }
+
+                // Validar médico activo
+                if (!existeMedicoActivo(horario.Medico.Id, datos)){
+                    throw new InvalidOperationException(
+                        "El médico no existe o se encuentra inactivo."
+                    );
+                }
+
+                // Validar superposición horaria
+                if (existeSuperposicion(horario, datos))
+                    throw new InvalidOperationException(
+                        "El médico ya tiene un horario superpuesto para ese día."
+                    );
+
+                datos.limpiarParametros();
+
                 datos.setearConsulta(
                     "UPDATE HORARIOS_TRABAJO SET " +
                     "Id_Medico = @IdMedico, " +
@@ -154,7 +175,9 @@ namespace Negocio
                     "Hora_Entrada = @HoraEntrada, " +
                     "Hora_Salida = @HoraSalida " +
                     "WHERE Id_Horario_Trabajo = @Id " +
-                    "AND Estado = 1");
+                    "AND Estado = 1; " +
+                    "SELECT @@ROWCOUNT;"
+                );
 
                 datos.setearParametro("@IdMedico", horario.Medico.Id);
                 datos.setearParametro("@DiaSemana", byte.Parse(horario.Dia_Semana));
@@ -162,7 +185,22 @@ namespace Negocio
                 datos.setearParametro("@HoraSalida", horario.Hora_Salida.TimeOfDay);
                 datos.setearParametro("@Id", horario.Id);
 
-                datos.ejecutarAccion();
+                // Ejecutar UPDATE y recuperar las filas afectadas
+                int filasAfectadas = Convert.ToInt32(datos.ejecutarEscalar());
+
+                if (filasAfectadas != 1)
+                {
+                    throw new InvalidOperationException(
+                        "No se pudo modificar el horario. Puede que no exista o esté inactivo."
+                    );
+                }
+
+                datos.confirmarTransaccion();
+            }
+            catch
+            {
+                datos.cancelarTransaccion();
+                throw;
             }
             finally
             {
@@ -188,82 +226,57 @@ namespace Negocio
                 datos.cerrarConexion();
             }
         }
-        private bool existeSuperposicion(HorarioTrabajo horario)
+        private bool existeSuperposicion(HorarioTrabajo horario, AccesoDatos datos)
         {
-            AccesoDatos datos = new AccesoDatos();
+            datos.limpiarParametros();
 
-            try
-            {
-                datos.setearConsulta(
-                    "SELECT TOP 1 1 FROM HORARIOS_TRABAJO " +
-                    "WHERE Id_Medico = @IdMedico " +
-                    "AND Dia_Semana = @DiaSemana " +
-                    "AND Estado = 1 " +
-                    "AND Id_Horario_Trabajo <> @IdHorario " +
-                    "AND Hora_Entrada < @HoraSalida " +
-                    "AND Hora_Salida > @HoraEntrada"
-                );
+            datos.setearConsulta(
+                "SELECT TOP 1 1 FROM HORARIOS_TRABAJO " +
+                "WHERE Id_Medico = @IdMedico " +
+                "AND Dia_Semana = @DiaSemana " +
+                "AND Estado = 1 " +
+                "AND Id_Horario_Trabajo <> @IdHorario " +
+                "AND Hora_Entrada < @HoraSalida " +
+                "AND Hora_Salida > @HoraEntrada"
+            );
 
-                datos.setearParametro("@IdMedico", horario.Medico.Id);
-                datos.setearParametro("@DiaSemana", byte.Parse(horario.Dia_Semana));
-                datos.setearParametro("@IdHorario", horario.Id);
-                datos.setearParametro("@HoraEntrada", horario.Hora_Entrada.TimeOfDay);
-                datos.setearParametro("@HoraSalida", horario.Hora_Salida.TimeOfDay);
+            datos.setearParametro("@IdMedico", horario.Medico.Id);
+            datos.setearParametro("@DiaSemana", byte.Parse(horario.Dia_Semana));
+            datos.setearParametro("@IdHorario", horario.Id);
+            datos.setearParametro("@HoraEntrada", horario.Hora_Entrada.TimeOfDay);
+            datos.setearParametro("@HoraSalida", horario.Hora_Salida.TimeOfDay);
 
-                datos.ejecutarLectura();
-
-                return datos.Lector.Read();
-            }
-            finally
-            {
-                datos.cerrarConexion();
-            }
+            return datos.ejecutarEscalar() != null;
         }
-        private bool existeHorarioActivo(int id)
+        private bool existeHorarioActivo(int id, AccesoDatos datos)
         {
-            AccesoDatos datos = new AccesoDatos();
+            datos.limpiarParametros();
+            
+            datos.setearConsulta(
+                "SELECT TOP 1 1 " +
+                "FROM HORARIOS_TRABAJO WITH (UPDLOCK, HOLDLOCK) " +
+                "WHERE Id_Horario_Trabajo = @Id " +
+                "AND Estado = 1"
+            );
 
-            try
-            {
-                datos.setearConsulta(
-                    "SELECT TOP 1 1 " +
-                    "FROM HORARIOS_TRABAJO " +
-                    "WHERE Id_Horario_Trabajo = @Id " +
-                    "AND Estado = 1"
-                );
+            datos.setearParametro("@Id", id);
 
-                datos.setearParametro("@Id", id);
-                datos.ejecutarLectura();
-
-                return datos.Lector.Read();
-            }
-            finally
-            {
-                datos.cerrarConexion();
-            }
+            return datos.ejecutarEscalar() != null;
         }
-        private bool existeMedicoActivo(int idMedico)
+        private bool existeMedicoActivo(int idMedico, AccesoDatos datos)
         {
-            AccesoDatos datos = new AccesoDatos();
+            datos.limpiarParametros();
+            
+            datos.setearConsulta(
+                "SELECT TOP 1 1 " +
+                "FROM MEDICOS WITH (HOLDLOCK) " +
+                "WHERE Id_Medico = @IdMedico " +
+                "AND Estado = 1"
+            );
 
-            try
-            {
-                datos.setearConsulta(
-                    "SELECT TOP 1 1 " +
-                    "FROM MEDICOS " +
-                    "WHERE Id_Medico = @IdMedico " +
-                    "AND Estado = 1"
-                );
+            datos.setearParametro("@IdMedico", idMedico);
 
-                datos.setearParametro("@IdMedico", idMedico);
-                datos.ejecutarLectura();
-
-                return datos.Lector.Read();
-            }
-            finally
-            {
-                datos.cerrarConexion();
-            }
+            return datos.ejecutarEscalar() != null;
         }
         private void validarDatosHorario(HorarioTrabajo horario)
         {
@@ -292,6 +305,31 @@ namespace Negocio
             {
                 throw new InvalidOperationException(
                     "La hora de salida debe ser posterior a la entrada."
+                );
+            }
+        }
+        private void bloquearHorariosMedico(int idMedico, AccesoDatos datos)
+        {
+            datos.limpiarParametros();
+
+            datos.setearConsulta(
+                "DECLARE @Resultado INT; " +
+                "EXEC @Resultado = sp_getapplock " +
+                "@Resource = @Recurso, " +
+                "@LockMode = 'Exclusive', " +
+                "@LockOwner = 'Transaction', " +
+                "@LockTimeout = 10000; " +
+                "SELECT @Resultado;"
+            );
+
+            datos.setearParametro("@Recurso", "HorariosMedico_" + idMedico);
+
+            int resultado = Convert.ToInt32(datos.ejecutarEscalar());
+
+            if (resultado < 0)
+            {
+                throw new InvalidOperationException(
+                    "No se pudo obtener el bloqueo del médico. Intente nuevamente."
                 );
             }
         }
