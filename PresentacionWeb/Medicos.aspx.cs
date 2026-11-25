@@ -351,12 +351,12 @@ namespace PresentacionWeb
 
                 // --- Cerrar modal y mostrar confirmación ---
                 ScriptManager.RegisterStartupScript(
-                    upMedico,
-                    upMedico.GetType(),
+                    Page,
+                    Page.GetType(),
                     "guardarExito",
                     esEdicion
-                        ? "mostrarExitoMedico('Médico modificado correctamente.');"
-                        : "mostrarExitoMedico('Médico registrado correctamente.');",
+                        ? "mostrarExito('Médico modificado correctamente.');"
+                        : "mostrarExito('Médico registrado correctamente.');",
                     true
                 );
             }
@@ -542,16 +542,23 @@ namespace PresentacionWeb
         }
 
         // ============================================================
-        // CONFIRMAR REACTIVACIÓN DEL MÉDICO
+        // CONFIRMACIÓN DE REACTIVACIÓN DEL MÉDICO
         // ============================================================
         protected void btnConfirmarReactivar_Click(object sender, EventArgs e)
         {
             try
             {
-                int idMedico = int.Parse(hfIdReactivar.Value);
+                // --- Obtener médico seleccionado ---
+                int id;
 
+                if (!int.TryParse(hfIdReactivar.Value, out id) || id <= 0)
+                {
+                    throw new ArgumentException("El médico seleccionado no es válido.");
+                }
+
+                // --- Ejecutar reactivación ---
                 MedicoNegocio negocio = new MedicoNegocio();
-                negocio.reactivar(idMedico);
+                negocio.reactivar(id);
 
                 // --- Actualizar listado ---
                 cargarMedicos();
@@ -573,16 +580,25 @@ namespace PresentacionWeb
             }
             catch (ArgumentException ex)
             {
-                lblErrorListado.Text = ex.Message;
-                lblErrorListado.Visible = true;
-                upListado.Update();
+                // --- Mostrar error ---
+                ScriptManager.RegisterStartupScript(
+                    Page,
+                    Page.GetType(),
+                    "errorReactivacion",
+                    "alert('" + HttpUtility.JavaScriptStringEncode(ex.Message) + "');",
+                    true
+                );
             }
             catch (Exception)
             {
-                lblErrorListado.Text =
-                    "No se pudo reactivar el médico. Intente nuevamente.";
-                lblErrorListado.Visible = true;
-                upListado.Update();
+                // --- Mostrar error general ---
+                ScriptManager.RegisterStartupScript(
+                    Page,
+                    Page.GetType(),
+                    "errorGeneralReactivacion",
+                    "alert('Ocurrió un error al reactivar el médico. Intente nuevamente.');",
+                    true
+                );
             }
         }
     }

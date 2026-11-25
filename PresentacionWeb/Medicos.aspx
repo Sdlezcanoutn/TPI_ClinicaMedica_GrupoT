@@ -490,11 +490,12 @@
                         <div class="modal-body">
                             <p>
                                 ¿Está seguro de que desea reactivar al médico
-                           
-                                <strong>
-                                    <asp:Label ID="lblNombreReactivar" runat="server" />
-                                </strong>?
-                       
+                                <strong><asp:Label ID="lblNombreReactivar" runat="server" /></strong>?
+                            </p>
+
+                            <p class="text-muted small mb-0">
+                                Una vez reactivado, el médico volverá a estar
+                                disponible para la asignación de nuevos turnos.
                             </p>
                         </div>
 
@@ -631,24 +632,25 @@
     });
 
     // ============================================================
-    // CONFIRMACIÓN DE REGISTRO DE MÉDICO
+    // CONFIRMACIÓN DE ALTA Y MODIFICACIÓN DE MÉDICOS
     // ============================================================
-    function mostrarExitoMedico(texto) {
-        // --- Cerrar el formulario ---
-        const modal = bootstrap.Modal.getOrCreateInstance(
-            document.getElementById("modalMedico")
-        );
+    function mostrarExito(texto) {
+
+        // --- Cerrar el modal ---
+        var elementoModal = document.getElementById('modalMedico');
+        var modal = bootstrap.Modal.getOrCreateInstance(elementoModal);
+
         modal.hide();
 
         // --- Mostrar el mensaje de confirmación ---
-        const mensaje = document.getElementById("mensajeExito");
+        var mensaje = document.getElementById('mensajeExito');
         mensaje.textContent = texto;
-        mensaje.classList.remove("d-none");
+        mensaje.classList.remove('d-none');
 
         // --- Ocultar el mensaje después de 4 segundos ---
-        setTimeout(function () {
-            mensaje.classList.add("d-none");
-        }, 4000);
+        setTimeout(function() {
+            mensaje.classList.add('d-none');
+                }, 4000);
     }
 
     // ============================================================
