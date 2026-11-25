@@ -766,17 +766,21 @@
         // ============================================================
         // BÚSQUEDA DINÁMICA DE MÉDICOS
         // ============================================================
+
         let temporizadorBusqueda;
 
+        // --- Esperar antes de buscar ---
         function programarBusqueda() {
             clearTimeout(temporizadorBusqueda);
 
             temporizadorBusqueda = setTimeout(function () {
                 ejecutarBusqueda();
-            }, 400);
+            }, 300);
         }
 
+        // --- Ejecutar búsqueda ---
         function ejecutarBusqueda() {
+            clearTimeout(temporizadorBusqueda);
             __doPostBack('<%= btnBuscar.UniqueID %>', '');
         }
     </script>
