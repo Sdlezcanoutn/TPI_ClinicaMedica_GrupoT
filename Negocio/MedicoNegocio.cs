@@ -86,17 +86,55 @@ namespace Negocio
         }
 
         // ============================================================
+        // VALIDACIÓN DE DATOS DEL MÉDICO
+        // ============================================================
+        private void validarDatos(Medico medico)
+        {
+            // --- Validar campos obligatorios ---
+            if (medico == null ||
+                string.IsNullOrWhiteSpace(medico.Nombre) ||
+                string.IsNullOrWhiteSpace(medico.Apellido) ||
+                string.IsNullOrWhiteSpace(medico.DNI) ||
+                string.IsNullOrWhiteSpace(medico.Matricula) ||
+                string.IsNullOrWhiteSpace(medico.Email))
+            {
+                throw new ArgumentException(
+                    "Completá todos los campos obligatorios.");
+            }
+
+            // --- Validar formato del DNI ---
+            if (medico.DNI.Length < 7 || medico.DNI.Length > 8 ||
+                !medico.DNI.All(char.IsDigit))
+            {
+                throw new ArgumentException(
+                    "Ingresá un DNI válido de 7 u 8 dígitos.");
+            }
+
+            // --- Validar formato del correo electrónico ---
+            if (!System.Text.RegularExpressions.Regex.IsMatch(
+                medico.Email,
+                @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
+            {
+                throw new ArgumentException(
+                    "Ingresá un correo electrónico válido.");
+            }
+
+            // --- Validar especialidades asignadas ---
+            if (medico.Especialidades == null ||
+                medico.Especialidades.Count == 0)
+            {
+                throw new ArgumentException(
+                    "Seleccioná al menos una especialidad.");
+            }
+        }
+
+        // ============================================================
         // ALTA DE MÉDICOS CON SUS ESPECIALIDADES
         // ============================================================
         public void agregar(Medico medico)
         {
-            // --- Validar que el médico tenga especialidades asignadas ---
-            if (medico == null || medico.Especialidades == null ||
-                medico.Especialidades.Count == 0)
-            {
-                throw new ArgumentException(
-                    "El médico debe tener al menos una especialidad.");
-            }
+            // --- Validar datos ---
+            validarDatos(medico);
 
             // ====================================================
             // VALIDAR DNI Y MATRÍCULA DUPLICADOS
@@ -217,13 +255,8 @@ namespace Negocio
         // ============================================================
         public void modificar(Medico medico)
         {
-            // --- Validar que tenga al menos una especialidad ---
-            if (medico == null || medico.Especialidades == null ||
-                medico.Especialidades.Count == 0)
-            {
-                throw new ArgumentException(
-                    "El médico debe tener al menos una especialidad.");
-            }
+            // --- Validar datos ---
+            validarDatos(medico);
 
             // ====================================================
             // VALIDAR DNI Y MATRÍCULA DUPLICADOS

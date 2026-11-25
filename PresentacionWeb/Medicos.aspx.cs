@@ -281,116 +281,64 @@ namespace PresentacionWeb
         // ============================================================
         protected void btnGuardarMedico_Click(object sender, EventArgs e)
         {
-            // --- Obtener los datos ingresados en el formulario ---
-            string nombre = txtNombreMedico.Text.Trim();
-            string apellido = txtApellidoMedico.Text.Trim();
-            string dni = txtDniMedico.Text.Trim();
-            string matricula = txtMatriculaMedico.Text.Trim();
-            string telefono = txtTelefonoMedico.Text.Trim();
-            string email = txtEmailMedico.Text.Trim();
-
-            // ========================================================
-            // 1. VALIDAR LOS CAMPOS OBLIGATORIOS
-            // ========================================================
-
-            if (string.IsNullOrWhiteSpace(nombre) ||
-                string.IsNullOrWhiteSpace(apellido) ||
-                string.IsNullOrWhiteSpace(dni) ||
-                string.IsNullOrWhiteSpace(matricula) ||
-                string.IsNullOrWhiteSpace(email))
-            {
-                mostrarErrorMedico("Completá todos los campos obligatorios.");
-                return;
-            }
-
-            // --- Validar que el DNI contenga únicamente números ---
-            if (dni.Length < 7 || dni.Length > 8 || !dni.All(char.IsDigit))
-            {
-                mostrarErrorMedico("Ingresá un DNI válido de 7 u 8 dígitos.");
-                return;
-            }
-
-            // --- Validar el formato del correo electrónico ---
-            if (!System.Text.RegularExpressions.Regex.IsMatch(
-                email,
-                @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
-            {
-                mostrarErrorMedico("Ingresá un correo electrónico válido.");
-                return;
-            }
-
-            // ========================================================
-            // 2. OBTENER LAS ESPECIALIDADES SELECCIONADAS
-            // ========================================================
-
-            List<Especialidad> especialidades = new List<Especialidad>();
-
-            foreach (ListItem item in cblEspecialidades.Items)
-            {
-                if (item.Selected)
-                {
-                    Especialidad especialidad = new Especialidad();
-
-                    especialidad.Id = int.Parse(item.Value);
-                    especialidad.Nombre = item.Text;
-
-                    especialidades.Add(especialidad);
-                }
-            }
-
-            // --- Exigir al menos una especialidad ---
-            if (especialidades.Count == 0)
-            {
-                mostrarErrorMedico("Seleccioná al menos una especialidad.");
-                return;
-            }
-
-            // ========================================================
-            // 3. PREPARAR EL OBJETO MÉDICO
-            // ========================================================
-
-            Medico medico = new Medico();
-
-            medico.Nombre = nombre;
-            medico.Apellido = apellido;
-            medico.DNI = dni;
-            medico.Matricula = matricula;
-            medico.Telefono = telefono;
-            medico.Email = email;
-            medico.Estado = true;
-            medico.Especialidades = especialidades;
-
-            // ========================================================
-            // 4. REGISTRAR O MODIFICAR EL MÉDICO EN LA BASE DE DATOS
-            // ========================================================
-
             try
             {
-                // --- Crear instancia de la capa de negocio ---
-                MedicoNegocio negocio = new MedicoNegocio();
+                // --- Obtener datos del formulario ---
+                Medico medico = new Medico();
 
+                medico.Nombre = txtNombreMedico.Text.Trim();
+                medico.Apellido = txtApellidoMedico.Text.Trim();
+                medico.DNI = txtDniMedico.Text.Trim();
+                medico.Matricula = txtMatriculaMedico.Text.Trim();
+                medico.Telefono = txtTelefonoMedico.Text.Trim();
+                medico.Email = txtEmailMedico.Text.Trim();
+
+                // --- Obtener las especialidades seleccionadas ---
+                List<Especialidad> especialidades = new List<Especialidad>();
+
+                foreach (ListItem item in cblEspecialidades.Items)
+                {
+                    if (item.Selected)
+                    {
+                        Especialidad especialidad = new Especialidad();
+
+                        especialidad.Id = int.Parse(item.Value);
+                        especialidad.Nombre = item.Text;
+
+                        especialidades.Add(especialidad);
+                    }
+                }
+
+                medico.Especialidades = especialidades;
+
+                MedicoNegocio negocio = new MedicoNegocio();
                 bool esEdicion = !string.IsNullOrEmpty(hfIdMedico.Value);
 
+                // --- Registrar o modificar médico ---
                 if (esEdicion)
                 {
-                    // --- Modificar el médico seleccionado ---
-                    medico.Id = int.Parse(hfIdMedico.Value);
+                    int id;
+
+                    if (!int.TryParse(hfIdMedico.Value, out id) || id <= 0)
+                    {
+                        throw new ArgumentException("No se pudo identificar al médico seleccionado.");
+                    }
+
+                    medico.Id = id;
                     negocio.modificar(medico);
                 }
                 else
                 {
-                    // --- Registrar un médico nuevo ---
+                    medico.Estado = true;
                     negocio.agregar(medico);
                 }
 
-                // --- Limpiar el identificador después de guardar ---
-                hfIdMedico.Value = "";
-
-                // --- Actualizar el listado de médicos ---
+                // --- Actualizar listado ---
                 cargarMedicos();
                 upListado.Update();
 
-                // --- Limpiar el formulario después de guardar ---
+                // --- Limpiar formulario ---
+                hfIdMedico.Value = "";
                 txtNombreMedico.Text = "";
                 txtApellidoMedico.Text = "";
                 txtDniMedico.Text = "";
@@ -398,21 +346,23 @@ namespace PresentacionWeb
                 txtTelefonoMedico.Text = "";
                 txtEmailMedico.Text = "";
                 cblEspecialidades.ClearSelection();
+                lblErrorMedico.Text = "";
                 lblErrorMedico.Visible = false;
 
-                // --- Cerrar el modal y mostrar confirmación ---
+                // --- Cerrar modal y mostrar confirmación ---
                 ScriptManager.RegisterStartupScript(
                     upMedico,
                     upMedico.GetType(),
                     "guardarExito",
-                    esEdicion ? "mostrarExitoMedico('Médico modificado correctamente.');"
-                              : "mostrarExitoMedico('Médico registrado correctamente.');",
+                    esEdicion
+                        ? "mostrarExitoMedico('Médico modificado correctamente.');"
+                        : "mostrarExitoMedico('Médico registrado correctamente.');",
                     true
                 );
             }
             catch (ArgumentException ex)
             {
-                // --- Mostrar errores de validación específicos ---
+                // --- Mostrar errores de validación ---
                 mostrarErrorMedico(ex.Message);
             }
             catch (Exception ex)
@@ -431,7 +381,6 @@ namespace PresentacionWeb
             lblErrorMedico.Text = mensaje;
             lblErrorMedico.Visible = true;
         }
-
 
         // ============================================================
         // PREPARAR BAJA LÓGICA DEL MÉDICO
