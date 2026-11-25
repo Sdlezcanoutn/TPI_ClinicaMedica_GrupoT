@@ -64,6 +64,16 @@ namespace Negocio
         }
         public void agregar(HorarioTrabajo horario)
         {
+            // Validar que alguno de los objetos no tenga referencia nula
+            if (horario == null || horario.Medico == null ||
+                horario.Medico.Id <= 0)
+            {
+                throw new InvalidOperationException("Seleccione un médico válido.");
+            }
+
+            // Validar horas y día de la semana
+            validarDatosHorario(horario);
+
             // Validar médico activo
             if (!existeMedicoActivo(horario.Medico.Id))
             {
@@ -102,6 +112,16 @@ namespace Negocio
         }
         public void modificar(HorarioTrabajo horario)
         {
+            // Validar que alguno de los objetos no tenga referencia nula
+            if (horario == null || horario.Medico == null ||
+                horario.Medico.Id <= 0)
+            {
+                throw new InvalidOperationException("Seleccione un médico válido.");
+            }
+
+            // Validar horas y día de la semana
+            validarDatosHorario(horario);
+
             // Validar si el horario existe en la base de datos y está activo
             if (horario.Id <= 0 || !existeHorarioActivo(horario.Id))
             {
@@ -243,6 +263,36 @@ namespace Negocio
             finally
             {
                 datos.cerrarConexion();
+            }
+        }
+        private void validarDatosHorario(HorarioTrabajo horario)
+        {
+            // Validar día de la semana
+            byte dia;
+
+            if (!byte.TryParse(horario.Dia_Semana, out dia) || dia < 1 || dia > 7)
+            {
+                throw new InvalidOperationException(
+                    "Seleccione un día de la semana válido."
+                );
+            }
+
+            // Validar horas
+            if (horario.Hora_Entrada == DateTime.MinValue ||
+                horario.Hora_Salida == DateTime.MinValue)
+            {
+                throw new InvalidOperationException(
+                    "Ingrese horarios válidos."
+                );
+            }
+
+            // La salida debe ser posterior a la entrada
+            if (horario.Hora_Salida.TimeOfDay <=
+                horario.Hora_Entrada.TimeOfDay)
+            {
+                throw new InvalidOperationException(
+                    "La hora de salida debe ser posterior a la entrada."
+                );
             }
         }
     }
