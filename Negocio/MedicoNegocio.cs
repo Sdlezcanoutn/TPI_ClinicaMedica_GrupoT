@@ -402,16 +402,13 @@ namespace Negocio
 
             try
             {
-                // --- Contar los turnos futuros que siguen pendientes ---
+                // --- Contar los turnos pendientes ---
                 datos.setearConsulta(
                     "SELECT COUNT(*) AS CantidadTurnos FROM TURNOS T " +
                     "INNER JOIN ESTADOS_TURNO ET " +
                     "ON T.Id_Estado_Turno = ET.Id_Estado_Turno " +
                     "WHERE T.Id_Medico = @IdMedico " +
-                    "AND ET.Nombre IN (N'Nuevo', N'Reprogramado') " +
-                    "AND (T.Fecha > CAST(GETDATE() AS DATE) " +
-                    "OR (T.Fecha = CAST(GETDATE() AS DATE) " +
-                    "AND T.Hora_Inicio >= CAST(GETDATE() AS TIME)))"
+                    "AND ET.Nombre IN (N'Nuevo', N'Reprogramado')"
                 );
 
                 datos.setearParametro("@IdMedico", idMedico);
@@ -452,7 +449,7 @@ namespace Negocio
                     "El médico no existe o ya está inactivo.");
             }
 
-            // --- Verificar si tiene turnos futuros pendientes ---
+            // --- Verificar si tiene turnos pendientes ---
             int turnosPendientes = contarTurnosPendientes(idMedico);
 
             if (turnosPendientes > 0)
@@ -476,10 +473,7 @@ namespace Negocio
                     "INNER JOIN ESTADOS_TURNO ET " +
                     "ON T.Id_Estado_Turno = ET.Id_Estado_Turno " +
                     "WHERE T.Id_Medico = @IdMedico " +
-                    "AND ET.Nombre IN (N'Nuevo', N'Reprogramado') " +
-                    "AND (T.Fecha > CAST(GETDATE() AS DATE) " +
-                    "OR (T.Fecha = CAST(GETDATE() AS DATE) " +
-                    "AND T.Hora_Inicio >= CAST(GETDATE() AS TIME)))" +
+                    "AND ET.Nombre IN (N'Nuevo', N'Reprogramado')" +
                     ")"
                 );
 

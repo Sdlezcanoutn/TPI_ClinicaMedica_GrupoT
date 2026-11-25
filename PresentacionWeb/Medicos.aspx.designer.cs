@@ -213,6 +213,15 @@ namespace PresentacionWeb
         protected global::System.Web.UI.WebControls.HiddenField hfIdBaja;
 
         /// <summary>
+        /// Control lblMensajeBaja.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblMensajeBaja;
+
+        /// <summary>
         /// Control lblNombreBaja.
         /// </summary>
         /// <remarks>
@@ -222,13 +231,13 @@ namespace PresentacionWeb
         protected global::System.Web.UI.WebControls.Label lblNombreBaja;
 
         /// <summary>
-        /// Control pnlBajaPermitida.
+        /// Control lblSignoBaja.
         /// </summary>
         /// <remarks>
         /// Campo generado automáticamente.
         /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel pnlBajaPermitida;
+        protected global::System.Web.UI.WebControls.Label lblSignoBaja;
 
         /// <summary>
         /// Control pnlBajaBloqueada.
@@ -247,6 +256,24 @@ namespace PresentacionWeb
         /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Label lblTurnosPendientes;
+
+        /// <summary>
+        /// Control pnlBajaPermitida.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel pnlBajaPermitida;
+
+        /// <summary>
+        /// Control btnCancelarBaja.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlButton btnCancelarBaja;
 
         /// <summary>
         /// Control btnConfirmarBaja.

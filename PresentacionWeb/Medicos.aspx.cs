@@ -412,10 +412,25 @@ namespace PresentacionWeb
                 // --- Consultar los turnos pendientes ---
                 int turnosPendientes = negocio.contarTurnosPendientes(idMedico);
 
-                // --- Permitir o bloquear la confirmación ---
+                // --- Adaptar el mensaje según los turnos pendientes ---
+                lblMensajeBaja.Text = turnosPendientes == 0
+                    ? "¿Está seguro de que desea dar de baja al médico"
+                    : "No se puede dar de baja al médico";
+
+                lblSignoBaja.Text = turnosPendientes == 0
+                     ? "?"
+                     : ".";
+
+                // --- Adaptar el contenido según los turnos pendientes ---
                 pnlBajaPermitida.Visible = turnosPendientes == 0;
                 pnlBajaBloqueada.Visible = turnosPendientes > 0;
+
+                // --- Adaptar los botones según los turnos pendientes ---
                 btnConfirmarBaja.Visible = turnosPendientes == 0;
+
+                btnCancelarBaja.InnerText = turnosPendientes == 0
+                    ? "Cancelar"
+                    : "Cerrar";
 
                 lblTurnosPendientes.Text = turnosPendientes.ToString();
 

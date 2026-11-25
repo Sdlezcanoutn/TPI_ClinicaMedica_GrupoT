@@ -364,7 +364,6 @@
                                 class="btn btn-outline-secondary"
                                 data-bs-dismiss="modal">
                                 Cancelar
-                   
                             </button>
 
                             <asp:Button ID="btnGuardarMedico"
@@ -396,8 +395,8 @@
 
                         <!-- Encabezado del modal -->
                         <div class="modal-header">
-                            <h5 class="modal-title fw-bold"
-                                id="tituloModalBajaMedico">Desactivar médico
+                            <h5 class="modal-title"
+                                id="tituloModalBajaMedico">Dar de baja médico
                             </h5>
 
                             <button type="button" class="btn-close"
@@ -408,48 +407,47 @@
                         <!-- Información de la baja -->
                         <div class="modal-body">
 
-                            <p class="mb-2">
-                                Médico:
-                               
-                                <strong>
-                                    <asp:Label ID="lblNombreBaja"
-                                        runat="server" />
-                                </strong>
+                            <p>
+                                <asp:Label ID="lblMensajeBaja" runat="server" />
+                                <strong><asp:Label ID="lblNombreBaja" runat="server" /></strong><asp:Label ID="lblSignoBaja" runat="server" />
                             </p>
-
-                            <asp:Panel ID="pnlBajaPermitida" runat="server">
-                                <p class="text-muted mb-0">
-                                    ¿Confirmás que querés desactivar
-                                    a este médico?
-                               
-                                </p>
-                            </asp:Panel>
 
                             <asp:Panel ID="pnlBajaBloqueada" runat="server"
                                 Visible="false">
 
-                                <div class="alert alert-warning mb-0">
-                                    No se puede desactivar al médico porque
-                                    tiene
-                                   
-                                    <strong>
-                                        <asp:Label ID="lblTurnosPendientes"
-                                            runat="server" />
-                                    </strong>
-                                    turno(s) pendiente(s).
-                               
+                                <div class="alert alert-warning">
+                                    Turnos pendientes:
+                                    <asp:Label ID="lblTurnosPendientes" runat="server" />.
+                                    <br />
+                                    Deben resolverse antes de confirmar la baja.
                                 </div>
 
                             </asp:Panel>
+
+                            <asp:Panel ID="pnlBajaPermitida" runat="server">
+
+                                <div class="alert alert-warning">
+                                    Este médico no tiene turnos pendientes.
+                                </div>
+
+                                <p>El historial de turnos de este médico se conservará.</p>
+
+                                <p class="text-muted small mb-0">
+                                    Una vez confirmada la baja, no se podrán asignar
+                                    nuevos turnos a este médico.
+                                </p>
+
+                            </asp:Panel>
+
                         </div>
 
                         <!-- Acciones -->
                         <div class="modal-footer">
-                            <button type="button"
-                                class="btn btn-outline-secondary"
+
+                            <button id="btnCancelarBaja" runat="server"
+                                type="button" class="btn btn-secondary"
                                 data-bs-dismiss="modal">
                                 Cancelar
-                           
                             </button>
 
                             <asp:Button ID="btnConfirmarBaja"
