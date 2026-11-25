@@ -351,10 +351,7 @@ namespace PresentacionWeb
                     Page.GetType(),
                     "bajaExitosa",
                     "bootstrap.Modal.getOrCreateInstance(document.getElementById('modalBajaEspecialidad')).hide();" +
-                    "var mensaje = document.getElementById('mensajeExito');" +
-                    "mensaje.textContent = 'Especialidad dada de baja correctamente.';" +
-                    "mensaje.classList.remove('d-none');" +
-                    "setTimeout(function() { mensaje.classList.add('d-none'); }, 4000);",
+                    "mostrarExitoListado('Especialidad dada de baja correctamente.');",
                     true
                 );
             }
@@ -441,10 +438,7 @@ namespace PresentacionWeb
                     Page.GetType(),
                     "reactivacionExitosa",
                     "bootstrap.Modal.getOrCreateInstance(document.getElementById('modalReactivarEspecialidad')).hide();" +
-                    "var mensaje = document.getElementById('mensajeExito');" +
-                    "mensaje.textContent = 'Especialidad reactivada correctamente.';" +
-                    "mensaje.classList.remove('d-none');" +
-                    "setTimeout(function() { mensaje.classList.add('d-none'); }, 4000);",
+                    "mostrarExitoListado('Especialidad reactivada correctamente.');",
                     true
                 );
             }

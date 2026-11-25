@@ -427,18 +427,40 @@
         actualizarContadores();
     });
  
-    // --- Cerrar modal y mostrar confirmación ---
+    // ============================================================
+    // CONFIRMACIÓN DE ALTA Y MODIFICACIÓN DE ESPECIALIDADES
+    // ============================================================
     function mostrarExito(texto) {
+
+        // --- Cerrar el modal ---
         var elementoModal = document.getElementById('modalEspecialidad');
         var modal = bootstrap.Modal.getOrCreateInstance(elementoModal);
 
         modal.hide();
 
+        // --- Mostrar confirmación ---
+        mostrarExitoListado(texto);
+    }
+
+    // ============================================================
+    // MENSAJES DE CONFIRMACIÓN DEL LISTADO
+    // ============================================================
+    function mostrarExitoListado(texto) {
+
+        // --- Obtener el contenedor del mensaje ---
         var mensaje = document.getElementById('mensajeExito');
+
+        // --- Mostrar la confirmación ---
         mensaje.textContent = texto;
         mensaje.classList.remove('d-none');
 
-        setTimeout(function () {
+        // --- Desplazar la página hacia arriba ---
+        setTimeout(function() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }, 500);
+
+        // --- Ocultar el mensaje después de 4 segundos ---
+        setTimeout(function() {
             mensaje.classList.add('d-none');
         }, 4000);
     }
