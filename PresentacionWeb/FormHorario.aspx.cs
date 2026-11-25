@@ -17,11 +17,25 @@ namespace PresentacionWeb
             {
                 cargarMedicos();
 
+                // Validación del parámetro por URL para editar un horario
+                string parametroId = Request.QueryString["id"];
+
+                // Si no existe el parámetro, es un horario nuevo.
+                if (parametroId == null)
+                    return;
+
+                // Si existe, debe ser un entero positivo.
                 int id;
-                if (int.TryParse(Request.QueryString["id"], out id))
+
+                if (!int.TryParse(parametroId, out id) || id <= 0)
                 {
-                    cargarHorario(id);
+                    lblMensaje.Text = "El identificador del horario no es válido.";
+                    btnGuardar.Enabled = false;
+                    return;
                 }
+
+                // Si llegamos acá, el ID tiene un formato válido.
+                cargarHorario(id);
             }
         }
         private void cargarMedicos()
@@ -51,9 +65,18 @@ namespace PresentacionWeb
             HorarioTrabajo horario = negocio.listar()
                 .FirstOrDefault(h => h.Id == id);
 
+            // Validar si el horario existe en la base de datos
             if (horario == null)
             {
                 lblMensaje.Text = "No se encontró el horario.";
+                btnGuardar.Enabled = false;
+                return;
+            }
+
+            // Validar si el horario está activo
+            if (!horario.Estado)
+            {
+                lblMensaje.Text = "No se puede editar un horario inactivo.";
                 btnGuardar.Enabled = false;
                 return;
             }
@@ -66,13 +89,22 @@ namespace PresentacionWeb
         }
         protected void btnGuardar_Click(object sender, EventArgs e)
         {
-            //Validaciones
+            // Validaciones de selección
             if (ddlMedico.SelectedValue == "")
             {
                 lblMensaje.Text = "Seleccione un médico.";
                 return;
             }
 
+            byte dia;
+
+            if (!byte.TryParse(ddlDiaSemana.SelectedValue, out dia) || dia < 1 || dia > 7)
+            {
+                lblMensaje.Text = "Seleccione un día de la semana válido.";
+                return;
+            }
+
+            // Validaciones horarias
             DateTime entrada;
             DateTime salida;
 
@@ -117,17 +149,28 @@ namespace PresentacionWeb
                 horario.Hora_Entrada = entrada;
                 horario.Hora_Salida = salida;
 
+                // Validación del parámetro por URL para editar un horario
                 HorarioTrabajoNegocio negocio = new HorarioTrabajoNegocio();
-                int id;
+                string parametroId = Request.QueryString["id"];
 
-                if (int.TryParse(Request.QueryString["id"], out id))
+                if (parametroId == null)
                 {
-                    horario.Id = id;
-                    negocio.modificar(horario);
+                    // No hay ID: estamos agregando.
+                    negocio.agregar(horario);
                 }
                 else
                 {
-                    negocio.agregar(horario);
+                    // Hay ID: debe ser válido para modificar.
+                    int id;
+
+                    if (!int.TryParse(parametroId, out id) || id <= 0)
+                    {
+                        lblMensaje.Text = "El identificador del horario no es válido.";
+                        return;
+                    }
+
+                    horario.Id = id;
+                    negocio.modificar(horario);
                 }
 
                 Response.Redirect("~/Horarios.aspx", false);
@@ -139,7 +182,8 @@ namespace PresentacionWeb
             }
             catch (Exception ex)
             {
-                lblMensaje.Text = "Error al guardar el horario: " + ex.Message;
+                System.Diagnostics.Debug.WriteLine(ex);
+                lblMensaje.Text = "Ocurrió un error al guardar el horario. Intente nuevamente.";
             }
         }
         protected void btnCancelar_Click(object sender, EventArgs e)

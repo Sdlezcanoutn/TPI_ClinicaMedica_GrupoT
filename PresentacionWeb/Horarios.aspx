@@ -84,12 +84,14 @@
                             </asp:TemplateField>
                             <asp:TemplateField HeaderText="Acciones" ItemStyle-CssClass="text-end" HeaderStyle-CssClass="text-end">
                                 <ItemTemplate>
+                                    <!-- Botón Editar -->
                                     <asp:LinkButton ID="btnEditar" runat="server" CommandArgument='<%# Eval("Id") %>' 
                                         OnClick="btnEditar_Click" CssClass="btn btn-sm btn-outline-secondary me-1">
                                         <i class="fa-solid fa-pen-to-square me-1"></i> Editar
                                     </asp:LinkButton>
+                                    <!-- Botón Eliminar -->
                                     <asp:LinkButton ID="btnEliminar" runat="server" CommandArgument='<%# Eval("Id") %>'
-                                        OnClick="btnEditar_Click" CssClass="btn btn-sm btn-outline-danger"
+                                        OnClick="btnEliminar_Click" CssClass="btn btn-sm btn-outline-danger"
                                         OnClientClick="return confirm('¿Está seguro de que desea desactivar este horario?');">
                                         <i class="fa-solid fa-trash me-1"></i> Eliminar
                                     </asp:LinkButton>

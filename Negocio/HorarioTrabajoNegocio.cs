@@ -64,6 +64,14 @@ namespace Negocio
         }
         public void agregar(HorarioTrabajo horario)
         {
+            // Validar médico activo
+            if (!existeMedicoActivo(horario.Medico.Id))
+            {
+                throw new InvalidOperationException(
+                    "El médico no existe o se encuentra inactivo."
+                );
+            }
+
             // Validar superposición horaria
             if (existeSuperposicion(horario))
                 throw new InvalidOperationException(
@@ -94,6 +102,21 @@ namespace Negocio
         }
         public void modificar(HorarioTrabajo horario)
         {
+            // Validar si el horario existe en la base de datos y está activo
+            if (horario.Id <= 0 || !existeHorarioActivo(horario.Id))
+            {
+                throw new InvalidOperationException(
+                    "El horario no existe o se encuentra inactivo."
+                );
+            }
+
+            // Validar médico activo
+            if (!existeMedicoActivo(horario.Medico.Id)){
+                throw new InvalidOperationException(
+                    "El médico no existe o se encuentra inactivo."
+                );
+            }
+
             // Validar superposición horaria
             if (existeSuperposicion(horario))
                 throw new InvalidOperationException(
@@ -110,7 +133,8 @@ namespace Negocio
                     "Dia_Semana = @DiaSemana, " +
                     "Hora_Entrada = @HoraEntrada, " +
                     "Hora_Salida = @HoraSalida " +
-                    "WHERE Id_Horario_Trabajo = @Id");
+                    "WHERE Id_Horario_Trabajo = @Id " +
+                    "AND Estado = 1");
 
                 datos.setearParametro("@IdMedico", horario.Medico.Id);
                 datos.setearParametro("@DiaSemana", byte.Parse(horario.Dia_Semana));
@@ -166,6 +190,52 @@ namespace Negocio
                 datos.setearParametro("@HoraEntrada", horario.Hora_Entrada.TimeOfDay);
                 datos.setearParametro("@HoraSalida", horario.Hora_Salida.TimeOfDay);
 
+                datos.ejecutarLectura();
+
+                return datos.Lector.Read();
+            }
+            finally
+            {
+                datos.cerrarConexion();
+            }
+        }
+        private bool existeHorarioActivo(int id)
+        {
+            AccesoDatos datos = new AccesoDatos();
+
+            try
+            {
+                datos.setearConsulta(
+                    "SELECT TOP 1 1 " +
+                    "FROM HORARIOS_TRABAJO " +
+                    "WHERE Id_Horario_Trabajo = @Id " +
+                    "AND Estado = 1"
+                );
+
+                datos.setearParametro("@Id", id);
+                datos.ejecutarLectura();
+
+                return datos.Lector.Read();
+            }
+            finally
+            {
+                datos.cerrarConexion();
+            }
+        }
+        private bool existeMedicoActivo(int idMedico)
+        {
+            AccesoDatos datos = new AccesoDatos();
+
+            try
+            {
+                datos.setearConsulta(
+                    "SELECT TOP 1 1 " +
+                    "FROM MEDICOS " +
+                    "WHERE Id_Medico = @IdMedico " +
+                    "AND Estado = 1"
+                );
+
+                datos.setearParametro("@IdMedico", idMedico);
                 datos.ejecutarLectura();
 
                 return datos.Lector.Read();

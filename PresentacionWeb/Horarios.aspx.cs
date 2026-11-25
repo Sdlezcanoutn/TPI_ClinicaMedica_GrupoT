@@ -82,7 +82,17 @@ namespace PresentacionWeb
         {
             LinkButton boton = (LinkButton)sender;
 
-            int id = int.Parse(boton.CommandArgument);
+            int id;
+
+
+            if (boton == null ||
+                !int.TryParse(boton.CommandArgument, out id) ||
+                id <= 0)
+            {
+                // Mostrar un mensaje o registrar el error.
+                System.Diagnostics.Debug.WriteLine("No se pudo editar: ID de horario inválido.");
+                return;
+            }
 
             Response.Redirect("~/FormHorario.aspx?id=" + id);
         }
