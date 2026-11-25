@@ -180,15 +180,15 @@
                                                 CommandArgument='<%# Eval("Id") %>'
                                                 OnClick="btnEditar_Click"
                                                 Visible='<%# Convert.ToBoolean(Eval("Estado")) %>'>
-        <i class="fa-solid fa-pen-to-square me-1"></i> Editar
-    </asp:LinkButton>
+                                                <i class="fa-solid fa-pen-to-square me-1"></i> Editar
+                                            </asp:LinkButton>
 
                                             <asp:LinkButton ID="btnEliminar" runat="server"
                                                 CssClass="btn btn-sm btn-outline-danger"
                                                 CommandArgument='<%# Eval("Id") %>'
                                                 OnClick="btnEliminar_Click"
                                                 Visible='<%# Convert.ToBoolean(Eval("Estado")) %>'>
-                                                <i class="fa-solid fa-user-xmark me-1"></i> Desactivar
+                                                <i class="fa-solid fa-trash me-1"></i> Dar de baja
                                             </asp:LinkButton>
 
                                             <asp:LinkButton ID="btnReactivar" runat="server"
@@ -642,33 +642,31 @@
 
         modal.hide();
 
-        // --- Mostrar el mensaje de confirmación ---
+        // --- Mostrar confirmación ---
+        mostrarExitoListado(texto);
+    }
+
+    // ============================================================
+    // MENSAJES DE CONFIRMACIÓN DEL LISTADO
+    // ============================================================
+    function mostrarExitoListado(texto) {
+
+        // --- Obtener el contenedor del mensaje ---
         var mensaje = document.getElementById('mensajeExito');
+
+        // --- Mostrar la confirmación ---
         mensaje.textContent = texto;
         mensaje.classList.remove('d-none');
+
+        // --- Desplazar la página hacia arriba ---
+        setTimeout(function() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }, 500);
 
         // --- Ocultar el mensaje después de 4 segundos ---
         setTimeout(function() {
             mensaje.classList.add('d-none');
                 }, 4000);
-    }
-
-    // ============================================================
-    // CONFIRMACIÓN DE BAJA LÓGICA DEL MÉDICO
-    // ============================================================
-    function mostrarExitoListadoMedico(texto) {
-
-        // --- Obtener el contenedor del mensaje ---
-        const mensaje = document.getElementById("mensajeExito");
-
-        // --- Mostrar la confirmación ---
-        mensaje.textContent = texto;
-        mensaje.classList.remove("d-none");
-
-        // --- Ocultar el mensaje después de 4 segundos ---
-        setTimeout(function () {
-            mensaje.classList.add("d-none");
-        }, 4000);
     }
 
     // ============================================================

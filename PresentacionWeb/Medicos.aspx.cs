@@ -88,7 +88,7 @@ namespace PresentacionWeb
 
                     if (lblSinResultados != null)
                     {
-                        if(todos.Count == 0)
+                        if (todos.Count == 0)
                         {
                             lblSinResultados.Text =
                                 "No hay médicos registrados en el sistema.";
@@ -473,20 +473,22 @@ namespace PresentacionWeb
                 cargarMedicos();
                 upListado.Update();
 
-                // --- Cerrar el modal y mostrar confirmación ---
+                // --- Limpiar selección ---
+                hfIdBaja.Value = "";
+
+                // --- Cerrar modal y mostrar confirmación ---
                 ScriptManager.RegisterStartupScript(
                     Page,
                     Page.GetType(),
-                    "bajaMedicoExitosa",
-                    "bootstrap.Modal.getOrCreateInstance(" +
-                    "document.getElementById('modalBajaMedico')).hide();" +
-                    "mostrarExitoListadoMedico('Médico desactivado correctamente.');",
+                    "bajaExitosa",
+                    "bootstrap.Modal.getOrCreateInstance(document.getElementById('modalBajaMedico')).hide();" +
+                    "mostrarExitoListado('Médico dado de baja correctamente.');",
                     true
                 );
             }
             catch (ArgumentException ex)
             {
-                // --- Mostrar el motivo por el que no se pudo desactivar ---
+                // --- Mostrar el motivo por el que no se pudo dar de baja ---
                 lblErrorListado.Text = ex.Message;
                 lblErrorListado.Visible = true;
             }
@@ -494,7 +496,7 @@ namespace PresentacionWeb
             {
                 // --- Mostrar un mensaje general si ocurre un error ---
                 lblErrorListado.Text =
-                    "No se pudo desactivar el médico. Intente nuevamente.";
+                    "Ocurrió un error al dar de baja el médico. Intente nuevamente.";
                 lblErrorListado.Visible = true;
             }
         }
@@ -571,10 +573,9 @@ namespace PresentacionWeb
                 ScriptManager.RegisterStartupScript(
                     Page,
                     Page.GetType(),
-                    "reactivacionMedicoExitosa",
-                    "bootstrap.Modal.getOrCreateInstance(" +
-                    "document.getElementById('modalReactivarMedico')).hide();" +
-                    "mostrarExitoListadoMedico('Médico reactivado correctamente.');",
+                    "reactivacionExitosa",
+                    "bootstrap.Modal.getOrCreateInstance(document.getElementById('modalReactivarMedico')).hide();" +
+                    "mostrarExitoListado('Médico reactivado correctamente.');",
                     true
                 );
             }
