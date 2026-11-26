@@ -133,7 +133,7 @@
 
                 <div class="modal-header">
                     <h5 class="modal-title fw-bold" id="tituloModalTurno">Nuevo Turno</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    <button type="button" class="btn-close" onclick="cerrarModalTurno();" aria-label="Cerrar"></button>
                 </div>
 
                 <asp:UpdatePanel ID="upTurno" runat="server" UpdateMode="Conditional">
@@ -228,7 +228,7 @@
                         </div>
 
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="button" class="btn btn-outline-secondary" onclick="cerrarModalTurno();">Cancelar</button>
                             <asp:Button ID="btnGuardarTurno" runat="server"
                                 Text="Guardar Turno"
                                 CssClass="btn btn-clinica-primary"
@@ -256,26 +256,38 @@
         }, 4000);
     }
 
-    // Cierra el modal tras guardar y dispara el aviso de éxito
-    function mostrarExitoTurno(texto) {
+    // --- Cerrar modal de turno ---
+    function cerrarModalTurno() {
         const modalEl = document.getElementById("modalTurno");
+
         if (modalEl) {
-            const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
-            modal.hide();
+            const modal = bootstrap.Modal.getInstance(modalEl);
+
+            if (modal) {
+                modal.hide();
+            }
 
             modalEl.classList.remove("show");
             modalEl.style.display = "none";
             modalEl.setAttribute("aria-hidden", "true");
+            modalEl.removeAttribute("aria-modal");
+            modalEl.removeAttribute("role");
         }
 
         document.body.classList.remove("modal-open");
         document.body.style.removeProperty("overflow");
         document.body.style.removeProperty("padding-right");
 
-        document.querySelectorAll(".modal-backdrop").forEach(function (backdrop) {
+        document.querySelectorAll(".modal-backdrop").forEach(function(backdrop) {
             backdrop.remove();
         });
 
+        limpiarFormularioTurno();
+    }
+
+    // --- Mostrar confirmación de guardado ---
+    function mostrarExitoTurno(texto) {
+        cerrarModalTurno();
         mostrarAlertaTurno(texto);
     }
 
