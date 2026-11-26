@@ -11,6 +11,19 @@ namespace PresentacionWeb
 {
     public partial class Turnos : System.Web.UI.Page
     {
+        // ===== IDENTIFICADOR DEL TURNO =====
+        private int IdTurno
+        {
+            get
+            {
+                return int.TryParse(hfIdTurno.Value, out int id) ? id : 0;
+            }
+            set
+            {
+                hfIdTurno.Value = value.ToString();
+            }
+        }
+
         #region Eventos de página y controles
 
         // Se ejecuta al cargar la página; solo en la primera carga (!IsPostBack) inicializa combos, horarios y grilla
@@ -164,6 +177,124 @@ namespace PresentacionWeb
             );
         }
 
+        // --- Preparar formulario para un nuevo turno ---
+        protected void btnAgregar_Click(object sender, EventArgs e)
+        {
+            IdTurno = 0;
+
+            // --- Habilitar campos del formulario ---
+            ddlPaciente.Enabled = true;
+            ddlEspecialidad.Enabled = true;
+            ddlMedico.Enabled = true;
+            txtMotivoConsulta.ReadOnly = false;
+
+            // --- Restablecer campos ---
+            ddlPaciente.SelectedIndex = 0;
+            ddlEspecialidad.SelectedIndex = 0;
+
+            CargarMedicosPorEspecialidad(0);
+
+            txtFechaTurno.Text = string.Empty;
+            txtMotivoConsulta.Text = string.Empty;
+
+            CargarHorariosDisponibles();
+            CargarSugerenciasEspecialidad(0);
+
+            lblErrorTurno.Visible = false;
+            btnGuardarTurno.Text = "Guardar Turno";
+
+            ScriptManager.RegisterStartupScript(
+                this,
+                GetType(),
+                "nuevoTurno",
+                "prepararNuevoTurno();",
+                true
+            );
+        }
+
+        // --- Recuperar turno para reprogramar ---
+        protected void btnEditar_Click(object sender, EventArgs e)
+        {
+            LinkButton boton = (LinkButton)sender;
+            int id = int.Parse(boton.CommandArgument);
+
+            TurnoNegocio negocio = new TurnoNegocio();
+            Turno turno = negocio.listar().FirstOrDefault(t => t.Id == id);
+
+            if (turno == null)
+                return;
+
+            if (turno.Estado.Nombre != "Nuevo" &&
+                turno.Estado.Nombre != "Reprogramado")
+            {
+                lblErrorListadoTurno.Text =
+                    "Solo se pueden reprogramar turnos nuevos o reprogramados.";
+
+                lblErrorListadoTurno.Visible = true;
+                upListadoTurnos.Update();
+                return;
+            }
+
+            // --- Verificar disponibilidad de las entidades ---
+            CargarMedicosPorEspecialidad(turno.Especialidad.Id);
+
+            if (ddlPaciente.Items.FindByValue(turno.Paciente.Id.ToString()) == null ||
+                ddlEspecialidad.Items.FindByValue(turno.Especialidad.Id.ToString()) == null ||
+                ddlMedico.Items.FindByValue(turno.Medico.Id.ToString()) == null)
+            {
+                lblErrorListadoTurno.Text =
+                    "El paciente, el médico y la especialidad deben estar activos y correctamente asociados.";
+
+                lblErrorListadoTurno.Visible = true;
+                upListadoTurnos.Update();
+                return;
+            }
+
+            IdTurno = turno.Id;
+
+            // --- Cargar datos del turno ---
+            ddlPaciente.SelectedValue = turno.Paciente.Id.ToString();
+            ddlEspecialidad.SelectedValue = turno.Especialidad.Id.ToString();
+            ddlMedico.SelectedValue = turno.Medico.Id.ToString();
+
+            txtFechaTurno.Text = turno.Fecha.ToString("yyyy-MM-dd");
+            txtMotivoConsulta.Text = turno.Motivo_Consulta;
+
+            // --- Bloquear campos que no se pueden modificar ---
+            ddlPaciente.Enabled = false;
+            ddlEspecialidad.Enabled = false;
+            ddlMedico.Enabled = false;
+            txtMotivoConsulta.ReadOnly = true;
+
+            // --- Cargar horarios disponibles ---
+            CargarHorariosDisponibles();
+
+            string horarioActual =
+                $"{turno.Hora_Inicio:HH:mm}|{turno.Hora_Fin:HH:mm}";
+
+            if (ddlHorarioDisponible.Items.FindByValue(horarioActual) != null)
+            {
+                ddlHorarioDisponible.SelectedValue = horarioActual;
+            }
+
+            // --- Preparar modal de reprogramación ---
+            pnlSugerenciasTurno.Visible = false;
+            lblErrorTurno.Visible = false;
+            lblErrorListadoTurno.Visible = false;
+            btnGuardarTurno.Text = "Reprogramar Turno";
+
+            upTurno.Update();
+            upListadoTurnos.Update();
+
+            ScriptManager.RegisterStartupScript(
+                this,
+                GetType(),
+                "editarTurno",
+                "document.getElementById('tituloModalTurno').textContent = 'Reprogramar Turno'; mostrarModalTurno();",
+                true
+            );
+        }
+
         // Valida los datos del modal, registra el nuevo turno en BD, refresca la grilla y muestra aviso de éxito
         protected void btnGuardarTurno_Click(object sender, EventArgs e)
         {
@@ -208,6 +339,7 @@ namespace PresentacionWeb
             {
                 Turno nuevo = new Turno
                 {
+                    Id = IdTurno,
                     Paciente = new Paciente { Id = idPaciente },
                     Especialidad = new Especialidad { Id = idEspecialidad },
                     Medico = new Medico { Id = idMedico },
@@ -218,7 +350,19 @@ namespace PresentacionWeb
                 };
 
                 TurnoNegocio negocio = new TurnoNegocio();
-                negocio.agregar(nuevo);
+                string mensaje;
+
+                // --- Diferenciar alta de reprogramación ---
+                if (IdTurno == 0)
+                {
+                    negocio.agregar(nuevo);
+                    mensaje = "Turno registrado correctamente.";
+                }
+                else
+                {
+                    negocio.reprogramar(nuevo);
+                    mensaje = "Turno reprogramado correctamente.";
+                }
 
                 AplicarFiltrosListado();
                 upListadoTurnos.Update();
@@ -230,7 +374,7 @@ namespace PresentacionWeb
                     this,
                     GetType(),
                     "guardarTurnoOk",
-                    "mostrarExitoTurno('Turno registrado correctamente.');",
+                    $"mostrarExitoTurno('{mensaje}');",
                     true
                 );
             }
@@ -494,7 +638,7 @@ namespace PresentacionWeb
             TurnoNegocio turnoNegocio = new TurnoNegocio();
 
             var disponibles = turnoNegocio.obtenerHorariosDisponibles(
-                idMedico, fechaSeleccionada.Date, idPaciente);
+            idMedico, fechaSeleccionada.Date, idPaciente, IdTurno);
 
             if (disponibles.Count == 0)
             {

@@ -17,9 +17,9 @@
                     </div>
                     <div class="mt-3 mt-md-0">
                         <asp:Button ID="btnAgregar" runat="server"
-                            Text="+ Nuevo Turno"
-                            CssClass="btn btn-clinica-primary px-4 py-2 rounded-3 shadow-sm"
-                            OnClientClick="prepararNuevoTurno(); return false;" />
+                        Text="+ Nuevo Turno"
+                        CssClass="btn btn-clinica-primary px-4 py-2 rounded-3 shadow-sm"
+                        OnClick="btnAgregar_Click" />
                     </div>
                 </div>
 
@@ -97,8 +97,9 @@
                                         <ItemTemplate>
                                             <asp:LinkButton ID="btnEditar" runat="server"
                                                 CssClass="btn btn-sm btn-outline-secondary me-1"
-                                                CommandArgument='<%# Eval("Id") %>'>
-                                                <i class="fa-solid fa-pen-to-square me-1"></i> Editar
+                                                CommandArgument='<%# Eval("Id") %>'
+                                                OnClick="btnEditar_Click">
+                                                <i class="fa-solid fa-calendar-days me-1"></i> Reprogramar
                                             </asp:LinkButton>
                                             <asp:LinkButton ID="btnCancelar" runat="server"
                                                 CssClass="btn btn-sm btn-outline-danger"
@@ -138,6 +139,8 @@
 
                 <asp:UpdatePanel ID="upTurno" runat="server" UpdateMode="Conditional">
                     <ContentTemplate>
+
+                        <asp:HiddenField ID="hfIdTurno" runat="server" Value="0" />
 
                         <div class="modal-body">
 
@@ -281,8 +284,6 @@
         document.querySelectorAll(".modal-backdrop").forEach(function(backdrop) {
             backdrop.remove();
         });
-
-        limpiarFormularioTurno();
     }
 
     // --- Mostrar confirmación de guardado ---
@@ -344,40 +345,10 @@
         });
     }
 
-    // Deja los campos del modal limpios para un nuevo turno
-    function limpiarFormularioTurno() {
-        const ddlPac = document.getElementById("<%= ddlPaciente.ClientID %>");
-        const ddlEsp = document.getElementById("<%= ddlEspecialidad.ClientID %>");
-        const ddlMed = document.getElementById("<%= ddlMedico.ClientID %>");
-        const ddlHor = document.getElementById("<%= ddlHorarioDisponible.ClientID %>");
-
-        if (ddlPac) ddlPac.selectedIndex = 0;
-        if (ddlEsp) ddlEsp.selectedIndex = 0;
-        if (ddlMed) ddlMed.selectedIndex = 0;
-        if (ddlHor) ddlHor.selectedIndex = 0;
-
-        const txtFecha = document.getElementById("<%= txtFechaTurno.ClientID %>");
-        const txtMotivo = document.getElementById("<%= txtMotivoConsulta.ClientID %>");
-
-        if (txtFecha) txtFecha.value = "";
-        if (txtMotivo) txtMotivo.value = "";
-
-        const pnlSug = document.getElementById("<%= pnlSugerenciasTurno.ClientID %>");
-        if (pnlSug) pnlSug.style.display = "none";
-
-        ocultarErrorTurno();
-        actualizarEstiloPlaceholderSelects();
-    }
-
-    // Abre el modal en modo alta
+    // --- Abrir modal en modo alta ---
     function prepararNuevoTurno() {
-        limpiarFormularioTurno();
         document.getElementById("tituloModalTurno").textContent = "Nuevo Turno";
-        document.getElementById("<%= btnGuardarTurno.ClientID %>").value = "Guardar Turno";
-
-        bootstrap.Modal.getOrCreateInstance(
-            document.getElementById("modalTurno")
-        ).show();
+         mostrarModalTurno();
     }
 
     // Reabre el modal cuando ocurre un postback dentro del UpdatePanel
@@ -405,7 +376,6 @@
     (function () {
         const modalTurno = document.getElementById("modalTurno");
         if (modalTurno) {
-            modalTurno.addEventListener("hidden.bs.modal", limpiarFormularioTurno);
             modalTurno.addEventListener("show.bs.modal", function () {
                 ocultarErrorTurno();
                 engancharEventosCamposTurno();
