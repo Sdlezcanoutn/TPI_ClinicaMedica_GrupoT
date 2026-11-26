@@ -23,9 +23,7 @@
                     </div>
                 </div>
 
-                <!-- Listado, filtros y alertas -->
-                <asp:UpdatePanel ID="upListadoTurnos" runat="server" UpdateMode="Conditional">
-                    <ContentTemplate>
+                <!-- Filtros del listado -->
 
                         <div class="row g-3 mb-4">
                             <div class="col-md-6 col-lg-3">
@@ -33,11 +31,19 @@
                                     <span class="input-group-text bg-light border-end-0">
                                         <i class="fa-solid fa-magnifying-glass"></i>
                                     </span>
+
                                     <asp:TextBox ID="txtBuscar" runat="server"
                                         CssClass="form-control bg-light border-start-0"
                                         Placeholder="Buscar por Paciente o Médico..."
-                                        AutoPostBack="true"
-                                        OnTextChanged="txtBuscar_TextChanged" />
+                                        AutoPostBack="false"
+                                        oninput="programarBusqueda()"
+                                        onkeydown="if (event.key === 'Enter') { event.preventDefault(); ejecutarBusqueda(); }" />
+
+                                    <!-- Botón oculto para ejecutar la búsqueda -->
+                                    <asp:LinkButton ID="btnBuscar" runat="server"
+                                        OnClick="btnBuscar_Click"
+                                        CssClass="boton-busqueda-oculto">
+                                    </asp:LinkButton>
                                 </div>
                             </div>
 
@@ -69,6 +75,10 @@
                                 </asp:LinkButton>
                             </div>
                         </div>
+
+                        <!-- Listado y alertas -->
+                        <asp:UpdatePanel ID="upListadoTurnos" runat="server" UpdateMode="Conditional">
+                            <ContentTemplate>
 
                         <asp:Label ID="lblErrorListadoTurno" runat="server"
                             CssClass="text-danger small d-block mb-2"
@@ -129,7 +139,15 @@
                             </asp:GridView>
                         </div>
 
-                    </ContentTemplate>
+                        </ContentTemplate>
+
+                    <Triggers>
+                        <asp:AsyncPostBackTrigger ControlID="btnBuscar" EventName="Click" />
+                        <asp:AsyncPostBackTrigger ControlID="ddlFiltroEspecialidad" EventName="SelectedIndexChanged" />
+                        <asp:AsyncPostBackTrigger ControlID="ddlFiltroMedico" EventName="SelectedIndexChanged" />
+                        <asp:AsyncPostBackTrigger ControlID="txtFiltroFecha" EventName="TextChanged" />
+                        <asp:PostBackTrigger ControlID="btnLimpiarFiltros" />
+                    </Triggers>
                 </asp:UpdatePanel>
 
             </div>
@@ -316,6 +334,25 @@
     </div>
 
     <script>
+        // ===== BÚSQUEDA DE TURNOS =====
+
+        let temporizadorBusqueda;
+
+        // --- Esperar antes de buscar ---
+        function programarBusqueda() {
+            clearTimeout(temporizadorBusqueda);
+
+        temporizadorBusqueda = setTimeout(function () {
+            ejecutarBusqueda();
+            }, 300);
+        }
+
+        // --- Ejecutar búsqueda ---
+        function ejecutarBusqueda() {
+            clearTimeout(temporizadorBusqueda);
+        __doPostBack('<%= btnBuscar.UniqueID %>', '');
+        }
+
     // Muestra el cartel verde de confirmación en el listado y lo oculta a los 4 segundos
     function mostrarAlertaTurno(texto) {
         const alerta = document.getElementById("mensajeExitoTurno");

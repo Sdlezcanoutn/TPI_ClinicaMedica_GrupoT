@@ -37,8 +37,8 @@ namespace PresentacionWeb
             }
         }
 
-        // Filtra el listado cuando el usuario escribe o cambia el texto de búsqueda
-        protected void txtBuscar_TextChanged(object sender, EventArgs e)
+        // --- Ejecutar búsqueda de turnos ---
+        protected void btnBuscar_Click(object sender, EventArgs e)
         {
             AplicarFiltrosListado();
             upListadoTurnos.Update();
@@ -600,20 +600,39 @@ namespace PresentacionWeb
 
                 List<Turno> lista = negocio.listar();
 
+                // --- Filtrar por texto ---
                 if (!string.IsNullOrWhiteSpace(filtro))
                 {
-                    string texto = filtro.Trim().ToLower();
-                    lista = lista.FindAll(t =>
+                    string busqueda = filtro.Trim();
+
+                    CompareInfo comparador = CultureInfo.GetCultureInfo("es-AR").CompareInfo;
+                    CompareOptions opciones = CompareOptions.IgnoreCase | CompareOptions.IgnoreNonSpace;
+
+                    lista = lista.Where(t =>
                         (t.Paciente != null &&
-                         ((!string.IsNullOrEmpty(t.Paciente.Nombre) && t.Paciente.Nombre.ToLower().Contains(texto)) ||
-                          (!string.IsNullOrEmpty(t.Paciente.Apellido) && t.Paciente.Apellido.ToLower().Contains(texto)) ||
-                          (!string.IsNullOrEmpty(t.Paciente.DNI) && t.Paciente.DNI.ToLower().Contains(texto)))) ||
+                            (comparador.IndexOf(
+                                $"{t.Paciente.Nombre} {t.Paciente.Apellido}",
+                                busqueda, opciones) >= 0 ||
+                             comparador.IndexOf(
+                                $"{t.Paciente.Apellido}, {t.Paciente.Nombre}",
+                                busqueda, opciones) >= 0 ||
+                             comparador.IndexOf(
+                                t.Paciente.DNI ?? "",
+                                busqueda, opciones) >= 0))
+                        ||
                         (t.Medico != null &&
-                         ((!string.IsNullOrEmpty(t.Medico.Nombre) && t.Medico.Nombre.ToLower().Contains(texto)) ||
-                          (!string.IsNullOrEmpty(t.Medico.Apellido) && t.Medico.Apellido.ToLower().Contains(texto)))) ||
+                            (comparador.IndexOf(
+                                $"{t.Medico.Nombre} {t.Medico.Apellido}",
+                                busqueda, opciones) >= 0 ||
+                             comparador.IndexOf(
+                                $"{t.Medico.Apellido}, {t.Medico.Nombre}",
+                                busqueda, opciones) >= 0))
+                        ||
                         (t.Especialidad != null &&
-                         !string.IsNullOrEmpty(t.Especialidad.Nombre) && t.Especialidad.Nombre.ToLower().Contains(texto))
-                    );
+                            comparador.IndexOf(
+                                t.Especialidad.Nombre ?? "",
+                                busqueda, opciones) >= 0)
+                    ).ToList();
                 }
 
                 if (idEspecialidad > 0)
