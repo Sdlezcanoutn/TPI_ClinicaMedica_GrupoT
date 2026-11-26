@@ -186,6 +186,71 @@ namespace Negocio
             datos.ejecutarAccionTransaccion();
         }
 
+        // --- Consultar el historial de un turno ---
+        public List<HistorialTurno> listarHistorial(int idTurno)
+        {
+            List<HistorialTurno> lista = new List<HistorialTurno>();
+            AccesoDatos datos = new AccesoDatos();
+
+            try
+            {
+                datos.setearConsulta(
+                    "SELECT H.Id_Historial_Turno, H.Id_Turno, " +
+                    "H.Fecha_Anterior, H.Hora_Inicio_Anterior, " +
+                    "H.Hora_Fin_Anterior, H.Fecha_Cambio, " +
+                    "H.Id_Estado_Turno_Anterior, E.Nombre AS NombreEstadoAnterior " +
+                    "FROM HISTORIAL_TURNOS H " +
+                    "INNER JOIN ESTADOS_TURNO E " +
+                    "ON H.Id_Estado_Turno_Anterior = E.Id_Estado_Turno " +
+                    "WHERE H.Id_Turno = @IdTurno " +
+                    "ORDER BY H.Fecha_Cambio DESC, H.Id_Historial_Turno DESC"
+                );
+
+                datos.setearParametro("@IdTurno", idTurno);
+                datos.ejecutarLectura();
+
+                while (datos.Lector.Read())
+                {
+                    DateTime fechaAnterior =
+                        (DateTime)datos.Lector["Fecha_Anterior"];
+
+                    HistorialTurno aux = new HistorialTurno
+                    {
+                        Id = (int)datos.Lector["Id_Historial_Turno"],
+
+                        Turno = new Turno
+                        {
+                            Id = (int)datos.Lector["Id_Turno"]
+                        },
+
+                        Fecha_Anterior = fechaAnterior.Date,
+
+                        Hora_Inicio_Anterior = fechaAnterior.Date.Add(
+                            (TimeSpan)datos.Lector["Hora_Inicio_Anterior"]),
+
+                        Hora_Fin_Anterior = fechaAnterior.Date.Add(
+                            (TimeSpan)datos.Lector["Hora_Fin_Anterior"]),
+
+                        Estado_Anterior = new EstadoTurno
+                        {
+                            Id = (int)datos.Lector["Id_Estado_Turno_Anterior"],
+                            Nombre = (string)datos.Lector["NombreEstadoAnterior"]
+                        },
+
+                        Fecha_Cambio = (DateTime)datos.Lector["Fecha_Cambio"]
+                    };
+
+                    lista.Add(aux);
+                }
+
+                return lista;
+            }
+            finally
+            {
+                datos.cerrarConexion();
+            }
+        }
+
         // ALTA Y ASIGNACIÓN DE TURNOS (ETAPA 1)
         public void agregar(Turno nuevo)
         {

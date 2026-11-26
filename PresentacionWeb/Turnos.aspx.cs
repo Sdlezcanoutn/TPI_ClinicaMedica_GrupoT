@@ -295,6 +295,72 @@ namespace PresentacionWeb
             );
         }
 
+        // ===== CONSULTA DEL HISTORIAL DE TURNOS =====
+
+        // --- Mostrar historial del turno seleccionado ---
+        protected void btnHistorial_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                LinkButton boton = (LinkButton)sender;
+                int id = int.Parse(boton.CommandArgument);
+
+                TurnoNegocio negocio = new TurnoNegocio();
+
+                Turno turno = negocio.listar()
+                    .FirstOrDefault(t => t.Id == id);
+
+                if (turno == null)
+                    throw new ArgumentException("No se encontró el turno seleccionado.");
+
+                // --- Mostrar datos actuales del turno ---
+                lblDatosHistorial.Text = Server.HtmlEncode(
+                    $"Turno #{turno.Id} - " +
+                    $"{turno.Paciente.Apellido}, {turno.Paciente.Nombre} - " +
+                    $"{turno.Especialidad.Nombre}");
+
+                lblFechaAltaHistorial.Text =
+                    $"Fecha de alta: {turno.Fecha_Alta:dd/MM/yyyy}";
+
+                lblEstadoActualHistorial.Text = Server.HtmlEncode(
+                    $"Fecha actual: {turno.Fecha:dd/MM/yyyy} - " +
+                    $"{turno.Hora_Inicio:HH:mm} a {turno.Hora_Fin:HH:mm} - " +
+                    $"Estado: {turno.Estado.Nombre}");
+
+                // --- Cargar modificaciones anteriores ---
+                dgvHistorialTurno.DataSource = negocio.listarHistorial(id);
+                dgvHistorialTurno.DataBind();
+
+                lblErrorListadoTurno.Visible = false;
+
+                upHistorialTurno.Update();
+                upListadoTurnos.Update();
+
+                // --- Abrir modal de historial ---
+                ScriptManager.RegisterStartupScript(
+                    this,
+                    GetType(),
+                    "mostrarHistorialTurno",
+                    "bootstrap.Modal.getOrCreateInstance(document.getElementById('modalHistorialTurno')).show();",
+                    true
+                );
+            }
+            catch (ArgumentException ex)
+            {
+                lblErrorListadoTurno.Text = Server.HtmlEncode(ex.Message);
+                lblErrorListadoTurno.Visible = true;
+                upListadoTurnos.Update();
+            }
+            catch (Exception)
+            {
+                lblErrorListadoTurno.Text =
+                    "No se pudo consultar el historial del turno.";
+
+                lblErrorListadoTurno.Visible = true;
+                upListadoTurnos.Update();
+            }
+        }
+
         // --- Recuperar turno para cancelar ---
         protected void btnCancelar_Click(object sender, EventArgs e)
         {

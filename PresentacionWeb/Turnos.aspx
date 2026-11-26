@@ -122,10 +122,13 @@
                                                 <i class="fa-solid fa-calendar-xmark me-1"></i> Cancelar
                                             </asp:LinkButton>
 
-                                            <asp:Label runat="server"
-                                            CssClass="text-muted"
-                                            Text="—"
-                                            Visible='<%# Eval("Estado").ToString() != "Nuevo" && Eval("Estado").ToString() != "Reprogramado" %>' />
+                                            <asp:LinkButton ID="btnHistorial" runat="server"
+                                                CssClass="btn btn-sm btn-outline-secondary ms-1"
+                                                CommandArgument='<%# Eval("Id") %>'
+                                                OnClick="btnHistorial_Click"
+                                                ToolTip="Consultar historial">
+                                                <i class="fa-solid fa-clock-rotate-left me-1"></i> Historial
+                                            </asp:LinkButton>
 
                                         </ItemTemplate>
                                     </asp:TemplateField>
@@ -154,6 +157,110 @@
 
         </div>
     </div>
+
+    <!-- Modal Historial de Turno -->
+<div class="modal fade" id="modalHistorialTurno" tabindex="-1"
+    aria-labelledby="tituloModalHistorial" aria-hidden="true">
+
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold" id="tituloModalHistorial">
+                    Historial del turno
+                </h5>
+
+                <button type="button" class="btn-close"
+                    data-bs-dismiss="modal" aria-label="Cerrar">
+                </button>
+            </div>
+
+            <asp:UpdatePanel ID="upHistorialTurno" runat="server"
+                UpdateMode="Conditional">
+                <ContentTemplate>
+
+                    <div class="modal-body">
+
+                        <!-- Datos del turno -->
+                        <div class="bg-light rounded-3 p-3 mb-4">
+                            <asp:Label ID="lblDatosHistorial" runat="server"
+                                CssClass="fw-semibold d-block" />
+
+                            <asp:Label ID="lblFechaAltaHistorial" runat="server"
+                                CssClass="text-muted small d-block" />
+
+                            <asp:Label ID="lblEstadoActualHistorial" runat="server"
+                                CssClass="small d-block mt-2" />
+                        </div>
+
+                        <!-- Modificaciones anteriores -->
+                        <h6 class="fw-bold mb-3">Modificaciones anteriores</h6>
+
+                        <div class="table-responsive">
+                            <asp:GridView ID="dgvHistorialTurno" runat="server"
+                                AutoGenerateColumns="False"
+                                CssClass="table table-custom align-middle mb-0"
+                                GridLines="None">
+
+                                <Columns>
+
+                                    <asp:BoundField
+                                        DataField="Fecha_Cambio"
+                                        HeaderText="Fecha de modificación"
+                                        DataFormatString="{0:dd/MM/yyyy HH:mm}" />
+
+                                    <asp:BoundField
+                                        DataField="Fecha_Anterior"
+                                        HeaderText="Fecha anterior"
+                                        DataFormatString="{0:dd/MM/yyyy}" />
+
+                                    <asp:BoundField
+                                        DataField="Hora_Inicio_Anterior"
+                                        HeaderText="Desde"
+                                        DataFormatString="{0:HH:mm}" />
+
+                                    <asp:BoundField
+                                        DataField="Hora_Fin_Anterior"
+                                        HeaderText="Hasta"
+                                        DataFormatString="{0:HH:mm}" />
+
+                                    <asp:TemplateField HeaderText="Estado anterior">
+                                        <ItemTemplate>
+                                            <span class='<%# ObtenerClaseBadgeEstado(Eval("Estado_Anterior.Nombre").ToString()) %>'>
+                                                <%#: Eval("Estado_Anterior.Nombre") %>
+                                            </span>
+                                        </ItemTemplate>
+                                    </asp:TemplateField>
+
+                                </Columns>
+
+                                <EmptyDataTemplate>
+                                    <div class="text-center py-4 text-muted">
+                                        <i class="fa-solid fa-clock-rotate-left fs-3 mb-2 d-block"></i>
+                                        <p class="m-0">
+                                            Este turno aún no registra modificaciones.
+                                        </p>
+                                    </div>
+                                </EmptyDataTemplate>
+
+                            </asp:GridView>
+                        </div>
+
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary"
+                            data-bs-dismiss="modal">
+                            Cerrar
+                        </button>
+                    </div>
+
+                </ContentTemplate>
+            </asp:UpdatePanel>
+
+        </div>
+    </div>
+</div>
 
     <!-- Modal Confirmación de Cancelación -->
 <div class="modal fade" id="modalCancelarTurno" tabindex="-1"

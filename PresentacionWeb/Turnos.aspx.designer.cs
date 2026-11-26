@@ -105,6 +105,51 @@ namespace PresentacionWeb
         protected global::System.Web.UI.WebControls.GridView dgvTurnos;
 
         /// <summary>
+        /// Control upHistorialTurno.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
+        protected global::System.Web.UI.UpdatePanel upHistorialTurno;
+
+        /// <summary>
+        /// Control lblDatosHistorial.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblDatosHistorial;
+
+        /// <summary>
+        /// Control lblFechaAltaHistorial.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblFechaAltaHistorial;
+
+        /// <summary>
+        /// Control lblEstadoActualHistorial.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblEstadoActualHistorial;
+
+        /// <summary>
+        /// Control dgvHistorialTurno.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.GridView dgvHistorialTurno;
+
+        /// <summary>
         /// Control upCancelarTurno.
         /// </summary>
         /// <remarks>
