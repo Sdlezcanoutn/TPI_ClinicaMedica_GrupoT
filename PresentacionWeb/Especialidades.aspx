@@ -146,34 +146,34 @@
 
                                     <div class="modal-body">
                                         <p>
-                                            ¿Está seguro de que desea dar de baja la especialidad
-                           
+                                            <asp:Label ID="lblTextoBaja" runat="server" />
                                             <strong>
-                                                <asp:Label ID="lblNombreBaja" runat="server" /></strong>?
+                                                <asp:Label ID="lblNombreBaja" runat="server" />
+                                            </strong><asp:Label ID="lblPuntuacionBaja" runat="server" />
                                         </p>
 
                                         <div class="alert alert-warning">
                                             <asp:Label ID="lblTurnosPendientes" runat="server" />
                                         </div>
 
-                                        <p>
-                                            Los turnos ya asignados se mantendrán y podrán
-                            atenderse normalmente.
-                       
-                                        </p>
+                                        <div id="divInformacionBaja" runat="server">
 
-                                        <p class="text-muted small mb-0">
-                                            Una vez confirmada la baja, no se podrán asignar
-                            nuevos turnos en esta especialidad.
-                       
-                                        </p>
+                                            <p>
+                                                El historial de turnos de esta especialidad se conservará.
+                                            </p>
+
+                                            <p class="text-muted small mb-0">
+                                                Una vez confirmada la baja, no se podrán asignar
+                                                nuevos turnos en esta especialidad.
+                                            </p>
+                                        </div>
                                     </div>
 
                                     <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary"
+                                        <button id="btnCancelarBaja" runat="server"
+                                            type="button" class="btn btn-secondary"
                                             data-bs-dismiss="modal">
                                             Cancelar
-                       
                                         </button>
 
                                         <asp:Button ID="btnConfirmarBaja" runat="server"
@@ -427,18 +427,40 @@
         actualizarContadores();
     });
  
-    // --- Cerrar modal y mostrar confirmación ---
+    // ============================================================
+    // CONFIRMACIÓN DE ALTA Y MODIFICACIÓN DE ESPECIALIDADES
+    // ============================================================
     function mostrarExito(texto) {
+
+        // --- Cerrar el modal ---
         var elementoModal = document.getElementById('modalEspecialidad');
         var modal = bootstrap.Modal.getOrCreateInstance(elementoModal);
 
         modal.hide();
 
+        // --- Mostrar confirmación ---
+        mostrarExitoListado(texto);
+    }
+
+    // ============================================================
+    // MENSAJES DE CONFIRMACIÓN DEL LISTADO
+    // ============================================================
+    function mostrarExitoListado(texto) {
+
+        // --- Obtener el contenedor del mensaje ---
         var mensaje = document.getElementById('mensajeExito');
+
+        // --- Mostrar la confirmación ---
         mensaje.textContent = texto;
         mensaje.classList.remove('d-none');
 
-        setTimeout(function () {
+        // --- Desplazar la página hacia arriba ---
+        setTimeout(function() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }, 500);
+
+        // --- Ocultar el mensaje después de 4 segundos ---
+        setTimeout(function() {
             mensaje.classList.add('d-none');
         }, 4000);
     }

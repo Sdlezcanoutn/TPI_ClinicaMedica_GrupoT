@@ -289,9 +289,28 @@ namespace PresentacionWeb
             hfIdBaja.Value = especialidad.Id.ToString();
             lblNombreBaja.Text = especialidad.Nombre;
 
+            // --- Adaptar mensaje según los turnos pendientes ---
+            lblTextoBaja.Text = turnosPendientes == 0
+                ? "¿Está seguro de que desea dar de baja la especialidad "
+                : "No se puede dar de baja la especialidad ";
+
+            lblPuntuacionBaja.Text = turnosPendientes == 0
+                ? "?"
+                : ".";
+
+            // --- Informar si existen turnos pendientes ---
             lblTurnosPendientes.Text = turnosPendientes == 0
                 ? "Esta especialidad no tiene turnos pendientes."
-                : "Turnos pendientes: " + turnosPendientes;
+                : "Turnos pendientes: " + turnosPendientes +
+                  ".<br />Deben resolverse antes de confirmar la baja.";
+
+            // --- Adaptar el modal según los turnos pendientes ---
+            btnConfirmarBaja.Visible = turnosPendientes == 0;
+            divInformacionBaja.Visible = turnosPendientes == 0;
+
+            btnCancelarBaja.InnerText = turnosPendientes == 0
+                ? "Cancelar"
+                : "Cerrar";
 
             upBajaEspecialidad.Update();
 
@@ -332,10 +351,7 @@ namespace PresentacionWeb
                     Page.GetType(),
                     "bajaExitosa",
                     "bootstrap.Modal.getOrCreateInstance(document.getElementById('modalBajaEspecialidad')).hide();" +
-                    "var mensaje = document.getElementById('mensajeExito');" +
-                    "mensaje.textContent = 'Especialidad dada de baja correctamente.';" +
-                    "mensaje.classList.remove('d-none');" +
-                    "setTimeout(function() { mensaje.classList.add('d-none'); }, 4000);",
+                    "mostrarExitoListado('Especialidad dada de baja correctamente.');",
                     true
                 );
             }
@@ -422,10 +438,7 @@ namespace PresentacionWeb
                     Page.GetType(),
                     "reactivacionExitosa",
                     "bootstrap.Modal.getOrCreateInstance(document.getElementById('modalReactivarEspecialidad')).hide();" +
-                    "var mensaje = document.getElementById('mensajeExito');" +
-                    "mensaje.textContent = 'Especialidad reactivada correctamente.';" +
-                    "mensaje.classList.remove('d-none');" +
-                    "setTimeout(function() { mensaje.classList.add('d-none'); }, 4000);",
+                    "mostrarExitoListado('Especialidad reactivada correctamente.');",
                     true
                 );
             }

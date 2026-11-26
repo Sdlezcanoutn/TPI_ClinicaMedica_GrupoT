@@ -392,6 +392,7 @@ form > div, main, .body-content {
     color: #ffffff;
 }
 
+
 /* Componentes reutilizables */
 /* Botón principal azul institucional */
 .btn-clinica-primary {
@@ -402,12 +403,25 @@ form > div, main, .body-content {
     transition: all 0.2s ease;
 }
 
-.btn-clinica-primary:hover,
-.btn-clinica-primary:focus {
- background-color: #124c6b !important;
- border-color: #124c6b !important;
- color: #ffffff !important;
-}    
+    .btn-clinica-primary:hover,
+    .btn-clinica-primary:focus {
+        background-color: #124c6b !important;
+        border-color: #124c6b !important;
+        color: #ffffff !important;
+    }
+
+/* Botón seleccionado de los filtros por estado */
+.btn-filtro-activo {
+    background-color: #18628a !important;
+    border-color: #18628a !important;
+    color: #ffffff !important;
+}
+
+    .btn-filtro-activo:hover {
+        background-color: #145373 !important;
+        border-color: #145373 !important;
+        color: #ffffff !important;
+    }
 
 /* Texto inicial de combos en gris más clarito */
 .form-select option[value="0"] {
