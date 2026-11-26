@@ -17,15 +17,13 @@
                     </div>
                     <div class="mt-3 mt-md-0">
                         <asp:Button ID="btnAgregar" runat="server"
-                            Text="+ Nuevo Turno"
-                            CssClass="btn btn-clinica-primary px-4 py-2 rounded-3 shadow-sm"
-                            OnClientClick="prepararNuevoTurno(); return false;" />
+                        Text="+ Nuevo Turno"
+                        CssClass="btn btn-clinica-primary px-4 py-2 rounded-3 shadow-sm"
+                        OnClick="btnAgregar_Click" />
                     </div>
                 </div>
 
-                <!-- Listado, filtros y alertas -->
-                <asp:UpdatePanel ID="upListadoTurnos" runat="server" UpdateMode="Conditional">
-                    <ContentTemplate>
+                <!-- Filtros del listado -->
 
                         <div class="row g-3 mb-4">
                             <div class="col-md-6 col-lg-3">
@@ -33,11 +31,19 @@
                                     <span class="input-group-text bg-light border-end-0">
                                         <i class="fa-solid fa-magnifying-glass"></i>
                                     </span>
+
                                     <asp:TextBox ID="txtBuscar" runat="server"
                                         CssClass="form-control bg-light border-start-0"
                                         Placeholder="Buscar por Paciente o Médico..."
-                                        AutoPostBack="true"
-                                        OnTextChanged="txtBuscar_TextChanged" />
+                                        AutoPostBack="false"
+                                        oninput="programarBusqueda()"
+                                        onkeydown="if (event.key === 'Enter') { event.preventDefault(); ejecutarBusqueda(); }" />
+
+                                    <!-- Botón oculto para ejecutar la búsqueda -->
+                                    <asp:LinkButton ID="btnBuscar" runat="server"
+                                        OnClick="btnBuscar_Click"
+                                        CssClass="boton-busqueda-oculto">
+                                    </asp:LinkButton>
                                 </div>
                             </div>
 
@@ -70,6 +76,10 @@
                             </div>
                         </div>
 
+                        <!-- Listado y alertas -->
+                        <asp:UpdatePanel ID="upListadoTurnos" runat="server" UpdateMode="Conditional">
+                            <ContentTemplate>
+
                         <asp:Label ID="lblErrorListadoTurno" runat="server"
                             CssClass="text-danger small d-block mb-2"
                             Visible="false" />
@@ -95,16 +105,28 @@
                                     </asp:TemplateField>
                                     <asp:TemplateField HeaderText="Acciones" ItemStyle-CssClass="text-end" HeaderStyle-CssClass="text-end">
                                         <ItemTemplate>
+
                                             <asp:LinkButton ID="btnEditar" runat="server"
                                                 CssClass="btn btn-sm btn-outline-secondary me-1"
-                                                CommandArgument='<%# Eval("Id") %>'>
-                                                <i class="fa-solid fa-pen-to-square me-1"></i> Editar
+                                                CommandArgument='<%# Eval("Id") %>'
+                                                Visible='<%# Eval("Estado").ToString() == "Nuevo" || Eval("Estado").ToString() == "Reprogramado" %>'
+                                                OnClick="btnEditar_Click">
+                                                <i class="fa-solid fa-calendar-days me-1"></i> Reprogramar
                                             </asp:LinkButton>
+
                                             <asp:LinkButton ID="btnCancelar" runat="server"
                                                 CssClass="btn btn-sm btn-outline-danger"
-                                                CommandArgument='<%# Eval("Id") %>'>
+                                                CommandArgument='<%# Eval("Id") %>'
+                                                Visible='<%# Eval("Estado").ToString() == "Nuevo" || Eval("Estado").ToString() == "Reprogramado" %>'
+                                                OnClick="btnCancelar_Click">
                                                 <i class="fa-solid fa-calendar-xmark me-1"></i> Cancelar
                                             </asp:LinkButton>
+
+                                            <asp:Label runat="server"
+                                            CssClass="text-muted"
+                                            Text="—"
+                                            Visible='<%# Eval("Estado").ToString() != "Nuevo" && Eval("Estado").ToString() != "Reprogramado" %>' />
+
                                         </ItemTemplate>
                                     </asp:TemplateField>
                                 </Columns>
@@ -117,13 +139,80 @@
                             </asp:GridView>
                         </div>
 
-                    </ContentTemplate>
+                        </ContentTemplate>
+
+                    <Triggers>
+                        <asp:AsyncPostBackTrigger ControlID="btnBuscar" EventName="Click" />
+                        <asp:AsyncPostBackTrigger ControlID="ddlFiltroEspecialidad" EventName="SelectedIndexChanged" />
+                        <asp:AsyncPostBackTrigger ControlID="ddlFiltroMedico" EventName="SelectedIndexChanged" />
+                        <asp:AsyncPostBackTrigger ControlID="txtFiltroFecha" EventName="TextChanged" />
+                        <asp:PostBackTrigger ControlID="btnLimpiarFiltros" />
+                    </Triggers>
                 </asp:UpdatePanel>
 
             </div>
 
         </div>
     </div>
+
+    <!-- Modal Confirmación de Cancelación -->
+<div class="modal fade" id="modalCancelarTurno" tabindex="-1"
+    aria-labelledby="tituloModalCancelar" aria-hidden="true">
+
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title" id="tituloModalCancelar">Cancelar turno</h5>
+                <button type="button" class="btn-close"
+                    data-bs-dismiss="modal" aria-label="Cerrar">
+                </button>
+            </div>
+
+            <asp:UpdatePanel ID="upCancelarTurno" runat="server"
+                UpdateMode="Conditional">
+                <ContentTemplate>
+
+                    <asp:HiddenField ID="hfIdCancelar" runat="server" />
+
+                    <div class="modal-body">
+                        <p>
+                            ¿Está seguro de que desea cancelar el siguiente turno?
+                        </p>
+
+                        <p>
+                            <strong>
+                                <asp:Label ID="lblDatosCancelar" runat="server" />
+                            </strong>
+                        </p>
+
+                        <div class="alert alert-warning">
+                            El horario quedará disponible para una nueva asignación.
+                        </div>
+
+                        <p class="text-muted small mb-0">
+                            El historial del turno se conservará.
+                        </p>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary"
+                            data-bs-dismiss="modal">
+                            Volver
+                        </button>
+
+                        <asp:Button ID="btnConfirmarCancelacion" runat="server"
+                            Text="Confirmar cancelación"
+                            CssClass="btn btn-danger"
+                            OnClick="btnConfirmarCancelacion_Click" />
+                    </div>
+
+                </ContentTemplate>
+            </asp:UpdatePanel>
+
+        </div>
+    </div>
+</div>
 
     <!-- Modal Alta de Turno -->
     <div class="modal fade" id="modalTurno" tabindex="-1"
@@ -133,11 +222,13 @@
 
                 <div class="modal-header">
                     <h5 class="modal-title fw-bold" id="tituloModalTurno">Nuevo Turno</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    <button type="button" class="btn-close" onclick="cerrarModalTurno();" aria-label="Cerrar"></button>
                 </div>
 
                 <asp:UpdatePanel ID="upTurno" runat="server" UpdateMode="Conditional">
                     <ContentTemplate>
+
+                        <asp:HiddenField ID="hfIdTurno" runat="server" Value="0" />
 
                         <div class="modal-body">
 
@@ -148,7 +239,7 @@
                             <div class="row g-3">
                                 <div class="col-md-6">
                                     <label class="form-label">Paciente *</label>
-                                    <asp:DropDownList ID="ddlPaciente" runat="server" CssClass="form-select" />
+                                    <asp:DropDownList ID="ddlPaciente" runat="server" CssClass="form-select" AutoPostBack="True" OnSelectedIndexChanged="ddlPaciente_SelectedIndexChanged" />
                                 </div>
 
                                 <div class="col-md-6">
@@ -228,7 +319,7 @@
                         </div>
 
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="button" class="btn btn-outline-secondary" onclick="cerrarModalTurno();">Cancelar</button>
                             <asp:Button ID="btnGuardarTurno" runat="server"
                                 Text="Guardar Turno"
                                 CssClass="btn btn-clinica-primary"
@@ -243,6 +334,25 @@
     </div>
 
     <script>
+        // ===== BÚSQUEDA DE TURNOS =====
+
+        let temporizadorBusqueda;
+
+        // --- Esperar antes de buscar ---
+        function programarBusqueda() {
+            clearTimeout(temporizadorBusqueda);
+
+        temporizadorBusqueda = setTimeout(function () {
+            ejecutarBusqueda();
+            }, 300);
+        }
+
+        // --- Ejecutar búsqueda ---
+        function ejecutarBusqueda() {
+            clearTimeout(temporizadorBusqueda);
+        __doPostBack('<%= btnBuscar.UniqueID %>', '');
+        }
+
     // Muestra el cartel verde de confirmación en el listado y lo oculta a los 4 segundos
     function mostrarAlertaTurno(texto) {
         const alerta = document.getElementById("mensajeExitoTurno");
@@ -256,26 +366,36 @@
         }, 4000);
     }
 
-    // Cierra el modal tras guardar y dispara el aviso de éxito
-    function mostrarExitoTurno(texto) {
+    // --- Cerrar modal de turno ---
+    function cerrarModalTurno() {
         const modalEl = document.getElementById("modalTurno");
+
         if (modalEl) {
-            const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
-            modal.hide();
+            const modal = bootstrap.Modal.getInstance(modalEl);
+
+            if (modal) {
+                modal.hide();
+            }
 
             modalEl.classList.remove("show");
             modalEl.style.display = "none";
             modalEl.setAttribute("aria-hidden", "true");
+            modalEl.removeAttribute("aria-modal");
+            modalEl.removeAttribute("role");
         }
 
         document.body.classList.remove("modal-open");
         document.body.style.removeProperty("overflow");
         document.body.style.removeProperty("padding-right");
 
-        document.querySelectorAll(".modal-backdrop").forEach(function (backdrop) {
+        document.querySelectorAll(".modal-backdrop").forEach(function(backdrop) {
             backdrop.remove();
         });
+    }
 
+    // --- Mostrar confirmación de guardado ---
+    function mostrarExitoTurno(texto) {
+        cerrarModalTurno();
         mostrarAlertaTurno(texto);
     }
 
@@ -332,40 +452,10 @@
         });
     }
 
-    // Deja los campos del modal limpios para un nuevo turno
-    function limpiarFormularioTurno() {
-        const ddlPac = document.getElementById("<%= ddlPaciente.ClientID %>");
-        const ddlEsp = document.getElementById("<%= ddlEspecialidad.ClientID %>");
-        const ddlMed = document.getElementById("<%= ddlMedico.ClientID %>");
-        const ddlHor = document.getElementById("<%= ddlHorarioDisponible.ClientID %>");
-
-        if (ddlPac) ddlPac.selectedIndex = 0;
-        if (ddlEsp) ddlEsp.selectedIndex = 0;
-        if (ddlMed) ddlMed.selectedIndex = 0;
-        if (ddlHor) ddlHor.selectedIndex = 0;
-
-        const txtFecha = document.getElementById("<%= txtFechaTurno.ClientID %>");
-        const txtMotivo = document.getElementById("<%= txtMotivoConsulta.ClientID %>");
-
-        if (txtFecha) txtFecha.value = "";
-        if (txtMotivo) txtMotivo.value = "";
-
-        const pnlSug = document.getElementById("<%= pnlSugerenciasTurno.ClientID %>");
-        if (pnlSug) pnlSug.style.display = "none";
-
-        ocultarErrorTurno();
-        actualizarEstiloPlaceholderSelects();
-    }
-
-    // Abre el modal en modo alta
+    // --- Abrir modal en modo alta ---
     function prepararNuevoTurno() {
-        limpiarFormularioTurno();
         document.getElementById("tituloModalTurno").textContent = "Nuevo Turno";
-        document.getElementById("<%= btnGuardarTurno.ClientID %>").value = "Guardar Turno";
-
-        bootstrap.Modal.getOrCreateInstance(
-            document.getElementById("modalTurno")
-        ).show();
+         mostrarModalTurno();
     }
 
     // Reabre el modal cuando ocurre un postback dentro del UpdatePanel
@@ -393,7 +483,6 @@
     (function () {
         const modalTurno = document.getElementById("modalTurno");
         if (modalTurno) {
-            modalTurno.addEventListener("hidden.bs.modal", limpiarFormularioTurno);
             modalTurno.addEventListener("show.bs.modal", function () {
                 ocultarErrorTurno();
                 engancharEventosCamposTurno();
