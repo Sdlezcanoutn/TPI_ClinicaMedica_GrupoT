@@ -302,6 +302,40 @@ form > div, main, .body-content {
     flex-shrink: 0;
 }
 
+.acceso-card {
+    background-color: #ffffff;
+    border: 1px solid #e6ecf2;
+    border-radius: 0.85rem;
+    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.acceso-card:hover {
+    transform: translateY(-3px);
+    border-color: #cbd5e1;
+    box-shadow: 0 0.65rem 1.4rem rgba(15, 23, 42, 0.06);
+}
+
+.acceso-icono {
+    color: #1d5fa7;
+    font-size: 1.35rem;
+}
+
+.acceso-link {
+    color: #1d5fa7;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    transition: gap 0.2s ease, color 0.2s ease;
+}
+
+.acceso-link:hover {
+    color: #0f3d73;
+    gap: 0.55rem;
+}
+
 /* Footer */
 .footer-institucional {
     font-weight: 300;
@@ -358,6 +392,7 @@ form > div, main, .body-content {
     color: #ffffff;
 }
 
+
 /* Componentes reutilizables */
 /* Botón principal azul institucional */
 .btn-clinica-primary {
@@ -368,12 +403,25 @@ form > div, main, .body-content {
     transition: all 0.2s ease;
 }
 
-.btn-clinica-primary:hover,
-.btn-clinica-primary:focus {
- background-color: #124c6b !important;
- border-color: #124c6b !important;
- color: #ffffff !important;
-}    
+    .btn-clinica-primary:hover,
+    .btn-clinica-primary:focus {
+        background-color: #124c6b !important;
+        border-color: #124c6b !important;
+        color: #ffffff !important;
+    }
+
+/* Botón seleccionado de los filtros por estado */
+.btn-filtro-activo {
+    background-color: #18628a !important;
+    border-color: #18628a !important;
+    color: #ffffff !important;
+}
+
+    .btn-filtro-activo:hover {
+        background-color: #145373 !important;
+        border-color: #145373 !important;
+        color: #ffffff !important;
+    }
 
 /* Texto inicial de combos en gris más clarito */
 .form-select option[value="0"] {

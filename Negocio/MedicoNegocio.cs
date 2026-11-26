@@ -1,7 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Datos;
 using Dominio;
-using Datos;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Data.SqlClient;
 
 namespace Negocio
 {
@@ -85,17 +87,86 @@ namespace Negocio
         }
 
         // ============================================================
+        // VALIDACIÓN DE DATOS DEL MÉDICO
+        // ============================================================
+        private void validarDatos(Medico medico)
+        {
+            // --- Validar campos obligatorios ---
+            if (medico == null ||
+                string.IsNullOrWhiteSpace(medico.Nombre) ||
+                string.IsNullOrWhiteSpace(medico.Apellido) ||
+                string.IsNullOrWhiteSpace(medico.DNI) ||
+                string.IsNullOrWhiteSpace(medico.Matricula) ||
+                string.IsNullOrWhiteSpace(medico.Email))
+            {
+                throw new ArgumentException(
+                    "Completá todos los campos obligatorios.");
+            }
+
+            // --- Validar longitud de los campos ---
+            if (medico.Nombre.Length > 100)
+            {
+                throw new ArgumentException(
+                    "El nombre no puede superar los 100 caracteres.");
+            }
+
+            if (medico.Apellido.Length > 100)
+            {
+                throw new ArgumentException(
+                    "El apellido no puede superar los 100 caracteres.");
+            }
+
+            if (medico.Matricula.Length > 50)
+            {
+                throw new ArgumentException(
+                    "La matrícula no puede superar los 50 caracteres.");
+            }
+
+            if (!string.IsNullOrEmpty(medico.Telefono) && medico.Telefono.Length > 30)
+            {
+                throw new ArgumentException(
+                    "El teléfono no puede superar los 30 caracteres.");
+            }
+
+            if (medico.Email.Length > 254)
+            {
+                throw new ArgumentException(
+                    "El correo electrónico no puede superar los 254 caracteres.");
+            }
+
+            // --- Validar formato del DNI ---
+            if (medico.DNI.Length < 7 || medico.DNI.Length > 8 ||
+                !medico.DNI.All(char.IsDigit))
+            {
+                throw new ArgumentException(
+                    "Ingresá un DNI válido de 7 u 8 dígitos.");
+            }
+
+            // --- Validar formato del correo electrónico ---
+            if (!System.Text.RegularExpressions.Regex.IsMatch(
+                medico.Email,
+                @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
+            {
+                throw new ArgumentException(
+                    "Ingresá un correo electrónico válido.");
+            }
+
+            // --- Validar especialidades asignadas ---
+            if (medico.Especialidades == null ||
+                medico.Especialidades.Count == 0)
+            {
+                throw new ArgumentException(
+                    "Seleccioná al menos una especialidad.");
+            }
+        }
+
+        // ============================================================
         // ALTA DE MÉDICOS CON SUS ESPECIALIDADES
         // ============================================================
         public void agregar(Medico medico)
         {
-            // --- Validar que el médico tenga especialidades asignadas ---
-            if (medico == null || medico.Especialidades == null ||
-                medico.Especialidades.Count == 0)
-            {
-                throw new ArgumentException(
-                    "El médico debe tener al menos una especialidad.");
-            }
+            // --- Validar datos ---
+            validarDatos(medico);
 
             // ====================================================
             // VALIDAR DNI Y MATRÍCULA DUPLICADOS
@@ -175,7 +246,11 @@ namespace Negocio
                     // --- Limpiar los parámetros de la consulta anterior ---
                     datos.limpiarParametros();
 
+                    // --- Verificar que la especialidad esté activa antes de asignarla ---
                     datos.setearConsulta(
+                        "IF NOT EXISTS (SELECT 1 FROM ESPECIALIDADES " +
+                        "WHERE Id_Especialidad = @IdEspecialidad AND Estado = 1) " +
+                        "THROW 50002, 'No se puede asignar una especialidad inactiva o inexistente.', 1; " +
                         "INSERT INTO MEDICOS_ESPECIALIDADES " +
                         "(Id_Medico, Id_Especialidad) " +
                         "VALUES (@IdMedico, @IdEspecialidad)"
@@ -196,11 +271,20 @@ namespace Negocio
                 datos.confirmarTransaccion();
                 transaccionIniciada = false;
             }
-            catch
+            catch (Exception ex)
             {
                 // --- Deshacer las operaciones si ocurre un error ---
                 if (transaccionIniciada)
                     datos.cancelarTransaccion();
+
+                // --- Identificar errores de validación ---
+                SqlException errorSql = ex as SqlException;
+
+                if (errorSql != null && errorSql.Number == 50002)
+                {
+                    throw new ArgumentException(
+                        "No se puede asignar una especialidad inactiva o inexistente.", ex);
+                }
 
                 throw;
             }
@@ -216,13 +300,8 @@ namespace Negocio
         // ============================================================
         public void modificar(Medico medico)
         {
-            // --- Validar que tenga al menos una especialidad ---
-            if (medico == null || medico.Especialidades == null ||
-                medico.Especialidades.Count == 0)
-            {
-                throw new ArgumentException(
-                    "El médico debe tener al menos una especialidad.");
-            }
+            // --- Validar datos ---
+            validarDatos(medico);
 
             // ====================================================
             // VALIDAR DNI Y MATRÍCULA DUPLICADOS
@@ -324,7 +403,11 @@ namespace Negocio
                     {
                         datos.limpiarParametros();
 
+                        // --- Verificar que la especialidad esté activa antes de asignarla ---
                         datos.setearConsulta(
+                            "IF NOT EXISTS (SELECT 1 FROM ESPECIALIDADES " +
+                            "WHERE Id_Especialidad = @IdEspecialidad AND Estado = 1) " +
+                            "THROW 50002, 'No se puede asignar una especialidad inactiva o inexistente.', 1; " +
                             "INSERT INTO MEDICOS_ESPECIALIDADES " +
                             "(Id_Medico, Id_Especialidad) " +
                             "VALUES (@IdMedico, @IdEspecialidad)"
@@ -343,12 +426,29 @@ namespace Negocio
                 datos.confirmarTransaccion();
                 transaccionIniciada = false;
             }
-            catch
+            catch (Exception ex)
             {
                 // --- Revertir todos los cambios si ocurre un error ---
                 if (transaccionIniciada)
                     datos.cancelarTransaccion();
 
+                // --- Identificar errores de validación ---
+                SqlException errorSql = ex as SqlException;
+
+                if (errorSql != null)
+                {
+                    if (errorSql.Number == 50001)
+                    {
+                        throw new ArgumentException(
+                            "No se puede quitar una especialidad con turnos registrados.", ex);
+                    }
+
+                    if (errorSql.Number == 50002)
+                    {
+                        throw new ArgumentException(
+                            "No se puede asignar una especialidad inactiva o inexistente.", ex);
+                    }
+                }
                 throw;
             }
             finally
@@ -357,6 +457,49 @@ namespace Negocio
             }
         }
 
+        // ============================================================
+        // CONSULTAR ESPECIALIDADES CON TURNOS REGISTRADOS
+        // ============================================================
+        public List<Especialidad> listarEspecialidadesConTurnos(int idMedico)
+        {
+            List<Especialidad> lista = new List<Especialidad>();
+            AccesoDatos datos = new AccesoDatos();
+
+            try
+            {
+                // --- Consultar especialidades asignadas con turnos registrados ---
+                datos.setearConsulta(
+                    "SELECT DISTINCT E.Id_Especialidad, E.Nombre " +
+                    "FROM ESPECIALIDADES E " +
+                    "INNER JOIN MEDICOS_ESPECIALIDADES ME " +
+                    "ON E.Id_Especialidad = ME.Id_Especialidad " +
+                    "INNER JOIN TURNOS T " +
+                    "ON ME.Id_Medico = T.Id_Medico " +
+                    "AND ME.Id_Especialidad = T.Id_Especialidad " +
+                    "WHERE ME.Id_Medico = @IdMedico"
+                );
+
+                datos.setearParametro("@IdMedico", idMedico);
+                datos.ejecutarLectura();
+
+                // --- Obtener las especialidades que no se pueden quitar ---
+                while (datos.Lector.Read())
+                {
+                    Especialidad especialidad = new Especialidad();
+
+                    especialidad.Id = (int)datos.Lector["Id_Especialidad"];
+                    especialidad.Nombre = (string)datos.Lector["Nombre"];
+
+                    lista.Add(especialidad);
+                }
+
+                return lista;
+            }
+            finally
+            {
+                datos.cerrarConexion();
+            }
+        }
 
         // ============================================================
         // CONSULTAR TURNOS PENDIENTES DEL MÉDICO
@@ -368,16 +511,13 @@ namespace Negocio
 
             try
             {
-                // --- Contar los turnos futuros que siguen pendientes ---
+                // --- Contar los turnos pendientes ---
                 datos.setearConsulta(
                     "SELECT COUNT(*) AS CantidadTurnos FROM TURNOS T " +
                     "INNER JOIN ESTADOS_TURNO ET " +
                     "ON T.Id_Estado_Turno = ET.Id_Estado_Turno " +
                     "WHERE T.Id_Medico = @IdMedico " +
-                    "AND ET.Nombre IN (N'Nuevo', N'Reprogramado') " +
-                    "AND (T.Fecha > CAST(GETDATE() AS DATE) " +
-                    "OR (T.Fecha = CAST(GETDATE() AS DATE) " +
-                    "AND T.Hora_Inicio >= CAST(GETDATE() AS TIME)))"
+                    "AND ET.Nombre IN (N'Nuevo', N'Reprogramado')"
                 );
 
                 datos.setearParametro("@IdMedico", idMedico);
@@ -418,7 +558,7 @@ namespace Negocio
                     "El médico no existe o ya está inactivo.");
             }
 
-            // --- Verificar si tiene turnos futuros pendientes ---
+            // --- Verificar si tiene turnos pendientes ---
             int turnosPendientes = contarTurnosPendientes(idMedico);
 
             if (turnosPendientes > 0)
@@ -442,10 +582,7 @@ namespace Negocio
                     "INNER JOIN ESTADOS_TURNO ET " +
                     "ON T.Id_Estado_Turno = ET.Id_Estado_Turno " +
                     "WHERE T.Id_Medico = @IdMedico " +
-                    "AND ET.Nombre IN (N'Nuevo', N'Reprogramado') " +
-                    "AND (T.Fecha > CAST(GETDATE() AS DATE) " +
-                    "OR (T.Fecha = CAST(GETDATE() AS DATE) " +
-                    "AND T.Hora_Inicio >= CAST(GETDATE() AS TIME)))" +
+                    "AND ET.Nombre IN (N'Nuevo', N'Reprogramado')" +
                     ")"
                 );
 
@@ -468,6 +605,43 @@ namespace Negocio
                     "No se pudo completar la baja del médico. Intente nuevamente.");
             }
 
+        }
+        // ============================================================
+        // REACTIVACIÓN DE MÉDICOS
+        // ============================================================
+        public void reactivar(int idMedico)
+        {
+            // Verificar que el médico exista y esté inactivo.
+            Medico medico = listar().FirstOrDefault(m => m.Id == idMedico);
+
+            if (medico == null)
+            {
+                throw new ArgumentException("El médico seleccionado no existe.");
+            }
+
+            if (medico.Estado)
+            {
+                throw new ArgumentException("El médico ya se encuentra activo.");
+            }
+
+            // Reactivar médico.
+            AccesoDatos datos = new AccesoDatos();
+
+            try
+            {
+                datos.setearConsulta(
+                    "UPDATE MEDICOS " +
+                    "SET Estado = 1 " +
+                    "WHERE Id_Medico = @Id AND Estado = 0"
+                );
+
+                datos.setearParametro("@Id", idMedico);
+                datos.ejecutarAccion();
+            }
+            finally
+            {
+                datos.cerrarConexion();
+            }
         }
     }
 }

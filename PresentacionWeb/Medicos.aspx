@@ -97,7 +97,7 @@
                         <asp:Button ID="btnAgregar" runat="server"
                             Text="+ Nuevo Médico"
                             CssClass="btn btn-clinica-primary px-4 py-2 rounded-3 shadow-sm"
-                            OnClientClick="prepararNuevoMedico(); return false;" />
+                            OnClick="btnAgregar_Click" />
                     </div>
                 </div>
 
@@ -108,9 +108,41 @@
                             <span class="input-group-text bg-light border-end-0">
                                 <i class="fa-solid fa-magnifying-glass"></i>
                             </span>
-                            <asp:TextBox ID="txtBuscar" runat="server" CssClass="form-control bg-light border-start-0" Placeholder="Buscar por Nombre o Matrícula..."></asp:TextBox>
+                            <asp:TextBox ID="txtBuscar" runat="server"
+                                CssClass="form-control bg-light border-start-0"
+                                Placeholder="Buscar por nombre, apellido o matrícula..."
+                                AutoPostBack="false"
+                                oninput="programarBusqueda()"
+                                onkeydown="if (event.key === 'Enter') { event.preventDefault(); ejecutarBusqueda(); }">
+                            </asp:TextBox>
+
+                            <asp:LinkButton ID="btnBuscar" runat="server"
+                                OnClick="btnBuscar_Click"
+                                CssClass="boton-busqueda-oculto">
+                            </asp:LinkButton>
                         </div>
                     </div>
+                </div>
+
+                <!-- ============================================================ -->
+                <!-- FILTRO POR ESTADO DE MÉDICOS -->
+                <!-- ============================================================ -->
+                <div class="d-flex gap-2 mb-4">
+
+                    <asp:LinkButton ID="btnActivos" runat="server"
+                        CssClass="btn btn-filtro-activo"
+                        OnClick="btnActivos_Click">
+                        Activos
+                    </asp:LinkButton>
+
+                    <asp:LinkButton ID="btnInactivos" runat="server"
+                        CssClass="btn btn-outline-secondary"
+                        OnClick="btnInactivos_Click">
+                        Inactivos
+                    </asp:LinkButton>
+
+                    <asp:HiddenField ID="hfEstado" runat="server" Value="1" />
+
                 </div>
 
                 <!-- ============================================================ -->
@@ -140,43 +172,56 @@
                                     <asp:BoundField DataField="NombreCompleto" HeaderText="Médico" />
                                     <asp:BoundField DataField="Especialidad" HeaderText="Especialidad" />
                                     <asp:BoundField DataField="Email" HeaderText="Email" />
-                                    <asp:TemplateField HeaderText="Estado">
-                                        <ItemTemplate>
-
-                                            <span class='<%# Convert.ToBoolean(Eval("Estado")) ? "badge bg-success" : "badge bg-secondary" %>'>
-                                                <%# Convert.ToBoolean(Eval("Estado")) ? "Activo" : "Inactivo" %> </span>
-
-                                        </ItemTemplate>
-                                    </asp:TemplateField>
                                     <asp:TemplateField HeaderText="Acciones" ItemStyle-CssClass="text-end" HeaderStyle-CssClass="text-end">
                                         <ItemTemplate>
-
 
                                             <asp:LinkButton ID="btnEditar" runat="server"
                                                 CssClass="btn btn-sm btn-outline-secondary me-1"
                                                 CommandArgument='<%# Eval("Id") %>'
-                                                OnClick="btnEditar_Click">
+                                                OnClick="btnEditar_Click"
+                                                Visible='<%# Convert.ToBoolean(Eval("Estado")) %>'>
                                                 <i class="fa-solid fa-pen-to-square me-1"></i> Editar
                                             </asp:LinkButton>
 
                                             <asp:LinkButton ID="btnEliminar" runat="server"
                                                 CssClass="btn btn-sm btn-outline-danger"
                                                 CommandArgument='<%# Eval("Id") %>'
-                                                OnClick="btnEliminar_Click">
-                                            <i class="fa-solid fa-user-xmark me-1"></i> Desactivar
-                                        </asp:LinkButton>
+                                                OnClick="btnEliminar_Click"
+                                                Visible='<%# Convert.ToBoolean(Eval("Estado")) %>'>
+                                                <i class="fa-solid fa-trash me-1"></i> Dar de baja
+                                            </asp:LinkButton>
+
+                                            <asp:LinkButton ID="btnReactivar" runat="server"
+                                                CssClass="btn btn-sm btn-outline-success"
+                                                CommandArgument='<%# Eval("Id") %>'
+                                                OnClick="btnReactivar_Click"
+                                                Visible='<%# !Convert.ToBoolean(Eval("Estado")) %>'>
+                                                <i class="fa-solid fa-rotate-left me-1"></i> Reactivar
+                                            </asp:LinkButton>
+
                                         </ItemTemplate>
+
                                     </asp:TemplateField>
                                 </Columns>
                                 <EmptyDataTemplate>
                                     <div class="text-center py-5 text-muted">
                                         <i class="fa-solid fa-user-doctor fs-2 mb-2 d-block text-secondary opacity-50"></i>
-                                        <p class="m-0 fw-medium">No hay médicos registrados en el sistema.</p>
+                                        <p class="m-0 fw-medium">
+                                            <asp:Label ID="lblSinResultados" runat="server"
+                                                Text="No hay médicos registrados por el momento." />
+                                        </p>
                                     </div>
                                 </EmptyDataTemplate>
                             </asp:GridView>
                         </div>
                     </ContentTemplate>
+
+                    <Triggers>
+                        <asp:AsyncPostBackTrigger
+                            ControlID="btnBuscar"
+                            EventName="Click" />
+                    </Triggers>
+
                 </asp:UpdatePanel>
             </div>
 
@@ -319,7 +364,6 @@
                                 class="btn btn-outline-secondary"
                                 data-bs-dismiss="modal">
                                 Cancelar
-                   
                             </button>
 
                             <asp:Button ID="btnGuardarMedico"
@@ -328,12 +372,18 @@
                                 CssClass="btn btn-clinica-primary"
                                 OnClick="btnGuardarMedico_Click" />
                         </div>
-                    </ContentTemplate>
+                        </ContentTemplate>
+
+                    <Triggers>
+                        <asp:AsyncPostBackTrigger
+                            ControlID="btnAgregar"
+                            EventName="Click" />
+                    </Triggers>
+
                 </asp:UpdatePanel>
             </div>
         </div>
     </div>
-
 
     <!-- ============================================================ -->
     <!-- MODAL DE BAJA LÓGICA DE MÉDICOS -->
@@ -352,8 +402,8 @@
 
                         <!-- Encabezado del modal -->
                         <div class="modal-header">
-                            <h5 class="modal-title fw-bold"
-                                id="tituloModalBajaMedico">Desactivar médico
+                            <h5 class="modal-title"
+                                id="tituloModalBajaMedico">Dar de baja médico
                             </h5>
 
                             <button type="button" class="btn-close"
@@ -364,48 +414,47 @@
                         <!-- Información de la baja -->
                         <div class="modal-body">
 
-                            <p class="mb-2">
-                                Médico:
-                               
-                                <strong>
-                                    <asp:Label ID="lblNombreBaja"
-                                        runat="server" />
-                                </strong>
+                            <p>
+                                <asp:Label ID="lblMensajeBaja" runat="server" />
+                                <strong><asp:Label ID="lblNombreBaja" runat="server" /></strong><asp:Label ID="lblSignoBaja" runat="server" />
                             </p>
-
-                            <asp:Panel ID="pnlBajaPermitida" runat="server">
-                                <p class="text-muted mb-0">
-                                    ¿Confirmás que querés desactivar
-                                    a este médico?
-                               
-                                </p>
-                            </asp:Panel>
 
                             <asp:Panel ID="pnlBajaBloqueada" runat="server"
                                 Visible="false">
 
-                                <div class="alert alert-warning mb-0">
-                                    No se puede desactivar al médico porque
-                                    tiene
-                                   
-                                    <strong>
-                                        <asp:Label ID="lblTurnosPendientes"
-                                            runat="server" />
-                                    </strong>
-                                    turno(s) pendiente(s).
-                               
+                                <div class="alert alert-warning">
+                                    Turnos pendientes:
+                                    <asp:Label ID="lblTurnosPendientes" runat="server" />.
+                                    <br />
+                                    Deben resolverse antes de confirmar la baja.
                                 </div>
 
                             </asp:Panel>
+
+                            <asp:Panel ID="pnlBajaPermitida" runat="server">
+
+                                <div class="alert alert-warning">
+                                    Este médico no tiene turnos pendientes.
+                                </div>
+
+                                <p>El historial de turnos de este médico se conservará.</p>
+
+                                <p class="text-muted small mb-0">
+                                    Una vez confirmada la baja, no se podrán asignar
+                                    nuevos turnos a este médico.
+                                </p>
+
+                            </asp:Panel>
+
                         </div>
 
                         <!-- Acciones -->
                         <div class="modal-footer">
-                            <button type="button"
-                                class="btn btn-outline-secondary"
+
+                            <button id="btnCancelarBaja" runat="server"
+                                type="button" class="btn btn-secondary"
                                 data-bs-dismiss="modal">
                                 Cancelar
-                           
                             </button>
 
                             <asp:Button ID="btnConfirmarBaja"
@@ -413,6 +462,61 @@
                                 Text="Confirmar baja"
                                 CssClass="btn btn-danger"
                                 OnClick="btnConfirmarBaja_Click" />
+                        </div>
+
+                    </ContentTemplate>
+                </asp:UpdatePanel>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- MODAL DE REACTIVACIÓN DE MÉDICOS -->
+    <!-- ============================================================ -->
+    <div class="modal fade" id="modalReactivarMedico" tabindex="-1"
+        aria-labelledby="tituloModalReactivar" aria-hidden="true">
+
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title" id="tituloModalReactivar">Reactivar médico
+                </h5>
+                    <button type="button" class="btn-close"
+                        data-bs-dismiss="modal" aria-label="Cerrar">
+                    </button>
+                </div>
+
+                <asp:UpdatePanel ID="upReactivarMedico" runat="server"
+                    UpdateMode="Conditional">
+                    <ContentTemplate>
+
+                        <asp:HiddenField ID="hfIdReactivar" runat="server" />
+
+                        <div class="modal-body">
+                            <p>
+                                ¿Está seguro de que desea reactivar al médico
+                                <strong><asp:Label ID="lblNombreReactivar" runat="server" /></strong>?
+                            </p>
+
+                            <p class="text-muted small mb-0">
+                                Una vez reactivado, el médico volverá a estar
+                                disponible para la asignación de nuevos turnos.
+                            </p>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary"
+                                data-bs-dismiss="modal">
+                                Cancelar
+                       
+                            </button>
+
+                            <asp:Button ID="btnConfirmarReactivar" runat="server"
+                                Text="Confirmar reactivación"
+                                CssClass="btn btn-success"
+                                OnClick="btnConfirmarReactivar_Click" />
                         </div>
 
                     </ContentTemplate>
@@ -535,42 +639,41 @@
     });
 
     // ============================================================
-    // CONFIRMACIÓN DE REGISTRO DE MÉDICO
+    // CONFIRMACIÓN DE ALTA Y MODIFICACIÓN DE MÉDICOS
     // ============================================================
-    function mostrarExitoMedico(texto) {
-        // --- Cerrar el formulario ---
-        const modal = bootstrap.Modal.getOrCreateInstance(
-            document.getElementById("modalMedico")
-        );
+    function mostrarExito(texto) {
+
+        // --- Cerrar el modal ---
+        var elementoModal = document.getElementById('modalMedico');
+        var modal = bootstrap.Modal.getOrCreateInstance(elementoModal);
+
         modal.hide();
 
-        // --- Mostrar el mensaje de confirmación ---
-        const mensaje = document.getElementById("mensajeExito");
-        mensaje.textContent = texto;
-        mensaje.classList.remove("d-none");
-
-        // --- Ocultar el mensaje después de 4 segundos ---
-        setTimeout(function () {
-            mensaje.classList.add("d-none");
-        }, 4000);
+        // --- Mostrar confirmación ---
+        mostrarExitoListado(texto);
     }
 
     // ============================================================
-    // CONFIRMACIÓN DE BAJA LÓGICA DEL MÉDICO
+    // MENSAJES DE CONFIRMACIÓN DEL LISTADO
     // ============================================================
-    function mostrarExitoListadoMedico(texto) {
+    function mostrarExitoListado(texto) {
 
         // --- Obtener el contenedor del mensaje ---
-        const mensaje = document.getElementById("mensajeExito");
+        var mensaje = document.getElementById('mensajeExito');
 
         // --- Mostrar la confirmación ---
         mensaje.textContent = texto;
-        mensaje.classList.remove("d-none");
+        mensaje.classList.remove('d-none');
+
+        // --- Desplazar la página hacia arriba ---
+        setTimeout(function() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }, 500);
 
         // --- Ocultar el mensaje después de 4 segundos ---
-        setTimeout(function () {
-            mensaje.classList.add("d-none");
-        }, 4000);
+        setTimeout(function() {
+            mensaje.classList.add('d-none');
+                }, 4000);
     }
 
     // ============================================================
@@ -663,7 +766,30 @@
 
         // --- Ocultar errores al modificar los campos del formulario ---
         document.getElementById('modalMedico')
-            .addEventListener('input', ocultarError);
-</script>
+        .addEventListener('input', ocultarError);
+
+        // ============================================================
+        // BÚSQUEDA DINÁMICA DE MÉDICOS
+        // ============================================================
+
+        let temporizadorBusqueda;
+
+        // --- Esperar antes de buscar ---
+        function programarBusqueda() {
+            clearTimeout(temporizadorBusqueda);
+
+            temporizadorBusqueda = setTimeout(function () {
+                ejecutarBusqueda();
+            }, 300);
+        }
+
+        // --- Ejecutar búsqueda ---
+        function ejecutarBusqueda() {
+            clearTimeout(temporizadorBusqueda);
+            __doPostBack('<%= btnBuscar.UniqueID %>', '');
+        }
+    </script>
 
 </asp:Content>
+
+

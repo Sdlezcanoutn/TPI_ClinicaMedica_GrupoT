@@ -212,17 +212,14 @@ namespace Negocio
 
             try
             {
-                // --- Consultar turnos futuros pendientes ---
+                // --- Consultar turnos pendientes ---
                 datos.setearConsulta(
                     "SELECT COUNT(*) AS Cantidad " +
                     "FROM TURNOS T " +
                     "INNER JOIN ESTADOS_TURNO E " +
                     "ON T.Id_Estado_Turno = E.Id_Estado_Turno " +
                     "WHERE T.Id_Especialidad = @IdEspecialidad " +
-                    "AND E.Nombre IN (N'Nuevo', N'Reprogramado') " +
-                    "AND (T.Fecha > CAST(GETDATE() AS DATE) " +
-                    "OR (T.Fecha = CAST(GETDATE() AS DATE) " +
-                    "AND T.Hora_Inicio > CAST(GETDATE() AS TIME)))"
+                    "AND E.Nombre IN (N'Nuevo', N'Reprogramado')"
                 );
 
                 datos.setearParametro("@IdEspecialidad", idEspecialidad);
@@ -260,15 +257,29 @@ namespace Negocio
                 throw new ArgumentException("La especialidad ya se encuentra dada de baja.");
             }
 
+            // --- Validar que no tenga turnos pendientes ---
+            if (contarTurnosPendientes(id) > 0)
+            {
+                throw new ArgumentException("No se puede dar de baja una especialidad con turnos pendientes.");
+            }
+
             // --- Desactivar especialidad ---
             AccesoDatos datos = new AccesoDatos();
 
             try
             {
+                // --- Cambiar el estado solo si no tiene turnos pendientes ---
                 datos.setearConsulta(
                     "UPDATE ESPECIALIDADES " +
                     "SET Estado = 0 " +
-                    "WHERE Id_Especialidad = @Id AND Estado = 1"
+                    "WHERE Id_Especialidad = @Id AND Estado = 1 " +
+                    "AND NOT EXISTS ( " +
+                    "SELECT 1 FROM TURNOS T " +
+                    "INNER JOIN ESTADOS_TURNO E " +
+                    "ON T.Id_Estado_Turno = E.Id_Estado_Turno " +
+                    "WHERE T.Id_Especialidad = @Id " +
+                    "AND E.Nombre IN (N'Nuevo', N'Reprogramado')" +
+                    ")"
                 );
 
                 datos.setearParametro("@Id", id);
@@ -277,6 +288,15 @@ namespace Negocio
             finally
             {
                 datos.cerrarConexion();
+            }
+            // --- Comprobar que la especialidad quedó inactiva ---
+            Especialidad especialidadActualizada = listar()
+                .FirstOrDefault(e => e.Id == id);
+
+            if (especialidadActualizada == null || especialidadActualizada.Estado)
+            {
+                throw new ArgumentException(
+                    "No se pudo completar la baja de la especialidad. Intente nuevamente.");
             }
         }
 

@@ -111,8 +111,8 @@
                     <div class="stat-etiqueta-azul">Profesionales y Especialistas</div>
                 </div>
                 <div class="col-12 col-md-4">
-                    <div class="stat-numero-azul">15 min</div>
-                    <div class="stat-etiqueta-azul">Módulos de Atención Ágil</div>
+                    <div class="stat-numero-azul">+35</div>
+                    <div class="stat-etiqueta-azul">Especialidades médicas</div>
                 </div>
             </div>
         </div>
@@ -120,90 +120,82 @@
         <hr class="seccion-divisor" />
 
         <!-- Tarjetas de Acceso Directo -->
-        <div class="row g-4">
+        <div class="my-4 py-2">
+            <div class="mb-4">
+                <span class="text-uppercase small fw-semibold text-muted" style="letter-spacing: 0.08em;">Gestión del sistema</span>
+                <h3 class="fw-bold text-dark mt-1 mb-0">Accesos principales</h3>
+            </div>
 
-            <!-- Turnos -->
-            <div class="col-md-6 col-xl-3">
-                <div class="card dashboard-glass-card border-0 shadow-sm rounded-3 h-100">
-                    <div class="card-body p-4 d-flex flex-column justify-content-between">
+            <div class="row g-4">
+
+                <!-- Turnos -->
+                <div class="col-md-6 col-xl-3">
+                    <div class="acceso-card p-4 h-100 d-flex flex-column justify-content-between">
                         <div>
                             <div class="d-flex align-items-center justify-content-between mb-3">
-                                <span class="p-3 bg-primary-subtle text-primary rounded-3">
-                                    <i class="fa-solid fa-calendar-check fs-4"></i>
-                                </span>
+                                <i class="fa-solid fa-calendar-check acceso-icono"></i>
                                 <span class="text-muted small">Agendamiento</span>
                             </div>
-                            <h5 class="fw-bold text-dark">Turnos</h5>
+                            <h5 class="fw-bold text-dark mb-2">Turnos</h5>
                             <p class="text-muted small mb-0">Administración de citas, horarios y atención a pacientes.</p>
                         </div>
-                        <div class="mt-4 pt-2 border-top">
-                            <a href="Turnos.aspx" class="btn btn-sm btn-outline-secondary w-100">Ir a Turnos →</a>
+                        <div class="mt-4 pt-3 border-top">
+                            <a href="Turnos.aspx" class="acceso-link">Ir a Turnos <span aria-hidden="true">→</span></a>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Pacientes -->
-            <div class="col-md-6 col-xl-3">
-                <div class="card dashboard-glass-card border-0 shadow-sm rounded-3 h-100">
-                    <div class="card-body p-4 d-flex flex-column justify-content-between">
+                <!-- Pacientes -->
+                <div class="col-md-6 col-xl-3">
+                    <div class="acceso-card p-4 h-100 d-flex flex-column justify-content-between">
                         <div>
                             <div class="d-flex align-items-center justify-content-between mb-3">
-                                <span class="p-3 bg-success-subtle text-success rounded-3">
-                                    <i class="fa-solid fa-user-group fs-4"></i>
-                                </span>
+                                <i class="fa-solid fa-user-group acceso-icono"></i>
                                 <span class="text-muted small">Registros</span>
                             </div>
-                            <h5 class="fw-bold text-dark">Pacientes</h5>
+                            <h5 class="fw-bold text-dark mb-2">Pacientes</h5>
                             <p class="text-muted small mb-0">Gestión de datos personales e historias clínicas.</p>
                         </div>
-                        <div class="mt-4 pt-2 border-top">
-                            <a href="Pacientes.aspx" class="btn btn-sm btn-outline-secondary w-100">Ir a Pacientes →</a>
+                        <div class="mt-4 pt-3 border-top">
+                            <a href="Pacientes.aspx" class="acceso-link">Ir a Pacientes <span aria-hidden="true">→</span></a>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Médicos -->
-            <div class="col-md-6 col-xl-3">
-                <div class="card dashboard-glass-card border-0 shadow-sm rounded-3 h-100">
-                    <div class="card-body p-4 d-flex flex-column justify-content-between">
+                <!-- Médicos -->
+                <div class="col-md-6 col-xl-3">
+                    <div class="acceso-card p-4 h-100 d-flex flex-column justify-content-between">
                         <div>
                             <div class="d-flex align-items-center justify-content-between mb-3">
-                                <span class="p-3 bg-info-subtle text-info-emphasis rounded-3">
-                                    <i class="fa-solid fa-user-doctor fs-4"></i>
-                                </span>
+                                <i class="fa-solid fa-user-doctor acceso-icono"></i>
                                 <span class="text-muted small">Personal</span>
                             </div>
-                            <h5 class="fw-bold text-dark">Médicos</h5>
+                            <h5 class="fw-bold text-dark mb-2">Médicos</h5>
                             <p class="text-muted small mb-0">Control del cuerpo médico, matrículas y estados.</p>
                         </div>
-                        <div class="mt-4 pt-2 border-top">
-                            <a href="Medicos.aspx" class="btn btn-sm btn-outline-secondary w-100">Ir a Médicos →</a>
+                        <div class="mt-4 pt-3 border-top">
+                            <a href="Medicos.aspx" class="acceso-link">Ir a Médicos <span aria-hidden="true">→</span></a>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Especialidades -->
-            <div class="col-md-6 col-xl-3">
-                <div class="card dashboard-glass-card border-0 shadow-sm rounded-3 h-100">
-                    <div class="card-body p-4 d-flex flex-column justify-content-between">
+                <!-- Especialidades -->
+                <div class="col-md-6 col-xl-3">
+                    <div class="acceso-card p-4 h-100 d-flex flex-column justify-content-between">
                         <div>
                             <div class="d-flex align-items-center justify-content-between mb-3">
-                                <span class="p-3 bg-warning-subtle text-warning-emphasis rounded-3">
-                                    <i class="fa-solid fa-stethoscope fs-4"></i>
-                                </span>
+                                <i class="fa-solid fa-stethoscope acceso-icono"></i>
                                 <span class="text-muted small">Catálogo</span>
                             </div>
-                            <h5 class="fw-bold text-dark">Especialidades</h5>
+                            <h5 class="fw-bold text-dark mb-2">Especialidades</h5>
                             <p class="text-muted small mb-0">Configuración de áreas médicas de la clínica.</p>
                         </div>
-                        <div class="mt-4 pt-2 border-top">
-                            <a href="Especialidades.aspx" class="btn btn-sm btn-outline-secondary w-100">Ir a Especialidades →</a>
+                        <div class="mt-4 pt-3 border-top">
+                            <a href="Especialidades.aspx" class="acceso-link">Ir a Especialidades <span aria-hidden="true">→</span></a>
                         </div>
                     </div>
                 </div>
+
             </div>
         </div>
 
@@ -216,35 +208,38 @@
                     <img src="/Images/slide-5.jpg" class="workflow-img" alt="Equipamiento e infraestructura de GSH Clínica Médica">
                 </div>
                 <div class="col-lg-7">
-                    <div class="p-4 p-lg-5">
-                        <span class="badge bg-info-subtle text-info-emphasis mb-2 px-3 py-2">Gestión Ágil</span>
-                        <h3 class="fw-bold text-dark mb-2">Cómo organizamos la atención diaria</h3>
-                        <p class="text-muted mb-4">
-                            Un circuito claro para coordinar profesionales, especialidades y disponibilidad horaria sin superposiciones.
-                        </p>
-
                         <div class="d-flex flex-column gap-3">
-                            <div class="d-flex align-items-start gap-3">
-                                <span class="step-badge">1</span>
-                                <div>
-                                    <h6 class="fw-bold text-dark mb-1">Registro y especialidades</h6>
-                                    <p class="text-muted small mb-0">Alta de pacientes, gestión de médicos activos y asignación de áreas médicas.</p>
-                                </div>
-                            </div>
+                            <div class="p-4 p-lg-5">
+                                <span class="badge bg-info-subtle text-info-emphasis mb-2 px-3 py-2">Experiencia del Paciente</span>
+                                <h3 class="fw-bold text-dark mb-2">Un acompañamiento claro en cada etapa</h3>
+                                <p class="text-muted mb-4">
+                                    Cuidamos cada detalle para que tu consulta sea ordenada, puntual y respaldada por profesionales de confianza.
+                                </p>
 
-                            <div class="d-flex align-items-start gap-3">
-                                <span class="step-badge">2</span>
-                                <div>
-                                    <h6 class="fw-bold text-dark mb-1">Disponibilidad en bloques de 15 minutos</h6>
-                                    <p class="text-muted small mb-0">Cálculo automático de horarios libres según los días y franjas de trabajo de cada profesional.</p>
-                                </div>
-                            </div>
+                                <div class="d-flex flex-column gap-3">
+                                    <div class="d-flex align-items-start gap-3">
+                                        <span class="step-badge">1</span>
+                                        <div>
+                                            <h6 class="fw-bold text-dark mb-1">Orientación y especialidad indicada</h6>
+                                            <p class="text-muted small mb-0">Te conectamos con el área médica adecuada según tu motivo de consulta y necesidades.</p>
+                                        </div>
+                                    </div>
 
-                            <div class="d-flex align-items-start gap-3">
-                                <span class="step-badge">3</span>
-                                <div>
-                                    <h6 class="fw-bold text-dark mb-1">Reserva, reprogramación y seguimiento</h6>
-                                    <p class="text-muted small mb-0">Control centralizado de turnos y estados para agilizar la atención en consultorio.</p>
+                                    <div class="d-flex align-items-start gap-3">
+                                        <span class="step-badge">2</span>
+                                        <div>
+                                            <h6 class="fw-bold text-dark mb-1">Horarios claros y sin esperas innecesarias</h6>
+                                            <p class="text-muted small mb-0">Organización precisa de agendas para respetar tu tiempo y facilitar la coordinación.</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="d-flex align-items-start gap-3">
+                                        <span class="step-badge">3</span>
+                                        <div>
+                                            <h6 class="fw-bold text-dark mb-1">Seguimiento cercano y continuidad</h6>
+                                            <p class="text-muted small mb-0">Acompañamiento médico continuo para evolucionar con tranquilidad en cada control.</p>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>

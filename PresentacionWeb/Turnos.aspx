@@ -159,12 +159,43 @@
                                         OnSelectedIndexChanged="ddlEspecialidad_SelectedIndexChanged" />
                                 </div>
 
+                                <div class="col-12">
+                                    <asp:Panel ID="pnlSugerenciasTurno" runat="server" Visible="false"
+                                        CssClass="border rounded-3 p-3 bg-light">
+                                        <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center mb-2">
+                                            <span class="small fw-semibold text-dark">
+                                                <i class="fa-solid fa-clock me-1 text-primary"></i>
+                                                Próximos horarios sugeridos (60 min)
+                                            </span>
+                                            <span class="small text-muted">Tocá una opción para autocompletar</span>
+                                        </div>
+
+                                        <asp:Repeater ID="rptSugerenciasTurno" runat="server"
+                                            OnItemCommand="rptSugerenciasTurno_ItemCommand">
+                                            <ItemTemplate>
+                                                <asp:LinkButton ID="btnSugerencia" runat="server"
+                                                    CssClass="btn btn-sm btn-outline-primary me-2 mb-2 text-start"
+                                                    CommandName="SeleccionarSugerencia"
+                                                    CommandArgument='<%# Eval("Argumento") %>'>
+                               <div class="fw-semibold"><%# Eval("MedicoTexto") %></div>
+                               <div class="small"><%# Eval("FechaTexto") %> · <%# Eval("HorarioTexto") %></div>
+                                                </asp:LinkButton>
+                                            </ItemTemplate>
+                                        </asp:Repeater>
+
+                                        <asp:Label ID="lblSinSugerencias" runat="server"
+                                            CssClass="small text-muted d-block"
+                                            Visible="false"
+                                            Text="No hay horarios libres en los próximos 21 días para esta especialidad." />
+                                    </asp:Panel>
+                                </div>
+
                                 <div class="col-md-6">
                                     <label class="form-label">Médico *</label>
                                     <asp:DropDownList ID="ddlMedico" runat="server"
                                         CssClass="form-select"
-                                        AutoPostBack="true"
-                                        OnSelectedIndexChanged="DisponibilidadTurno_Changed" />
+                                        AutoPostBack="True"
+                                        OnSelectedIndexChanged="ddlMedico_SelectedIndexChanged" />
                                 </div>
 
                                 <div class="col-md-6">
@@ -172,32 +203,15 @@
                                     <asp:TextBox ID="txtFechaTurno" runat="server"
                                         CssClass="form-control"
                                         TextMode="Date"
-                                        AutoPostBack="true"
-                                        OnTextChanged="DisponibilidadTurno_Changed" />
+                                        AutoPostBack="True"
+                                        OnTextChanged="txtFechaTurno_TextChanged" />
                                 </div>
 
                                 <div class="col-12">
-                                    <label class="form-label">Horarios disponibles (cada 15 min)</label>
-                                    <asp:DropDownList ID="ddlHorariosDisponibles" runat="server"
-                                        CssClass="form-select"
-                                        AutoPostBack="true"
-                                        OnSelectedIndexChanged="ddlHorariosDisponibles_SelectedIndexChanged" />
-                                    <asp:Label ID="lblInfoDisponibilidad" runat="server"
-                                        CssClass="form-text text-muted d-block mt-1" />
-                                </div>
-
-                                <div class="col-md-6">
-                                    <label class="form-label">Hora inicio *</label>
-                                    <asp:TextBox ID="txtHoraInicio" runat="server"
-                                        CssClass="form-control"
-                                        TextMode="Time" />
-                                </div>
-
-                                <div class="col-md-6">
-                                    <label class="form-label">Hora fin *</label>
-                                    <asp:TextBox ID="txtHoraFin" runat="server"
-                                        CssClass="form-control"
-                                        TextMode="Time" />
+                                    <label class="form-label">Horario disponible (60 min) *</label>
+                                    <asp:DropDownList ID="ddlHorarioDisponible" runat="server" CssClass="form-select">
+                                        <asp:ListItem Text="-- Seleccione médico y fecha --" Value="0" />
+                                    </asp:DropDownList>
                                 </div>
 
                                 <div class="col-12">
@@ -245,8 +259,23 @@
     // Cierra el modal tras guardar y dispara el aviso de éxito
     function mostrarExitoTurno(texto) {
         const modalEl = document.getElementById("modalTurno");
-        const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
-        modal.hide();
+        if (modalEl) {
+            const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+            modal.hide();
+
+            modalEl.classList.remove("show");
+            modalEl.style.display = "none";
+            modalEl.setAttribute("aria-hidden", "true");
+        }
+
+        document.body.classList.remove("modal-open");
+        document.body.style.removeProperty("overflow");
+        document.body.style.removeProperty("padding-right");
+
+        document.querySelectorAll(".modal-backdrop").forEach(function (backdrop) {
+            backdrop.remove();
+        });
+
         mostrarAlertaTurno(texto);
     }
 
@@ -259,13 +288,13 @@
         }
     }
 
-    // Gris clarito solo si el combo está en "0"/vacío o si el input de fecha/hora está vacío
+    // Gris clarito solo si el combo está en "0"/vacío o si el input de fecha está vacío
     function actualizarEstiloPlaceholderSelects() {
         const selectIds = [
             "<%= ddlPaciente.ClientID %>",
             "<%= ddlEspecialidad.ClientID %>",
             "<%= ddlMedico.ClientID %>",
-            "<%= ddlHorariosDisponibles.ClientID %>"
+            "<%= ddlHorarioDisponible.ClientID %>"
         ];
 
         selectIds.forEach(function (id) {
@@ -276,19 +305,11 @@
             ddl.classList.toggle("placeholder-select", estaVacio);
         });
 
-        const inputIds = [
-            "<%= txtHoraInicio.ClientID %>",
-            "<%= txtHoraFin.ClientID %>",
-            "<%= txtFechaTurno.ClientID %>"
-        ];
-
-        inputIds.forEach(function (id) {
-            const inp = document.getElementById(id);
-            if (!inp) return;
-
-            const estaVacio = !inp.value || inp.value.trim() === "";
-            inp.classList.toggle("placeholder-time", estaVacio);
-        });
+        const inpFecha = document.getElementById("<%= txtFechaTurno.ClientID %>");
+        if (inpFecha) {
+            const estaVacio = !inpFecha.value || inpFecha.value.trim() === "";
+            inpFecha.classList.toggle("placeholder-time", estaVacio);
+        }
     }
 
     function engancharEventosCamposTurno() {
@@ -296,8 +317,7 @@
             "<%= ddlPaciente.ClientID %>",
             "<%= ddlEspecialidad.ClientID %>",
             "<%= ddlMedico.ClientID %>",
-            "<%= txtHoraInicio.ClientID %>",
-            "<%= txtHoraFin.ClientID %>",
+            "<%= ddlHorarioDisponible.ClientID %>",
             "<%= txtFechaTurno.ClientID %>"
         ];
 
@@ -317,24 +337,21 @@
         const ddlPac = document.getElementById("<%= ddlPaciente.ClientID %>");
         const ddlEsp = document.getElementById("<%= ddlEspecialidad.ClientID %>");
         const ddlMed = document.getElementById("<%= ddlMedico.ClientID %>");
-        const ddlSlots = document.getElementById("<%= ddlHorariosDisponibles.ClientID %>");
+        const ddlHor = document.getElementById("<%= ddlHorarioDisponible.ClientID %>");
 
         if (ddlPac) ddlPac.selectedIndex = 0;
         if (ddlEsp) ddlEsp.selectedIndex = 0;
         if (ddlMed) ddlMed.selectedIndex = 0;
-        if (ddlSlots) ddlSlots.selectedIndex = 0;
+        if (ddlHor) ddlHor.selectedIndex = 0;
 
         const txtFecha = document.getElementById("<%= txtFechaTurno.ClientID %>");
-        const txtInicio = document.getElementById("<%= txtHoraInicio.ClientID %>");
-        const txtFin = document.getElementById("<%= txtHoraFin.ClientID %>");
         const txtMotivo = document.getElementById("<%= txtMotivoConsulta.ClientID %>");
-        const lblSlots = document.getElementById("<%= lblInfoDisponibilidad.ClientID %>");
 
         if (txtFecha) txtFecha.value = "";
-        if (txtInicio) txtInicio.value = "";
-        if (txtFin) txtFin.value = "";
         if (txtMotivo) txtMotivo.value = "";
-        if (lblSlots) lblSlots.textContent = "";
+
+        const pnlSug = document.getElementById("<%= pnlSugerenciasTurno.ClientID %>");
+        if (pnlSug) pnlSug.style.display = "none";
 
         ocultarErrorTurno();
         actualizarEstiloPlaceholderSelects();
@@ -355,9 +372,22 @@
     function mostrarModalTurno() {
         engancharEventosCamposTurno();
         actualizarEstiloPlaceholderSelects();
-        bootstrap.Modal.getOrCreateInstance(
-            document.getElementById("modalTurno")
-        ).show();
+
+        const modalEl = document.getElementById("modalTurno");
+        if (!modalEl) return;
+
+        modalEl.classList.add("show");
+        modalEl.style.display = "block";
+        modalEl.removeAttribute("aria-hidden");
+        document.body.classList.add("modal-open");
+
+        if (!document.querySelector(".modal-backdrop")) {
+            const backdrop = document.createElement("div");
+            backdrop.className = "modal-backdrop fade show";
+            document.body.appendChild(backdrop);
+        }
+
+        bootstrap.Modal.getOrCreateInstance(modalEl);
     }
 
     (function () {
