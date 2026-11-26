@@ -303,8 +303,34 @@ namespace PresentacionWeb
                     return;
                 }
 
+                // Verifica si tiene turnos pendientes a partir de hoy (si los paneles existen en la página)
+                TurnoNegocio turnoNegocio = new TurnoNegocio();
+                int turnosPendientes = turnoNegocio.listar().Count(t =>
+                    t.Paciente != null &&
+                    t.Paciente.Id == idPaciente &&
+                    t.Fecha.Date >= DateTime.Today &&
+                    (t.Estado == null ||
+                     (!t.Estado.Nombre.Equals("Cancelado", StringComparison.OrdinalIgnoreCase) &&
+                      !t.Estado.Nombre.Equals("Atendido", StringComparison.OrdinalIgnoreCase) &&
+                      !t.Estado.Nombre.Equals("Ausente", StringComparison.OrdinalIgnoreCase)))
+                );
+
+                if (pnlTurnosPendientesPaciente != null && lblAvisoTurnosPendientesPaciente != null)
+                {
+                    if (turnosPendientes > 0)
+                    {
+                        pnlTurnosPendientesPaciente.Visible = true;
+                        lblAvisoTurnosPendientesPaciente.Text = $"Este paciente tiene {turnosPendientes} turno(s) pendiente(s).";
+                    }
+                    else
+                    {
+                        pnlTurnosPendientesPaciente.Visible = false;
+                        lblAvisoTurnosPendientesPaciente.Text = "";
+                    }
+                }
+
                 hfIdBajaPaciente.Value = paciente.Id.ToString();
-                lblNombreBajaPaciente.Text = $"{paciente.Nombre} {paciente.Apellido} (DNI {paciente.DNI})";
+                lblNombreBajaPaciente.Text = $"{paciente.Nombre} {paciente.Apellido}";
                 upBajaPaciente.Update();
 
                 ScriptManager.RegisterStartupScript(
@@ -416,6 +442,91 @@ namespace PresentacionWeb
             {
                 Session["error"] = ex.ToString();
                 lblErrorListado.Text = "No se pudo desactivar el paciente. Intentá nuevamente.";
+                lblErrorListado.Visible = true;
+                upListado.Update();
+            }
+
+
+        }
+
+        // Abre el modal de confirmación para reactivar un paciente inactivo
+        protected void btnReactivar_Click(object sender, EventArgs e)
+        {
+            LinkButton btn = (LinkButton)sender;
+
+            if (!int.TryParse(btn.CommandArgument, out int idPaciente))
+                return;
+
+            try
+            {
+                PacienteNegocio negocio = new PacienteNegocio();
+                Paciente paciente = negocio.listar().Find(p => p.Id == idPaciente);
+
+                if (paciente == null)
+                {
+                    lblErrorListado.Text = "El paciente seleccionado no existe.";
+                    lblErrorListado.Visible = true;
+                    upListado.Update();
+                    return;
+                }
+
+                if (paciente.Estado)
+                {
+                    lblErrorListado.Text = "El paciente ya se encuentra activo.";
+                    lblErrorListado.Visible = true;
+                    upListado.Update();
+                    return;
+                }
+
+                hfIdReactivarPaciente.Value = paciente.Id.ToString();
+                lblNombreReactivarPaciente.Text = $"{paciente.Nombre} {paciente.Apellido}";
+                upReactivarPaciente.Update();
+
+                ScriptManager.RegisterStartupScript(
+                    this,
+                    GetType(),
+                    "abrirModalReactivarPaciente",
+                    "bootstrap.Modal.getOrCreateInstance(document.getElementById('modalReactivarPaciente')).show();",
+                    true
+                );
+            }
+            catch (Exception ex)
+            {
+                Session["error"] = ex.ToString();
+                lblErrorListado.Text = "No se pudieron consultar los datos del paciente.";
+                lblErrorListado.Visible = true;
+                upListado.Update();
+            }
+        }
+
+        // Reactiva el paciente, refresca el listado y cierra el modal
+        protected void btnConfirmarReactivarPaciente_Click(object sender, EventArgs e)
+        {
+            if (!int.TryParse(hfIdReactivarPaciente.Value, out int idPaciente))
+                return;
+
+            try
+            {
+                PacienteNegocio negocio = new PacienteNegocio();
+                negocio.reactivar(idPaciente);
+
+                hfIdReactivarPaciente.Value = "";
+                CargarPacientes(txtBuscar.Text);
+                upListado.Update();
+
+                ScriptManager.RegisterStartupScript(
+                    this,
+                    GetType(),
+                    "reactivarPacienteOk",
+                    "bootstrap.Modal.getOrCreateInstance(document.getElementById('modalReactivarPaciente')).hide();" +
+                    "mostrarAlertaPaciente('Paciente reactivado correctamente.');",
+                    true
+                );
+            }
+            catch (Exception ex)
+            {
+                Session["error"] = ex.ToString();
+                lblErrorListado.Text = "No se pudo reactivar el paciente. Intentá nuevamente.";
                 lblErrorListado.Visible = true;
                 upListado.Update();
             }

@@ -10,6 +10,7 @@ namespace Negocio
 {
     public class PacienteNegocio
     {
+        // Devuelve el listado completo de pacientes (activos e inactivos)
         public List<Paciente> listar()
         {
             List<Paciente> lista = new List<Paciente>();
@@ -33,6 +34,7 @@ namespace Negocio
                     aux.DNI = (string)datos.Lector["DNI"];
                     aux.Fecha_Nacimiento = (DateTime)datos.Lector["Fecha_Nacimiento"];
 
+                    // Convierte valores NULL opcionales a cadena vacía
                     aux.Telefono = datos.Lector["Telefono"] == DBNull.Value ? "" : (string)datos.Lector["Telefono"];
                     aux.Email = (string)datos.Lector["Email"];
                     aux.Direccion = datos.Lector["Direccion"] == DBNull.Value ? "" : (string)datos.Lector["Direccion"];
@@ -53,6 +55,7 @@ namespace Negocio
             }
         }
 
+        // Registra un nuevo paciente activo en la base de datos
         public void agregar(Paciente nuevo)
         {
             AccesoDatos datos = new AccesoDatos();
@@ -83,6 +86,7 @@ namespace Negocio
             }
         }
 
+        // Actualiza los datos personales de un paciente existente
         public void modificar(Paciente pac)
         {
             AccesoDatos datos = new AccesoDatos();
@@ -113,6 +117,7 @@ namespace Negocio
             }
         }
 
+        // Realiza la baja lógica cambiando el estado del paciente a inactivo
         public void eliminarLogico(int id)
         {
             AccesoDatos datos = new AccesoDatos();
@@ -132,6 +137,45 @@ namespace Negocio
             }
         }
 
+        // Reactiva un paciente dado de baja lógica
+        public void reactivar(int id)
+        {
+            Paciente paciente = listar().FirstOrDefault(p => p.Id == id);
+
+            if (paciente == null)
+            {
+                throw new ArgumentException("El paciente seleccionado no existe.");
+            }
+
+            if (paciente.Estado)
+            {
+                throw new ArgumentException("El paciente ya se encuentra activo.");
+            }
+
+            AccesoDatos datos = new AccesoDatos();
+
+            try
+            {
+                datos.setearConsulta(
+                    "UPDATE PACIENTES " +
+                    "SET Estado = 1 " +
+                    "WHERE Id_Paciente = @Id AND Estado = 0"
+                );
+
+                datos.setearParametro("@Id", id);
+                datos.ejecutarAccion();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                datos.cerrarConexion();
+            }
+        }
+
+        // Verifica si el DNI ya está registrado (opcionalmente excluyendo un ID en edición)
         public bool existeDni(string dni, int? idActual = null)
         {
             AccesoDatos datos = new AccesoDatos();
