@@ -507,8 +507,21 @@ namespace Negocio
             cambiarEstado(id, "No asistió");
         }
 
+        // --- Cerrar turno con diagnóstico ---
+        public void cerrar(int id, string diagnostico)
+        {
+            if (string.IsNullOrWhiteSpace(diagnostico))
+            {
+                throw new ArgumentException(
+                    "Debe ingresar el diagnóstico del paciente.");
+            }
+
+            cambiarEstado(id, "Cerrado", diagnostico.Trim());
+        }
+
         // --- Centralizar cambios de estado ---
-        private void cambiarEstado(int id, string nuevoEstado)
+        private void cambiarEstado(int id, string nuevoEstado,
+            string diagnostico = null)
         {
             // --- Validar identificador ---
             if (id <= 0)
@@ -532,9 +545,7 @@ namespace Negocio
                 original.Estado.Nombre != "Reprogramado")
             {
                 throw new ArgumentException(
-                    nuevoEstado == "Cancelado"
-                        ? "Solo se pueden cancelar turnos nuevos o reprogramados."
-                        : "Solo se puede registrar la inasistencia de turnos nuevos o reprogramados.");
+                    "Solo se pueden modificar turnos nuevos o reprogramados.");
             }
 
             // --- Validar horario para registrar inasistencia ---
@@ -543,6 +554,14 @@ namespace Negocio
             {
                 throw new ArgumentException(
                     "No se puede registrar una inasistencia antes de que finalice el turno.");
+            }
+
+            // --- Validar horario para cerrar turno ---
+            if (nuevoEstado == "Cerrado" &&
+                original.Fecha.Date.Add(original.Hora_Inicio.TimeOfDay) > DateTime.Now)
+            {
+                throw new ArgumentException(
+                    "No se puede cerrar un turno antes de que comience.");
             }
 
             // --- Preparar la conexión ---
@@ -557,18 +576,21 @@ namespace Negocio
                 // --- Registrar los datos anteriores en el historial ---
                 registrarHistorial(datos, original);
 
-                // --- Actualizar estado del turno ---
+                // --- Actualizar estado y diagnóstico del turno ---
                 datos.limpiarParametros();
 
                 datos.setearConsulta(
                     "UPDATE TURNOS SET " +
                     "Id_Estado_Turno = (SELECT Id_Estado_Turno " +
-                    "FROM ESTADOS_TURNO WHERE Nombre = @NuevoEstado) " +
+                    "FROM ESTADOS_TURNO WHERE Nombre = @NuevoEstado), " +
+                    "Diagnostico = CASE WHEN @NuevoEstado = 'Cerrado' " +
+                    "THEN @Diagnostico ELSE Diagnostico END " +
                     "WHERE Id_Turno = @IdTurno"
                 );
 
                 datos.setearParametro("@NuevoEstado", nuevoEstado);
                 datos.setearParametro("@IdTurno", original.Id);
+                datos.setearParametro("@Diagnostico", (object)diagnostico ?? DBNull.Value);
 
                 datos.ejecutarAccionTransaccion();
 
