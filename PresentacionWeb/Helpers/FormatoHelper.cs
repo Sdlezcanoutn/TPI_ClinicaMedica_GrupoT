@@ -19,7 +19,7 @@ namespace PresentacionWeb.Helpers
             //Convertimos el número de día a un texto reconocible en el idioma seleccionado
             DayOfWeek diaSemana = (DayOfWeek)(dia % 7);
 
-            return cultura.DateTimeFormat.GetDayName(diaSemana);
+            return cultura.TextInfo.ToTitleCase(cultura.DateTimeFormat.GetDayName(diaSemana));
         }
 
         public static string ObtenerEstado(bool activo)

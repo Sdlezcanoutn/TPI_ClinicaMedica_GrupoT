@@ -36,6 +36,7 @@ namespace PresentacionWeb
 
                 // Si llegamos acá, el ID tiene un formato válido.
                 cargarHorario(id);
+                Page.Title = "Editar Horario";
             }
         }
         private void cargarMedicos()

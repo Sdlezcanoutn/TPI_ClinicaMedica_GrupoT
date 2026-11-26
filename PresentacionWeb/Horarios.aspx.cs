@@ -49,6 +49,18 @@ namespace PresentacionWeb
                     horarios = horarios.FindAll(h => h.Dia_Semana == dia);
                 }
 
+                // Filtro por estado del horario
+                string estado = ddlEstado.SelectedValue;
+
+                if (estado == "1")
+                {
+                    horarios = horarios.FindAll(h => h.Estado);
+                }
+                else if (estado == "0")
+                {
+                    horarios = horarios.FindAll(h => !h.Estado);
+                }
+
                 dgvHorarios.DataSource = horarios;
                 dgvHorarios.DataBind();
             }
@@ -114,6 +126,18 @@ namespace PresentacionWeb
             {
                 System.Diagnostics.Debug.WriteLine(ex.Message);
             }
+        }
+        protected void ddlEstado_Filtros_Changed(object sender, EventArgs e)
+        {
+            cargar();
+        }
+        protected void btnLimpiar_Click(object sender, EventArgs e)
+        {
+            txtBuscarMedico.Text = "";
+            ddlDiaSemana.SelectedIndex = 0;
+            ddlEstado.SelectedValue = "1";
+
+            cargar();
         }
     }
 }
