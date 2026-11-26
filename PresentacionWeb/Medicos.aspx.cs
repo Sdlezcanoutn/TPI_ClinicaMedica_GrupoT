@@ -22,9 +22,6 @@ namespace PresentacionWeb
             {
                 // Cargar el listado de médicos registrados.
                 cargarMedicos();
-
-                // Cargar las especialidades disponibles para asignar.
-                cargarEspecialidades();
             }
             // Mantener la apariencia del filtro seleccionado.
             actualizarEstiloFiltro();
@@ -213,8 +210,9 @@ namespace PresentacionWeb
             }
             catch (Exception)
             {
-                // Evitar mostrar especialidades incompletas si ocurre un error.
+                // --- Limpiar el selector y propagar el error ---
                 cblEspecialidades.Items.Clear();
+                throw;
             }
         }
 
@@ -223,20 +221,32 @@ namespace PresentacionWeb
         // ============================================================
         protected void btnAgregar_Click(object sender, EventArgs e)
         {
-            // --- Cargar únicamente las especialidades activas ---
-            cargarEspecialidades();
+            try
+            {
+                // --- Cargar únicamente las especialidades activas ---
+                cargarEspecialidades();
 
-            // --- Actualizar el contenido del formulario ---
-            upMedico.Update();
+                // --- Actualizar el contenido del formulario ---
+                upMedico.Update();
 
-            // --- Abrir el formulario de alta ---
-            ScriptManager.RegisterStartupScript(
-                Page,
-                Page.GetType(),
-                "abrirNuevoMedico",
-                "prepararNuevoMedico();",
-                true
-            );
+                // --- Abrir el formulario de alta ---
+                ScriptManager.RegisterStartupScript(
+                    Page,
+                    Page.GetType(),
+                    "abrirNuevoMedico",
+                    "prepararNuevoMedico();",
+                    true
+                );
+            }
+            catch (Exception)
+            {
+                // --- Informar si no se pudieron cargar las especialidades ---
+                lblErrorListado.Text =
+                    "No se pudieron cargar las especialidades. Intente nuevamente.";
+
+                lblErrorListado.Visible = true;
+                upListado.Update();
+            }
         }
 
         // ============================================================

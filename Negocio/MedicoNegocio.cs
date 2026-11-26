@@ -103,6 +103,37 @@ namespace Negocio
                     "Completá todos los campos obligatorios.");
             }
 
+            // --- Validar longitud de los campos ---
+            if (medico.Nombre.Length > 100)
+            {
+                throw new ArgumentException(
+                    "El nombre no puede superar los 100 caracteres.");
+            }
+
+            if (medico.Apellido.Length > 100)
+            {
+                throw new ArgumentException(
+                    "El apellido no puede superar los 100 caracteres.");
+            }
+
+            if (medico.Matricula.Length > 50)
+            {
+                throw new ArgumentException(
+                    "La matrícula no puede superar los 50 caracteres.");
+            }
+
+            if (!string.IsNullOrEmpty(medico.Telefono) && medico.Telefono.Length > 30)
+            {
+                throw new ArgumentException(
+                    "El teléfono no puede superar los 30 caracteres.");
+            }
+
+            if (medico.Email.Length > 254)
+            {
+                throw new ArgumentException(
+                    "El correo electrónico no puede superar los 254 caracteres.");
+            }
+
             // --- Validar formato del DNI ---
             if (medico.DNI.Length < 7 || medico.DNI.Length > 8 ||
                 !medico.DNI.All(char.IsDigit))
