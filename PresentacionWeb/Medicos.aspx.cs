@@ -219,6 +219,27 @@ namespace PresentacionWeb
         }
 
         // ============================================================
+        // PREPARAR FORMULARIO PARA NUEVO MÉDICO
+        // ============================================================
+        protected void btnAgregar_Click(object sender, EventArgs e)
+        {
+            // --- Cargar únicamente las especialidades activas ---
+            cargarEspecialidades();
+
+            // --- Actualizar el contenido del formulario ---
+            upMedico.Update();
+
+            // --- Abrir el formulario de alta ---
+            ScriptManager.RegisterStartupScript(
+                Page,
+                Page.GetType(),
+                "abrirNuevoMedico",
+                "prepararNuevoMedico();",
+                true
+            );
+        }
+
+        // ============================================================
         // CARGAR DATOS DEL MÉDICO PARA EDITAR
         // ============================================================
         protected void btnEditar_Click(object sender, EventArgs e)

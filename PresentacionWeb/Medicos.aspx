@@ -97,7 +97,7 @@
                         <asp:Button ID="btnAgregar" runat="server"
                             Text="+ Nuevo Médico"
                             CssClass="btn btn-clinica-primary px-4 py-2 rounded-3 shadow-sm"
-                            OnClientClick="prepararNuevoMedico(); return false;" />
+                            OnClick="btnAgregar_Click" />
                     </div>
                 </div>
 
@@ -372,7 +372,14 @@
                                 CssClass="btn btn-clinica-primary"
                                 OnClick="btnGuardarMedico_Click" />
                         </div>
-                    </ContentTemplate>
+                        </ContentTemplate>
+
+                    <Triggers>
+                        <asp:AsyncPostBackTrigger
+                            ControlID="btnAgregar"
+                            EventName="Click" />
+                    </Triggers>
+
                 </asp:UpdatePanel>
             </div>
         </div>
