@@ -245,6 +245,7 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Helpers\FormatoHelper.cs" />
     <Compile Include="Horarios.aspx.cs">
       <DependentUpon>Horarios.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>

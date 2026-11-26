@@ -6,8 +6,16 @@
     
             <div class="card border-0 shadow-sm rounded-4 bg-white p-4 p-md-5">
                 <div class="mb-4 pb-3 border-bottom">
-                    <h2 class="fw-bold text-dark m-0">Nuevo Horario</h2>
-                    <p class="text-muted small m-0 mt-1">Complete los datos para registrar el horario de atención médica.</p>
+                    <h2 class="fw-bold text-dark m-0">
+                        <%= Request.QueryString["id"] != null 
+                            ? "Editar Horario"
+                            : "Nuevo Horario" %>
+                    </h2>
+                    <p class="text-muted small m-0 mt-1">
+                        <%= Request.QueryString["id"] != null
+                            ? "Modifique los datos del horario de atención médica."
+                            : "Complete los datos para registrar el horario de atención médica." %>
+                    </p>
                 </div>
     
                 <!-- Etiqueta para mostrar los errores de validación -->
