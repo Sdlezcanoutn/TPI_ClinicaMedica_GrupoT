@@ -150,40 +150,67 @@ namespace PresentacionWeb
         protected global::System.Web.UI.WebControls.GridView dgvHistorialTurno;
 
         /// <summary>
-        /// Control upCancelarTurno.
+        /// Control upConfirmarEstado.
         /// </summary>
         /// <remarks>
         /// Campo generado automáticamente.
         /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
         /// </remarks>
-        protected global::System.Web.UI.UpdatePanel upCancelarTurno;
+        protected global::System.Web.UI.UpdatePanel upConfirmarEstado;
 
         /// <summary>
-        /// Control hfIdCancelar.
+        /// Control lblTituloEstado.
         /// </summary>
         /// <remarks>
         /// Campo generado automáticamente.
         /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.HiddenField hfIdCancelar;
+        protected global::System.Web.UI.WebControls.Label lblTituloEstado;
 
         /// <summary>
-        /// Control lblDatosCancelar.
+        /// Control hfIdCambioEstado.
         /// </summary>
         /// <remarks>
         /// Campo generado automáticamente.
         /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblDatosCancelar;
+        protected global::System.Web.UI.WebControls.HiddenField hfIdCambioEstado;
 
         /// <summary>
-        /// Control btnConfirmarCancelacion.
+        /// Control lblMensajeEstado.
         /// </summary>
         /// <remarks>
         /// Campo generado automáticamente.
         /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnConfirmarCancelacion;
+        protected global::System.Web.UI.WebControls.Label lblMensajeEstado;
+
+        /// <summary>
+        /// Control lblDatosEstado.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblDatosEstado;
+
+        /// <summary>
+        /// Control lblAdvertenciaEstado.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblAdvertenciaEstado;
+
+        /// <summary>
+        /// Control btnConfirmarEstado.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnConfirmarEstado;
 
         /// <summary>
         /// Control upTurno.

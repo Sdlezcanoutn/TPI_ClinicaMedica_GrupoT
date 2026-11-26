@@ -493,8 +493,22 @@ namespace Negocio
             }
         }
 
-        // ===== CANCELACIÓN DE TURNOS =====
+        // ===== CAMBIOS DE ESTADO DE TURNOS =====
+
+        // --- Cancelar turno ---
         public void cancelar(int id)
+        {
+            cambiarEstado(id, "Cancelado");
+        }
+
+        // --- Registrar inasistencia ---
+        public void registrarInasistencia(int id)
+        {
+            cambiarEstado(id, "No asistió");
+        }
+
+        // --- Centralizar cambios de estado ---
+        private void cambiarEstado(int id, string nuevoEstado)
         {
             // --- Validar identificador ---
             if (id <= 0)
@@ -518,7 +532,17 @@ namespace Negocio
                 original.Estado.Nombre != "Reprogramado")
             {
                 throw new ArgumentException(
-                    "Solo se pueden cancelar turnos nuevos o reprogramados.");
+                    nuevoEstado == "Cancelado"
+                        ? "Solo se pueden cancelar turnos nuevos o reprogramados."
+                        : "Solo se puede registrar la inasistencia de turnos nuevos o reprogramados.");
+            }
+
+            // --- Validar horario para registrar inasistencia ---
+            if (nuevoEstado == "No asistió" &&
+                original.Fecha.Date.Add(original.Hora_Fin.TimeOfDay) > DateTime.Now)
+            {
+                throw new ArgumentException(
+                    "No se puede registrar una inasistencia antes de que finalice el turno.");
             }
 
             // --- Preparar la conexión ---
@@ -539,10 +563,11 @@ namespace Negocio
                 datos.setearConsulta(
                     "UPDATE TURNOS SET " +
                     "Id_Estado_Turno = (SELECT Id_Estado_Turno " +
-                    "FROM ESTADOS_TURNO WHERE Nombre = N'Cancelado') " +
+                    "FROM ESTADOS_TURNO WHERE Nombre = @NuevoEstado) " +
                     "WHERE Id_Turno = @IdTurno"
                 );
 
+                datos.setearParametro("@NuevoEstado", nuevoEstado);
                 datos.setearParametro("@IdTurno", original.Id);
 
                 datos.ejecutarAccionTransaccion();

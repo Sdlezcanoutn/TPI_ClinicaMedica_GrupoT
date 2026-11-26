@@ -361,65 +361,149 @@ namespace PresentacionWeb
             }
         }
 
-        // --- Recuperar turno para cancelar ---
+        // ===== CONFIRMACIÓN DE CAMBIOS DE ESTADO =====
+
+        // --- Preparar cancelación ---
         protected void btnCancelar_Click(object sender, EventArgs e)
         {
-            LinkButton boton = (LinkButton)sender;
-            int id = int.Parse(boton.CommandArgument);
-
-            TurnoNegocio negocio = new TurnoNegocio();
-            Turno turno = negocio.listar().FirstOrDefault(t => t.Id == id);
-
-            if (turno == null)
-                return;
-
-            // --- Validar estado del turno ---
-            if (turno.Estado.Nombre != "Nuevo" &&
-                turno.Estado.Nombre != "Reprogramado")
-            {
-                lblErrorListadoTurno.Text =
-                    "Solo se pueden cancelar turnos nuevos o reprogramados.";
-
-                lblErrorListadoTurno.Visible = true;
-                upListadoTurnos.Update();
-                return;
-            }
-
-            // --- Preparar modal de confirmación ---
-            hfIdCancelar.Value = turno.Id.ToString();
-
-            lblDatosCancelar.Text =
-                $"{turno.Paciente.Apellido}, {turno.Paciente.Nombre} - " +
-                $"{turno.Fecha:dd/MM/yyyy} - " +
-                $"{turno.Hora_Inicio:HH:mm} a {turno.Hora_Fin:HH:mm}";
-
-            lblErrorListadoTurno.Visible = false;
-
-            upCancelarTurno.Update();
-            upListadoTurnos.Update();
-
-            ScriptManager.RegisterStartupScript(
-                this,
-                GetType(),
-                "cancelarTurno",
-                "bootstrap.Modal.getOrCreateInstance(document.getElementById('modalCancelarTurno')).show();",
-                true
-            );
+            PrepararCambioEstado(sender, "Cancelado");
         }
 
-        // --- Confirmar cancelación del turno ---
-        protected void btnConfirmarCancelacion_Click(object sender, EventArgs e)
+        // --- Preparar inasistencia ---
+        protected void btnInasistencia_Click(object sender, EventArgs e)
+        {
+            PrepararCambioEstado(sender, "No asistió");
+        }
+
+        // --- Preparar modal de confirmación ---
+        private void PrepararCambioEstado(object sender, string nuevoEstado)
         {
             try
             {
-                int id = int.TryParse(hfIdCancelar.Value, out int valor)
-                    ? valor : 0;
+                LinkButton boton = (LinkButton)sender;
+                int id = int.Parse(boton.CommandArgument);
 
                 TurnoNegocio negocio = new TurnoNegocio();
-                negocio.cancelar(id);
+                Turno turno = negocio.listar().FirstOrDefault(t => t.Id == id);
+
+                if (turno == null)
+                    throw new ArgumentException("No se encontró el turno seleccionado.");
+
+                // --- Validar estado del turno ---
+                if (turno.Estado.Nombre != "Nuevo" &&
+                    turno.Estado.Nombre != "Reprogramado")
+                {
+                    throw new ArgumentException(
+                        "Solo se pueden modificar turnos nuevos o reprogramados.");
+                }
+
+                // --- Validar horario de inasistencia ---
+                if (nuevoEstado == "No asistió" &&
+                    turno.Fecha.Date.Add(turno.Hora_Fin.TimeOfDay) > DateTime.Now)
+                {
+                    throw new ArgumentException(
+                        "No se puede registrar una inasistencia antes de que finalice el turno.");
+                }
+
+                // --- Conservar turno y acción seleccionada ---
+                hfIdCambioEstado.Value = turno.Id.ToString();
+                ViewState["NuevoEstadoTurno"] = nuevoEstado;
+
+                lblDatosEstado.Text = Server.HtmlEncode(
+                    $"{turno.Paciente.Apellido}, {turno.Paciente.Nombre} - " +
+                    $"{turno.Fecha:dd/MM/yyyy} - " +
+                    $"{turno.Hora_Inicio:HH:mm} a {turno.Hora_Fin:HH:mm}");
+
+                // --- Configurar contenido del modal ---
+                if (nuevoEstado == "Cancelado")
+                {
+                    lblTituloEstado.Text = "Cancelar turno";
+                    lblMensajeEstado.Text =
+                        "¿Está seguro de que desea cancelar el siguiente turno?";
+
+                    lblAdvertenciaEstado.Text =
+                        "El horario quedará disponible para una nueva asignación.";
+
+                    btnConfirmarEstado.Text = "Confirmar cancelación";
+                    btnConfirmarEstado.CssClass = "btn btn-danger";
+                }
+                else
+                {
+                    lblTituloEstado.Text = "Registrar inasistencia";
+                    lblMensajeEstado.Text =
+                        "¿Está seguro de que el paciente no asistió al siguiente turno?";
+
+                    lblAdvertenciaEstado.Text =
+                        "El turno quedará registrado como No asistió.";
+
+                    btnConfirmarEstado.Text = "Confirmar inasistencia";
+                    btnConfirmarEstado.CssClass = "btn btn-warning";
+                }
+
+                lblErrorListadoTurno.Visible = false;
+
+                upConfirmarEstado.Update();
+                upListadoTurnos.Update();
+
+                // --- Abrir modal ---
+                ScriptManager.RegisterStartupScript(
+                    this,
+                    GetType(),
+                    "mostrarCambioEstado",
+                    "bootstrap.Modal.getOrCreateInstance(document.getElementById('modalConfirmarEstado')).show();",
+                    true
+                );
+            }
+            catch (ArgumentException ex)
+            {
+                lblErrorListadoTurno.Text = Server.HtmlEncode(ex.Message);
+                lblErrorListadoTurno.Visible = true;
+                upListadoTurnos.Update();
+            }
+            catch (Exception ex)
+            {
+                Session["error"] = ex.ToString();
+
+                lblErrorListadoTurno.Text =
+                    "No se pudo recuperar el turno seleccionado.";
+
+                lblErrorListadoTurno.Visible = true;
+                upListadoTurnos.Update();
+            }
+        }
+
+        // --- Confirmar cambio de estado ---
+        protected void btnConfirmarEstado_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                int id = int.TryParse(hfIdCambioEstado.Value, out int valor)
+                    ? valor : 0;
+
+                string nuevoEstado = ViewState["NuevoEstadoTurno"] as string;
+
+                TurnoNegocio negocio = new TurnoNegocio();
+                string mensaje;
+
+                // --- Ejecutar acción seleccionada ---
+                if (nuevoEstado == "Cancelado")
+                {
+                    negocio.cancelar(id);
+                    mensaje = "Turno cancelado correctamente.";
+                }
+                else if (nuevoEstado == "No asistió")
+                {
+                    negocio.registrarInasistencia(id);
+                    mensaje = "Inasistencia registrada correctamente.";
+                }
+                else
+                {
+                    throw new ArgumentException("La acción seleccionada no es válida.");
+                }
 
                 // --- Actualizar listado ---
-                hfIdCancelar.Value = string.Empty;
+                hfIdCambioEstado.Value = string.Empty;
+                ViewState.Remove("NuevoEstadoTurno");
 
                 AplicarFiltrosListado();
                 upListadoTurnos.Update();
@@ -428,23 +512,23 @@ namespace PresentacionWeb
                 ScriptManager.RegisterStartupScript(
                     this,
                     GetType(),
-                    "cancelarTurnoOk",
-                    "bootstrap.Modal.getOrCreateInstance(document.getElementById('modalCancelarTurno')).hide();" +
-                    "mostrarAlertaTurno('Turno cancelado correctamente.');",
+                    "cambioEstadoOk",
+                    "bootstrap.Modal.getOrCreateInstance(document.getElementById('modalConfirmarEstado')).hide();" +
+                    $"mostrarAlertaTurno('{mensaje}');",
                     true
                 );
             }
             catch (ArgumentException ex)
             {
-                lblErrorListadoTurno.Text = ex.Message;
+                lblErrorListadoTurno.Text = Server.HtmlEncode(ex.Message);
                 lblErrorListadoTurno.Visible = true;
                 upListadoTurnos.Update();
 
                 ScriptManager.RegisterStartupScript(
                     this,
                     GetType(),
-                    "cancelarTurnoError",
-                    "bootstrap.Modal.getOrCreateInstance(document.getElementById('modalCancelarTurno')).hide();",
+                    "cambioEstadoError",
+                    "bootstrap.Modal.getOrCreateInstance(document.getElementById('modalConfirmarEstado')).hide();",
                     true
                 );
             }
@@ -453,7 +537,7 @@ namespace PresentacionWeb
                 Session["error"] = ex.ToString();
 
                 lblErrorListadoTurno.Text =
-                    "Ocurrió un error al cancelar el turno. Intentá nuevamente.";
+                    "Ocurrió un error al modificar el estado del turno. Intentá nuevamente.";
 
                 lblErrorListadoTurno.Visible = true;
                 upListadoTurnos.Update();
@@ -461,8 +545,8 @@ namespace PresentacionWeb
                 ScriptManager.RegisterStartupScript(
                     this,
                     GetType(),
-                    "cancelarTurnoError",
-                    "bootstrap.Modal.getOrCreateInstance(document.getElementById('modalCancelarTurno')).hide();",
+                    "cambioEstadoError",
+                    "bootstrap.Modal.getOrCreateInstance(document.getElementById('modalConfirmarEstado')).hide();",
                     true
                 );
             }

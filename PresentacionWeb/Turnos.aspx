@@ -122,6 +122,15 @@
                                                 <i class="fa-solid fa-calendar-xmark me-1"></i> Cancelar
                                             </asp:LinkButton>
 
+                                            <asp:LinkButton ID="btnInasistencia" runat="server"
+                                                CssClass="btn btn-sm btn-outline-warning ms-1"
+                                                CommandArgument='<%# Eval("Id") %>'
+                                                Visible='<%# Eval("Estado").ToString() == "Nuevo" || Eval("Estado").ToString() == "Reprogramado" %>'
+                                                OnClick="btnInasistencia_Click"
+                                                ToolTip="Registrar inasistencia">
+                                                <i class="fa-solid fa-user-xmark me-1"></i> No asistió
+                                            </asp:LinkButton>
+
                                             <asp:LinkButton ID="btnHistorial" runat="server"
                                                 CssClass="btn btn-sm btn-outline-secondary ms-1"
                                                 CommandArgument='<%# Eval("Id") %>'
@@ -262,44 +271,49 @@
     </div>
 </div>
 
-    <!-- Modal Confirmación de Cancelación -->
-<div class="modal fade" id="modalCancelarTurno" tabindex="-1"
-    aria-labelledby="tituloModalCancelar" aria-hidden="true">
+    <!-- Modal Confirmación de Cambio de Estado -->
+<div class="modal fade" id="modalConfirmarEstado" tabindex="-1"
+    aria-labelledby="tituloModalEstado" aria-hidden="true">
 
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
 
-            <div class="modal-header">
-                <h5 class="modal-title" id="tituloModalCancelar">Cancelar turno</h5>
-                <button type="button" class="btn-close"
-                    data-bs-dismiss="modal" aria-label="Cerrar">
-                </button>
-            </div>
-
-            <asp:UpdatePanel ID="upCancelarTurno" runat="server"
+            <asp:UpdatePanel ID="upConfirmarEstado" runat="server"
                 UpdateMode="Conditional">
                 <ContentTemplate>
 
-                    <asp:HiddenField ID="hfIdCancelar" runat="server" />
+                    <div class="modal-header">
+                        <h5 class="modal-title fw-bold" id="tituloModalEstado">
+                            <asp:Label ID="lblTituloEstado" runat="server" />
+                        </h5>
+
+                        <button type="button" class="btn-close"
+                            data-bs-dismiss="modal" aria-label="Cerrar">
+                        </button>
+                    </div>
+
+                    <asp:HiddenField ID="hfIdCambioEstado" runat="server" />
 
                     <div class="modal-body">
+
                         <p>
-                            ¿Está seguro de que desea cancelar el siguiente turno?
+                            <asp:Label ID="lblMensajeEstado" runat="server" />
                         </p>
 
                         <p>
                             <strong>
-                                <asp:Label ID="lblDatosCancelar" runat="server" />
+                                <asp:Label ID="lblDatosEstado" runat="server" />
                             </strong>
                         </p>
 
                         <div class="alert alert-warning">
-                            El horario quedará disponible para una nueva asignación.
+                            <asp:Label ID="lblAdvertenciaEstado" runat="server" />
                         </div>
 
                         <p class="text-muted small mb-0">
                             El historial del turno se conservará.
                         </p>
+
                     </div>
 
                     <div class="modal-footer">
@@ -308,10 +322,8 @@
                             Volver
                         </button>
 
-                        <asp:Button ID="btnConfirmarCancelacion" runat="server"
-                            Text="Confirmar cancelación"
-                            CssClass="btn btn-danger"
-                            OnClick="btnConfirmarCancelacion_Click" />
+                        <asp:Button ID="btnConfirmarEstado" runat="server"
+                            OnClick="btnConfirmarEstado_Click" />
                     </div>
 
                 </ContentTemplate>
