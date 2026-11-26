@@ -425,13 +425,66 @@ namespace PresentacionWeb
             }
             catch (ArgumentException ex)
             {
-                // --- Mostrar errores de validación ---
+                // --- Verificar si una especialidad dejó de estar disponible ---
+                System.Data.SqlClient.SqlException errorSql =
+                    ex.InnerException as System.Data.SqlClient.SqlException;
+
+                if (errorSql != null && errorSql.Number == 50002)
+                {
+                    try
+                    {
+                        // --- Conservar las especialidades seleccionadas ---
+                        List<string> seleccionadas = cblEspecialidades.Items
+                            .Cast<ListItem>()
+                            .Where(item => item.Selected)
+                            .Select(item => item.Value)
+                            .ToList();
+
+                        // --- Recuperar las asignaciones existentes si es una edición ---
+                        Medico medicoAnterior = null;
+                        int idMedico;
+
+                        if (int.TryParse(hfIdMedico.Value, out idMedico))
+                        {
+                            MedicoNegocio negocio = new MedicoNegocio();
+
+                            medicoAnterior = negocio.listar()
+                                .Find(m => m.Id == idMedico);
+                        }
+
+                        // --- Actualizar las especialidades disponibles ---
+                        cargarEspecialidades(medicoAnterior);
+
+                        // --- Recuperar las selecciones que siguen siendo válidas ---
+                        foreach (ListItem item in cblEspecialidades.Items)
+                        {
+                            item.Selected = seleccionadas.Contains(item.Value);
+                        }
+
+                        // --- Informar el cambio de disponibilidad ---
+                        mostrarErrorMedico(
+                            "Las especialidades que dejaron de estar disponibles se eliminaron de la selección. " +
+                            "Puede continuar seleccionando las especialidades disponibles.");
+                    }
+                    catch (Exception)
+                    {
+                        // --- Informar si no se pudo actualizar el selector ---
+                        mostrarErrorMedico(
+                            "No se pudieron actualizar las especialidades. " +
+                            "Cerrá el formulario e intentá nuevamente.");
+                    }
+
+                    return;
+                }
+
+                // --- Mostrar los demás errores de validación ---
                 mostrarErrorMedico(ex.Message);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                // --- Mostrar el error real para identificar el problema ---
-                mostrarErrorMedico(ex.Message);
+                // --- Mostrar error general ---
+                mostrarErrorMedico(
+                    "Ocurrió un error al guardar el médico. Intente nuevamente.");
             }
         }
 

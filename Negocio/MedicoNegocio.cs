@@ -3,6 +3,7 @@ using Dominio;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Data.SqlClient;
 
 namespace Negocio
 {
@@ -214,7 +215,11 @@ namespace Negocio
                     // --- Limpiar los parámetros de la consulta anterior ---
                     datos.limpiarParametros();
 
+                    // --- Verificar que la especialidad esté activa antes de asignarla ---
                     datos.setearConsulta(
+                        "IF NOT EXISTS (SELECT 1 FROM ESPECIALIDADES " +
+                        "WHERE Id_Especialidad = @IdEspecialidad AND Estado = 1) " +
+                        "THROW 50002, 'No se puede asignar una especialidad inactiva o inexistente.', 1; " +
                         "INSERT INTO MEDICOS_ESPECIALIDADES " +
                         "(Id_Medico, Id_Especialidad) " +
                         "VALUES (@IdMedico, @IdEspecialidad)"
@@ -235,11 +240,20 @@ namespace Negocio
                 datos.confirmarTransaccion();
                 transaccionIniciada = false;
             }
-            catch
+            catch (Exception ex)
             {
                 // --- Deshacer las operaciones si ocurre un error ---
                 if (transaccionIniciada)
                     datos.cancelarTransaccion();
+
+                // --- Identificar errores de validación ---
+                SqlException errorSql = ex as SqlException;
+
+                if (errorSql != null && errorSql.Number == 50002)
+                {
+                    throw new ArgumentException(
+                        "No se puede asignar una especialidad inactiva o inexistente.", ex);
+                }
 
                 throw;
             }
@@ -358,7 +372,11 @@ namespace Negocio
                     {
                         datos.limpiarParametros();
 
+                        // --- Verificar que la especialidad esté activa antes de asignarla ---
                         datos.setearConsulta(
+                            "IF NOT EXISTS (SELECT 1 FROM ESPECIALIDADES " +
+                            "WHERE Id_Especialidad = @IdEspecialidad AND Estado = 1) " +
+                            "THROW 50002, 'No se puede asignar una especialidad inactiva o inexistente.', 1; " +
                             "INSERT INTO MEDICOS_ESPECIALIDADES " +
                             "(Id_Medico, Id_Especialidad) " +
                             "VALUES (@IdMedico, @IdEspecialidad)"
@@ -377,12 +395,29 @@ namespace Negocio
                 datos.confirmarTransaccion();
                 transaccionIniciada = false;
             }
-            catch
+            catch (Exception ex)
             {
                 // --- Revertir todos los cambios si ocurre un error ---
                 if (transaccionIniciada)
                     datos.cancelarTransaccion();
 
+                // --- Identificar errores de validación ---
+                SqlException errorSql = ex as SqlException;
+
+                if (errorSql != null)
+                {
+                    if (errorSql.Number == 50001)
+                    {
+                        throw new ArgumentException(
+                            "No se puede quitar una especialidad con turnos registrados.", ex);
+                    }
+
+                    if (errorSql.Number == 50002)
+                    {
+                        throw new ArgumentException(
+                            "No se puede asignar una especialidad inactiva o inexistente.", ex);
+                    }
+                }
                 throw;
             }
             finally
