@@ -175,7 +175,7 @@ namespace PresentacionWeb
         // ============================================================
         // CARGA DE ESPECIALIDADES
         // ============================================================
-        private void cargarEspecialidades()
+        private void cargarEspecialidades(Medico medico = null)
         {
             EspecialidadNegocio negocio = new EspecialidadNegocio();
 
@@ -184,8 +184,20 @@ namespace PresentacionWeb
                 // Obtener las especialidades registradas en la base de datos.
                 List<Especialidad> lista = negocio.listar();
 
-                // Mostrar únicamente las especialidades activas.
-                lista = lista.Where(e => e.Estado).ToList();
+                // --- Mostrar especialidades activas y las asignadas al médico ---
+                lista = lista.Where(e => e.Estado ||
+                    (medico != null &&
+                    medico.Especialidades.Exists(a => a.Id == e.Id)))
+                    .ToList();
+
+                // --- Identificar las especialidades inactivas ---
+                foreach (Especialidad especialidad in lista)
+                {
+                    if (!especialidad.Estado)
+                    {
+                        especialidad.Nombre += " (inactiva)";
+                    }
+                }
 
                 // Configurar el listado de especialidades.
                 cblEspecialidades.DataSource = lista;
@@ -240,7 +252,7 @@ namespace PresentacionWeb
                 txtEmailMedico.Text = medico.Email;
 
                 // --- Cargar las especialidades disponibles ---
-                cargarEspecialidades();
+                cargarEspecialidades(medico);
 
                 // --- Marcar las especialidades asignadas al médico ---
                 foreach (ListItem item in cblEspecialidades.Items)
