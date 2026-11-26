@@ -93,7 +93,34 @@ namespace Negocio
             }
         }
 
-        
+        // ===== VALIDACIONES DE TURNOS =====
+
+        // --- Verificar superposición de turnos ---
+        private void validarSuperposicion(
+            int idMedico,
+            int idPaciente,
+            DateTime fecha,
+            TimeSpan horaInicio,
+            TimeSpan horaFin,
+            int idTurnoExcluir = 0)
+        {
+            bool haySuperposicion = listar().Any(t =>
+                t.Id != idTurnoExcluir &&
+                t.Fecha.Date == fecha.Date &&
+                t.Estado != null &&
+                t.Estado.Nombre != "Cancelado" &&
+                horaInicio < t.Hora_Fin.TimeOfDay &&
+                horaFin > t.Hora_Inicio.TimeOfDay &&
+                (t.Medico.Id == idMedico || t.Paciente.Id == idPaciente)
+            );
+
+            if (haySuperposicion)
+            {
+                throw new ArgumentException(
+                    "Ya existe un turno superpuesto en ese horario para el médico o el paciente.");
+            }
+        }
+
         // ALTA Y ASIGNACIÓN DE TURNOS (ETAPA 1)
         public void agregar(Turno nuevo)
         {
@@ -166,20 +193,14 @@ namespace Negocio
                 throw new ArgumentException("El horario seleccionado está fuera del horario laboral del médico para ese día.");
             }
 
-            // Evitar superposición de turnos (mismo médico o mismo paciente) en turnos no cancelados
-            bool haySuperposicion = listar().Any(t =>
-                t.Fecha.Date == fechaSolo &&
-                t.Estado != null &&
-                t.Estado.Nombre != "Cancelado" &&
-                horaInicio < t.Hora_Fin.TimeOfDay &&
-                horaFin > t.Hora_Inicio.TimeOfDay &&
-                (t.Medico.Id == medico.Id || t.Paciente.Id == paciente.Id)
+            // --- Validar superposición de turnos ---
+            validarSuperposicion(
+                medico.Id,
+                paciente.Id,
+                fechaSolo,
+                horaInicio,
+                horaFin
             );
-
-            if (haySuperposicion)
-            {
-                throw new ArgumentException("Ya existe un turno superpuesto en ese horario para el médico o el paciente.");
-            }
 
             AccesoDatos datos = new AccesoDatos();
 
