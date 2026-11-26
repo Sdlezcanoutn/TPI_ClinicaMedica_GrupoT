@@ -95,17 +95,28 @@
                                     </asp:TemplateField>
                                     <asp:TemplateField HeaderText="Acciones" ItemStyle-CssClass="text-end" HeaderStyle-CssClass="text-end">
                                         <ItemTemplate>
+
                                             <asp:LinkButton ID="btnEditar" runat="server"
                                                 CssClass="btn btn-sm btn-outline-secondary me-1"
                                                 CommandArgument='<%# Eval("Id") %>'
+                                                Visible='<%# Eval("Estado").ToString() == "Nuevo" || Eval("Estado").ToString() == "Reprogramado" %>'
                                                 OnClick="btnEditar_Click">
                                                 <i class="fa-solid fa-calendar-days me-1"></i> Reprogramar
                                             </asp:LinkButton>
+
                                             <asp:LinkButton ID="btnCancelar" runat="server"
                                                 CssClass="btn btn-sm btn-outline-danger"
-                                                CommandArgument='<%# Eval("Id") %>'>
+                                                CommandArgument='<%# Eval("Id") %>'
+                                                Visible='<%# Eval("Estado").ToString() == "Nuevo" || Eval("Estado").ToString() == "Reprogramado" %>'
+                                                OnClick="btnCancelar_Click">
                                                 <i class="fa-solid fa-calendar-xmark me-1"></i> Cancelar
                                             </asp:LinkButton>
+
+                                            <asp:Label runat="server"
+                                            CssClass="text-muted"
+                                            Text="—"
+                                            Visible='<%# Eval("Estado").ToString() != "Nuevo" && Eval("Estado").ToString() != "Reprogramado" %>' />
+
                                         </ItemTemplate>
                                     </asp:TemplateField>
                                 </Columns>
@@ -125,6 +136,65 @@
 
         </div>
     </div>
+
+    <!-- Modal Confirmación de Cancelación -->
+<div class="modal fade" id="modalCancelarTurno" tabindex="-1"
+    aria-labelledby="tituloModalCancelar" aria-hidden="true">
+
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title" id="tituloModalCancelar">Cancelar turno</h5>
+                <button type="button" class="btn-close"
+                    data-bs-dismiss="modal" aria-label="Cerrar">
+                </button>
+            </div>
+
+            <asp:UpdatePanel ID="upCancelarTurno" runat="server"
+                UpdateMode="Conditional">
+                <ContentTemplate>
+
+                    <asp:HiddenField ID="hfIdCancelar" runat="server" />
+
+                    <div class="modal-body">
+                        <p>
+                            ¿Está seguro de que desea cancelar el siguiente turno?
+                        </p>
+
+                        <p>
+                            <strong>
+                                <asp:Label ID="lblDatosCancelar" runat="server" />
+                            </strong>
+                        </p>
+
+                        <div class="alert alert-warning">
+                            El horario quedará disponible para una nueva asignación.
+                        </div>
+
+                        <p class="text-muted small mb-0">
+                            El historial del turno se conservará.
+                        </p>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary"
+                            data-bs-dismiss="modal">
+                            Volver
+                        </button>
+
+                        <asp:Button ID="btnConfirmarCancelacion" runat="server"
+                            Text="Confirmar cancelación"
+                            CssClass="btn btn-danger"
+                            OnClick="btnConfirmarCancelacion_Click" />
+                    </div>
+
+                </ContentTemplate>
+            </asp:UpdatePanel>
+
+        </div>
+    </div>
+</div>
 
     <!-- Modal Alta de Turno -->
     <div class="modal fade" id="modalTurno" tabindex="-1"

@@ -157,6 +157,35 @@ namespace Negocio
             }
         }
 
+        // ===== HISTORIAL DE TURNOS =====
+
+        // --- Registrar los datos anteriores del turno ---
+        private void registrarHistorial(AccesoDatos datos, Turno original)
+        {
+            datos.setearConsulta(
+                "INSERT INTO HISTORIAL_TURNOS " +
+                "(Id_Turno, Fecha_Anterior, Hora_Inicio_Anterior, " +
+                "Hora_Fin_Anterior, Id_Estado_Turno_Anterior) " +
+                "SELECT Id_Turno, Fecha, Hora_Inicio, Hora_Fin, Id_Estado_Turno " +
+                "FROM TURNOS WITH (UPDLOCK, HOLDLOCK) " +
+                "WHERE Id_Turno = @IdTurno " +
+                "AND Fecha = @FechaAnterior " +
+                "AND Hora_Inicio = @HoraInicioAnterior " +
+                "AND Hora_Fin = @HoraFinAnterior " +
+                "AND Id_Estado_Turno = @IdEstadoAnterior; " +
+                "IF @@ROWCOUNT = 0 " +
+                "THROW 50001, 'El turno fue modificado. Actualice el listado.', 1;"
+            );
+
+            datos.setearParametro("@IdTurno", original.Id);
+            datos.setearParametro("@FechaAnterior", original.Fecha.Date);
+            datos.setearParametro("@HoraInicioAnterior", original.Hora_Inicio.TimeOfDay);
+            datos.setearParametro("@HoraFinAnterior", original.Hora_Fin.TimeOfDay);
+            datos.setearParametro("@IdEstadoAnterior", original.Estado.Id);
+
+            datos.ejecutarAccionTransaccion();
+        }
+
         // ALTA Y ASIGNACIÓN DE TURNOS (ETAPA 1)
         public void agregar(Turno nuevo)
         {
@@ -349,28 +378,7 @@ namespace Negocio
                 transaccionIniciada = true;
 
                 // --- Registrar los datos anteriores en el historial ---
-                datos.setearConsulta(
-                    "INSERT INTO HISTORIAL_TURNOS " +
-                    "(Id_Turno, Fecha_Anterior, Hora_Inicio_Anterior, " +
-                    "Hora_Fin_Anterior, Id_Estado_Turno_Anterior) " +
-                    "SELECT Id_Turno, Fecha, Hora_Inicio, Hora_Fin, Id_Estado_Turno " +
-                    "FROM TURNOS WITH (UPDLOCK, HOLDLOCK) " +
-                    "WHERE Id_Turno = @IdTurno " +
-                    "AND Fecha = @FechaAnterior " +
-                    "AND Hora_Inicio = @HoraInicioAnterior " +
-                    "AND Hora_Fin = @HoraFinAnterior " +
-                    "AND Id_Estado_Turno = @IdEstadoAnterior; " +
-                    "IF @@ROWCOUNT = 0 " +
-                    "THROW 50001, 'El turno fue modificado. Actualice el listado.', 1;"
-                );
-
-                datos.setearParametro("@IdTurno", original.Id);
-                datos.setearParametro("@FechaAnterior", original.Fecha.Date);
-                datos.setearParametro("@HoraInicioAnterior", original.Hora_Inicio.TimeOfDay);
-                datos.setearParametro("@HoraFinAnterior", original.Hora_Fin.TimeOfDay);
-                datos.setearParametro("@IdEstadoAnterior", original.Estado.Id);
-
-                datos.ejecutarAccionTransaccion();
+                registrarHistorial(datos, original);
 
                 // --- Actualizar fecha, horario y estado del turno ---
                 datos.limpiarParametros();
@@ -389,6 +397,87 @@ namespace Negocio
                 datos.setearParametro("@Fecha", fecha);
                 datos.setearParametro("@HoraInicio", horaInicio);
                 datos.setearParametro("@HoraFin", horaFin);
+                datos.setearParametro("@IdTurno", original.Id);
+
+                datos.ejecutarAccionTransaccion();
+
+                // --- Confirmar las operaciones ---
+                datos.confirmarTransaccion();
+                transaccionIniciada = false;
+            }
+            catch (System.Data.SqlClient.SqlException ex)
+            {
+                if (transaccionIniciada)
+                    datos.cancelarTransaccion();
+
+                if (ex.Number == 50001)
+                    throw new ArgumentException(ex.Message);
+
+                throw;
+            }
+            catch
+            {
+                if (transaccionIniciada)
+                    datos.cancelarTransaccion();
+
+                throw;
+            }
+            finally
+            {
+                datos.cerrarConexion();
+            }
+        }
+
+        // ===== CANCELACIÓN DE TURNOS =====
+        public void cancelar(int id)
+        {
+            // --- Validar identificador ---
+            if (id <= 0)
+            {
+                throw new ArgumentException(
+                    "El turno seleccionado no es válido.");
+            }
+
+            // --- Recuperar turno original ---
+            Turno original = listar()
+                .FirstOrDefault(t => t.Id == id);
+
+            if (original == null)
+            {
+                throw new ArgumentException(
+                    "El turno seleccionado no existe.");
+            }
+
+            // --- Validar estado del turno ---
+            if (original.Estado.Nombre != "Nuevo" &&
+                original.Estado.Nombre != "Reprogramado")
+            {
+                throw new ArgumentException(
+                    "Solo se pueden cancelar turnos nuevos o reprogramados.");
+            }
+
+            // --- Preparar la conexión ---
+            AccesoDatos datos = new AccesoDatos();
+            bool transaccionIniciada = false;
+
+            try
+            {
+                datos.iniciarTransaccion();
+                transaccionIniciada = true;
+
+                // --- Registrar los datos anteriores en el historial ---
+                registrarHistorial(datos, original);
+
+                // --- Actualizar estado del turno ---
+                datos.limpiarParametros();
+
+                datos.setearConsulta(
+                    "UPDATE TURNOS SET " +
+                    "Id_Estado_Turno = (SELECT Id_Estado_Turno " +
+                    "FROM ESTADOS_TURNO WHERE Nombre = N'Cancelado') " +
+                    "WHERE Id_Turno = @IdTurno"
+                );
+
                 datos.setearParametro("@IdTurno", original.Id);
 
                 datos.ejecutarAccionTransaccion();

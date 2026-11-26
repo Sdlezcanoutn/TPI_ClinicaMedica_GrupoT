@@ -295,6 +295,113 @@ namespace PresentacionWeb
             );
         }
 
+        // --- Recuperar turno para cancelar ---
+        protected void btnCancelar_Click(object sender, EventArgs e)
+        {
+            LinkButton boton = (LinkButton)sender;
+            int id = int.Parse(boton.CommandArgument);
+
+            TurnoNegocio negocio = new TurnoNegocio();
+            Turno turno = negocio.listar().FirstOrDefault(t => t.Id == id);
+
+            if (turno == null)
+                return;
+
+            // --- Validar estado del turno ---
+            if (turno.Estado.Nombre != "Nuevo" &&
+                turno.Estado.Nombre != "Reprogramado")
+            {
+                lblErrorListadoTurno.Text =
+                    "Solo se pueden cancelar turnos nuevos o reprogramados.";
+
+                lblErrorListadoTurno.Visible = true;
+                upListadoTurnos.Update();
+                return;
+            }
+
+            // --- Preparar modal de confirmación ---
+            hfIdCancelar.Value = turno.Id.ToString();
+
+            lblDatosCancelar.Text =
+                $"{turno.Paciente.Apellido}, {turno.Paciente.Nombre} - " +
+                $"{turno.Fecha:dd/MM/yyyy} - " +
+                $"{turno.Hora_Inicio:HH:mm} a {turno.Hora_Fin:HH:mm}";
+
+            lblErrorListadoTurno.Visible = false;
+
+            upCancelarTurno.Update();
+            upListadoTurnos.Update();
+
+            ScriptManager.RegisterStartupScript(
+                this,
+                GetType(),
+                "cancelarTurno",
+                "bootstrap.Modal.getOrCreateInstance(document.getElementById('modalCancelarTurno')).show();",
+                true
+            );
+        }
+
+        // --- Confirmar cancelación del turno ---
+        protected void btnConfirmarCancelacion_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                int id = int.TryParse(hfIdCancelar.Value, out int valor)
+                    ? valor : 0;
+
+                TurnoNegocio negocio = new TurnoNegocio();
+                negocio.cancelar(id);
+
+                // --- Actualizar listado ---
+                hfIdCancelar.Value = string.Empty;
+
+                AplicarFiltrosListado();
+                upListadoTurnos.Update();
+
+                // --- Cerrar modal y mostrar confirmación ---
+                ScriptManager.RegisterStartupScript(
+                    this,
+                    GetType(),
+                    "cancelarTurnoOk",
+                    "bootstrap.Modal.getOrCreateInstance(document.getElementById('modalCancelarTurno')).hide();" +
+                    "mostrarAlertaTurno('Turno cancelado correctamente.');",
+                    true
+                );
+            }
+            catch (ArgumentException ex)
+            {
+                lblErrorListadoTurno.Text = ex.Message;
+                lblErrorListadoTurno.Visible = true;
+                upListadoTurnos.Update();
+
+                ScriptManager.RegisterStartupScript(
+                    this,
+                    GetType(),
+                    "cancelarTurnoError",
+                    "bootstrap.Modal.getOrCreateInstance(document.getElementById('modalCancelarTurno')).hide();",
+                    true
+                );
+            }
+            catch (Exception ex)
+            {
+                Session["error"] = ex.ToString();
+
+                lblErrorListadoTurno.Text =
+                    "Ocurrió un error al cancelar el turno. Intentá nuevamente.";
+
+                lblErrorListadoTurno.Visible = true;
+                upListadoTurnos.Update();
+
+                ScriptManager.RegisterStartupScript(
+                    this,
+                    GetType(),
+                    "cancelarTurnoError",
+                    "bootstrap.Modal.getOrCreateInstance(document.getElementById('modalCancelarTurno')).hide();",
+                    true
+                );
+            }
+        }
+
         // Valida los datos del modal, registra el nuevo turno en BD, refresca la grilla y muestra aviso de éxito
         protected void btnGuardarTurno_Click(object sender, EventArgs e)
         {

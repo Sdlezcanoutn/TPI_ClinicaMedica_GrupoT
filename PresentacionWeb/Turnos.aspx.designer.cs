@@ -96,6 +96,42 @@ namespace PresentacionWeb
         protected global::System.Web.UI.WebControls.GridView dgvTurnos;
 
         /// <summary>
+        /// Control upCancelarTurno.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
+        protected global::System.Web.UI.UpdatePanel upCancelarTurno;
+
+        /// <summary>
+        /// Control hfIdCancelar.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.HiddenField hfIdCancelar;
+
+        /// <summary>
+        /// Control lblDatosCancelar.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblDatosCancelar;
+
+        /// <summary>
+        /// Control btnConfirmarCancelacion.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnConfirmarCancelacion;
+
+        /// <summary>
         /// Control upTurno.
         /// </summary>
         /// <remarks>
