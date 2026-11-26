@@ -255,6 +255,65 @@ namespace PresentacionWeb
             }
         }
 
+        protected void btnHistorial_Click(object sender, EventArgs e)
+        {
+            LinkButton btn = (LinkButton)sender;
+
+            if (!int.TryParse(btn.CommandArgument, out int idPaciente))
+                return;
+
+            try
+            {
+                PacienteNegocio pacienteNegocio = new PacienteNegocio();
+                Paciente paciente = pacienteNegocio.listar().Find(p => p.Id == idPaciente);
+
+                if (paciente == null || !paciente.Estado)
+                {
+                    lblErrorListado.Text = "El paciente no existe o está inactivo.";
+                    lblErrorListado.Visible = true;
+                    upListado.Update();
+                    return;
+                }
+
+                TurnoNegocio turnoNegocio = new TurnoNegocio();
+                var historial = turnoNegocio.listar()
+                    .Where(t => t.Paciente != null && t.Paciente.Id == idPaciente)
+                    .OrderByDescending(t => t.Fecha)
+                    .ThenByDescending(t => t.Hora_Inicio)
+                    .Select(t => new
+                    {
+                        Fecha = t.Fecha.ToString("dd/MM/yyyy"),
+                        Horario = $"{t.Hora_Inicio:HH:mm} - {t.Hora_Fin:HH:mm}",
+                        Especialidad = t.Especialidad != null ? t.Especialidad.Nombre : "",
+                        Medico = t.Medico != null ? $"{t.Medico.Apellido}, {t.Medico.Nombre}" : "",
+                        Estado = t.Estado != null ? t.Estado.Nombre : "",
+                        Motivo = t.Motivo_Consulta,
+                        Diagnostico = string.IsNullOrWhiteSpace(t.Diagnostico) ? "-" : t.Diagnostico
+                    })
+                    .ToList();
+
+                lblSubtituloHistorial.Text = $"{paciente.Apellido}, {paciente.Nombre} — DNI {paciente.DNI}";
+                dgvHistorialPaciente.DataSource = historial;
+                dgvHistorialPaciente.DataBind();
+                upHistorialPaciente.Update();
+
+                ScriptManager.RegisterStartupScript(
+                    this,
+                    GetType(),
+                    "abrirHistorialPaciente",
+                    "abrirModalHistorialPaciente();",
+                    true
+                );
+            }
+            catch (Exception ex)
+            {
+                Session["error"] = ex.ToString();
+                lblErrorListado.Text = "No se pudo cargar el historial del paciente.";
+                lblErrorListado.Visible = true;
+                upListado.Update();
+            }
+        }
+
         protected void btnConfirmarBajaPaciente_Click(object sender, EventArgs e)
         {
             if (!int.TryParse(hfIdBajaPaciente.Value, out int idPaciente))

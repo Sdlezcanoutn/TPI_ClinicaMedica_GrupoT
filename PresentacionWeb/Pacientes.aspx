@@ -62,6 +62,12 @@
                                     <asp:BoundField DataField="Direccion" HeaderText="Dirección" />
                                     <asp:TemplateField HeaderText="Acciones" ItemStyle-CssClass="text-end" HeaderStyle-CssClass="text-end">
                                         <ItemTemplate>
+                                            <asp:LinkButton ID="btnHistorial" runat="server"
+                                                CssClass="btn btn-sm btn-outline-info me-1"
+                                                CommandArgument='<%# Eval("Id") %>'
+                                                OnClick="btnHistorial_Click">
+                                                <i class="fa-solid fa-clock-rotate-left me-1"></i>Ver historial
+                                            </asp:LinkButton>
                                             <asp:LinkButton ID="btnEditar" runat="server"
                                                 CssClass="btn btn-sm btn-outline-secondary me-1"
                                                 CommandArgument='<%# Eval("Id") %>'
@@ -169,6 +175,57 @@
             </div>
         </div>
     </div>
+    <!-- Modal Historial de Turnos del Paciente -->
+    <div class="modal fade" id="modalHistorialPaciente" tabindex="-1"
+        aria-labelledby="tituloModalHistorialPaciente" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-xl">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <div>
+                        <h5 class="modal-title fw-bold mb-0" id="tituloModalHistorialPaciente">Historial del Paciente</h5>
+                        <small class="text-muted">
+                            <asp:Label ID="lblSubtituloHistorial" runat="server" />
+                        </small>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+
+                <asp:UpdatePanel ID="upHistorialPaciente" runat="server" UpdateMode="Conditional">
+                    <ContentTemplate>
+
+                        <div class="modal-body">
+                            <div class="table-responsive">
+                                <asp:GridView ID="dgvHistorialPaciente" runat="server" AutoGenerateColumns="False"
+                                    CssClass="table table-custom align-middle mb-0" GridLines="None">
+                                    <Columns>
+                                        <asp:BoundField DataField="Fecha" HeaderText="Fecha" />
+                                        <asp:BoundField DataField="Horario" HeaderText="Horario" />
+                                        <asp:BoundField DataField="Especialidad" HeaderText="Especialidad" />
+                                        <asp:BoundField DataField="Medico" HeaderText="Médico" />
+                                        <asp:BoundField DataField="Estado" HeaderText="Estado" />
+                                        <asp:BoundField DataField="Motivo" HeaderText="Motivo" />
+                                        <asp:BoundField DataField="Diagnostico" HeaderText="Diagnóstico" />
+                                    </Columns>
+                                    <EmptyDataTemplate>
+                                        <div class="text-center py-4 text-muted">
+                                            <p class="m-0">Este paciente no tiene turnos registrados.</p>
+                                        </div>
+                                    </EmptyDataTemplate>
+                                </asp:GridView>
+                            </div>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cerrar</button>
+                        </div>
+
+                    </ContentTemplate>
+                </asp:UpdatePanel>
+
+            </div>
+        </div>
+    </div>
 
     <!-- Modal Baja Lógica de Paciente -->
     <div class="modal fade" id="modalBajaPaciente" tabindex="-1"
@@ -266,6 +323,7 @@
         ).show();
     }
 
+
     // Abre el modal en modo edición (los campos ya se cargaron desde el code-behind)
     function prepararEdicionPaciente() {
         document.getElementById("tituloModalPaciente").textContent = "Editar Paciente";
@@ -285,6 +343,12 @@
             modalPaciente.addEventListener("input", ocultarErrorPaciente);
         }
     })();
+
+    function abrirModalHistorialPaciente() {
+       bootstrap.Modal.getOrCreateInstance(
+         document.getElementById("modalHistorialPaciente")
+       ).show();
+    }
     </script>
 
 </asp:Content>
