@@ -148,7 +148,7 @@
                             <div class="row g-3">
                                 <div class="col-md-6">
                                     <label class="form-label">Paciente *</label>
-                                    <asp:DropDownList ID="ddlPaciente" runat="server" CssClass="form-select" />
+                                    <asp:DropDownList ID="ddlPaciente" runat="server" CssClass="form-select" AutoPostBack="True" OnSelectedIndexChanged="ddlPaciente_SelectedIndexChanged" />
                                 </div>
 
                                 <div class="col-md-6">

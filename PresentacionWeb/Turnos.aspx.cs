@@ -50,6 +50,27 @@ namespace PresentacionWeb
             upListadoTurnos.Update();
         }
 
+        // --- Actualizar disponibilidad al cambiar el paciente ---
+        protected void ddlPaciente_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            int idEspecialidad = int.TryParse(
+                ddlEspecialidad.SelectedValue, out int id) ? id : 0;
+
+            CargarHorariosDisponibles();
+            CargarSugerenciasEspecialidad(idEspecialidad);
+
+            lblErrorTurno.Visible = false;
+            upTurno.Update();
+
+            ScriptManager.RegisterStartupScript(
+                this,
+                GetType(),
+                "reabrirTurnoPaciente",
+                "mostrarModalTurno();",
+                true
+            );
+        }
+
         // Al cambiar especialidad en el modal: filtra médicos, actualiza horarios, busca hasta 3 sugerencias y reabre el modal
         protected void ddlEspecialidad_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -445,79 +466,6 @@ namespace PresentacionWeb
             }
         }
 
-        // Convierte DayOfWeek de .NET (Domingo = 0) al formato de la BD (Lunes = 1 ... Domingo = 7)
-        private int ConvertirDiaSemanaDb(DateTime fecha)
-        {
-            return fecha.DayOfWeek == DayOfWeek.Sunday ? 7 : (int)fecha.DayOfWeek;
-        }
-
-        // Calcula franjas libres de duracionMinutos (por defecto 60) para un médico y fecha, evitando turnos ya ocupados
-        private List<(TimeSpan Inicio, TimeSpan Fin)> ObtenerHorariosDisponibles(
-            int idMedico,
-            DateTime fecha,
-            int? idPaciente = null,
-            int duracionMinutos = 60)
-        {
-            var slotsDisponibles = new List<(TimeSpan Inicio, TimeSpan Fin)>();
-
-            if (idMedico <= 0 || fecha.Date < DateTime.Today)
-                return slotsDisponibles;
-
-            int diaBuscado = ConvertirDiaSemanaDb(fecha.Date);
-
-            HorarioTrabajoNegocio horarioNegocio = new HorarioTrabajoNegocio();
-            List<HorarioTrabajo> franjasDia = horarioNegocio.listar()
-                .Where(h => h.Estado &&
-                            h.Medico != null &&
-                            h.Medico.Id == idMedico &&
-                            int.TryParse(h.Dia_Semana, out int diaDb) &&
-                            diaDb == diaBuscado)
-                .OrderBy(h => h.Hora_Entrada.TimeOfDay)
-                .ToList();
-
-            if (franjasDia.Count == 0)
-                return slotsDisponibles;
-
-            TurnoNegocio turnoNegocio = new TurnoNegocio();
-            List<Turno> turnosDia = turnoNegocio.listar()
-                .Where(t => t.Fecha.Date == fecha.Date &&
-                            (t.Estado == null || t.Estado.Nombre != "Cancelado"))
-                .ToList();
-
-            TimeSpan duracion = TimeSpan.FromMinutes(duracionMinutos);
-            TimeSpan horaActual = DateTime.Now.TimeOfDay;
-
-            foreach (var franja in franjasDia)
-            {
-                TimeSpan inicio = franja.Hora_Entrada.TimeOfDay;
-                TimeSpan finJornada = franja.Hora_Salida.TimeOfDay;
-
-                // Avanza de a bloques de duracionMinutos dentro de la jornada laboral
-                while (inicio + duracion <= finJornada)
-                {
-                    TimeSpan finSlot = inicio + duracion;
-
-                    bool yaPasoHoy = fecha.Date == DateTime.Today && inicio <= horaActual;
-
-                    // Verifica si choca con un turno existente del mismo médico o del mismo paciente
-                    bool hayConflicto = turnosDia.Any(t =>
-                        inicio < t.Hora_Fin.TimeOfDay &&
-                        finSlot > t.Hora_Inicio.TimeOfDay &&
-                        (t.Medico.Id == idMedico || (idPaciente.HasValue && idPaciente.Value > 0 && t.Paciente.Id == idPaciente.Value))
-                    );
-
-                    if (!yaPasoHoy && !hayConflicto)
-                    {
-                        slotsDisponibles.Add((inicio, finSlot));
-                    }
-
-                    inicio = finSlot;
-                }
-            }
-
-            return slotsDisponibles;
-        }
-
         // Llena ddlHorarioDisponible con los bloques libres de 60 min para el médico y la fecha elegidos
         private void CargarHorariosDisponibles()
         {
@@ -543,7 +491,10 @@ namespace PresentacionWeb
                 return;
             }
 
-            var disponibles = ObtenerHorariosDisponibles(idMedico, fechaSeleccionada.Date, idPaciente, 60);
+            TurnoNegocio turnoNegocio = new TurnoNegocio();
+
+            var disponibles = turnoNegocio.obtenerHorariosDisponibles(
+                idMedico, fechaSeleccionada.Date, idPaciente);
 
             if (disponibles.Count == 0)
             {
@@ -553,8 +504,8 @@ namespace PresentacionWeb
 
             foreach (var slot in disponibles)
             {
-                string texto = $"{slot.Inicio:hh\\:mm} - {slot.Fin:hh\\:mm}";
-                string valor = $"{slot.Inicio:hh\\:mm}|{slot.Fin:hh\\:mm}";
+                string texto = slot.Etiqueta;
+                string valor = $"{slot.HoraInicio:hh\\:mm}|{slot.HoraFin:hh\\:mm}";
                 ddlHorarioDisponible.Items.Add(new ListItem(texto, valor));
             }
 
@@ -586,6 +537,7 @@ namespace PresentacionWeb
 
             var sugerencias = new List<SugerenciaTurnoItem>();
             CultureInfo culturaAr = new CultureInfo("es-AR");
+            TurnoNegocio turnoNegocio = new TurnoNegocio();
 
             for (int offset = 0; offset < 21 && sugerencias.Count < 3; offset++)
             {
@@ -596,14 +548,14 @@ namespace PresentacionWeb
                     if (sugerencias.Count >= 3)
                         break;
 
-                    var slots = ObtenerHorariosDisponibles(medico.Id, fechaBuscada, idPaciente, 60);
+                    var slots = turnoNegocio.obtenerHorariosDisponibles(medico.Id, fechaBuscada, idPaciente);
                     foreach (var slot in slots)
                     {
                         if (sugerencias.Count >= 3)
                             break;
 
-                        string horarioTxt = $"{slot.Inicio:hh\\:mm} - {slot.Fin:hh\\:mm}";
-                        string horarioVal = $"{slot.Inicio:hh\\:mm}|{slot.Fin:hh\\:mm}";
+                        string horarioTxt = slot.Etiqueta;
+                        string horarioVal = $"{slot.HoraInicio:hh\\:mm}|{slot.HoraFin:hh\\:mm}";
                         string fechaTexto = culturaAr.TextInfo.ToTitleCase(
                             fechaBuscada.ToString("ddd dd/MM", culturaAr));
 
