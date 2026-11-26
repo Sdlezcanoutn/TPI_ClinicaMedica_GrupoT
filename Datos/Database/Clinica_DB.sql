@@ -142,68 +142,7 @@ GO
 -- ============================================================
 -- Datos de catálogo mínimos para probar la lectura desde la aplicación
 INSERT INTO PERFILES (Nombre) VALUES (N'Administrador'), (N'Recepcionista'), (N'Médico');
-INSERT INTO ESTADOS_TURNO (Nombre) VALUES
-  (N'Nuevo'), (N'Reprogramado'), (N'Cancelado'), (N'No asistió'), (N'Cerrado');
-INSERT INTO ESPECIALIDADES (Nombre, Descripcion) VALUES
-  (N'Clínica médica', N'Atención clínica general'),
-  (N'Cardiología', N'Atención cardiovascular'),
-  (N'Dermatología', N'Atención dermatológica');
--- Médico de prueba sin usuario asociado
-IF NOT EXISTS (
-    SELECT 1 FROM MEDICOS WHERE Matricula = 'TEST-001'
-)
-BEGIN
-    INSERT INTO MEDICOS
-        (Id_Usuario, Nombre, Apellido, DNI, Matricula, Telefono, Email)
-    VALUES
-        (NULL, 'Juan', 'Perez', '99999991', 'TEST-001',
-         '1112345678', 'medico.prueba@example.com');
-END;
-GO
-
--- Horario de prueba: lunes de 09:00 a 13:00
-DECLARE @IdMedico INT;
-
-SELECT @IdMedico = Id_Medico
-FROM MEDICOS
-WHERE Matricula = 'TEST-001';
-
-IF @IdMedico IS NOT NULL
-   AND NOT EXISTS (
-       SELECT 1
-       FROM HORARIOS_TRABAJO
-       WHERE Id_Medico = @IdMedico
-         AND Dia_Semana = 1
-         AND Hora_Entrada = '09:00:00'
-         AND Hora_Salida = '13:00:00'
-   )
-BEGIN
-    INSERT INTO HORARIOS_TRABAJO
-        (Id_Medico, Dia_Semana, Hora_Entrada, Hora_Salida)
-    VALUES
-        (@IdMedico, 1, '09:00:00', '13:00:00');
-END;
-GO
--- Consulta sugerida para el checkpoint:
-SELECT Id_Especialidad, Nombre, Descripcion, Estado FROM ESPECIALIDADES ORDER BY Nombre;
-GO
-
-SELECT Id_Medico, Nombre, Apellido, Matricula, Estado
-FROM MEDICOS;
-
-SELECT Id_Horario_Trabajo, Id_Medico, Dia_Semana,
-       Hora_Entrada, Hora_Salida, Estado
-FROM HORARIOS_TRABAJO;
-/* PENDIENTE EN NEGOCIO / IMPLEMENTACIÓN:
- - Validar turnos no vencidos, duración de 1 hora y horarios de atención vigentes.
- - Evitar superposición de turnos del médico y del paciente, con transacción y concurrencia.
- - No asignar turnos a pacientes/médicos inactivos.
- - Controlar que un usuario no quede asociado a la vez a MEDICOS y EMPLEADOS.
- - Controlar perfiles acordes a la persona asociada y validaciones de correo.
- - Reprogramación: registrar valores anteriores en HISTORIAL_TURNOS y resetear EmailEnviado=0.
- - Las tablas se crean una sola vez; no re-ejecutar este script completo sobre la misma BD.
-*/
-
+INSERT INTO ESTADOS_TURNO (Nombre) VALUES (N'Nuevo'), (N'Reprogramado'), (N'Cancelado'), (N'No asistió'), (N'Cerrado');
 -- ============================================================
 -- CARGA INICIAL DE ESPECIALIDADES
 -- ============================================================
@@ -236,3 +175,90 @@ FROM (VALUES
 WHERE NOT EXISTS (
     SELECT 1 FROM ESPECIALIDADES e WHERE e.Nombre = v.Nombre
 );
+-- ============================================================
+-- CARGA INICIAL DE MÉDICOS
+-- ============================================================
+-- Médicos de prueba para validar búsquedas sin usuario asociado
+IF NOT EXISTS (
+    SELECT 1 FROM MEDICOS WHERE Matricula = 'TEST-001'
+)
+BEGIN
+    INSERT INTO MEDICOS
+        (Id_Usuario, Nombre, Apellido, DNI, Matricula, Telefono, Email)
+    VALUES
+        (NULL, 'Juan', 'Perez', '99999991', 'TEST-001',
+         '1112345678', 'medico.prueba@example.com');
+END;
+GO
+IF NOT EXISTS (SELECT 1 FROM MEDICOS WHERE Matricula = 'TEST-002')
+BEGIN
+    INSERT INTO MEDICOS
+        (Id_Usuario, Nombre, Apellido, DNI, Matricula, Telefono, Email)
+    VALUES
+        (NULL, N'Nicolás', N'Muñoz', '99999992',
+         'TEST-002', '1112345679', 'nicolas.test@example.com');
+END;
+IF NOT EXISTS (SELECT 1 FROM MEDICOS WHERE Matricula = 'TEST-003')
+BEGIN
+    INSERT INTO MEDICOS
+        (Id_Usuario, Nombre, Apellido, DNI, Matricula, Telefono, Email)
+    VALUES
+        (NULL, N'María', N'Peña', '99999993',
+         'TEST-003', '1112345680', 'maria.test@example.com');
+END;
+IF NOT EXISTS (SELECT 1 FROM MEDICOS WHERE Matricula = 'TEST-004')
+BEGIN
+    INSERT INTO MEDICOS
+        (Id_Usuario, Nombre, Apellido, DNI, Matricula, Telefono, Email)
+    VALUES
+        (NULL, N'Juan', N'González', '99999994',
+         'TEST-004', '1112345681', 'juan.test@example.com');
+END;
+GO
+-- ============================================================
+-- CARGA INICIAL DE HORARIOS DE TRABAJO
+-- ============================================================
+INSERT INTO HORARIOS_TRABAJO
+    (Id_Medico, Dia_Semana, Hora_Entrada, Hora_Salida)
+SELECT
+    m.Id_Medico,
+    v.Dia_Semana,
+    v.Hora_Entrada,
+    v.Hora_Salida
+FROM (
+    VALUES
+        ('TEST-001', 1, CAST('09:00' AS TIME), CAST('13:00' AS TIME)),
+        ('TEST-002', 1, CAST('14:00' AS TIME), CAST('18:00' AS TIME)),
+        ('TEST-003', 3, CAST('08:00' AS TIME), CAST('12:00' AS TIME)),
+        ('TEST-004', 5, CAST('10:00' AS TIME), CAST('16:00' AS TIME))
+) AS v(Matricula, Dia_Semana, Hora_Entrada, Hora_Salida)
+INNER JOIN MEDICOS m
+    ON m.Matricula = v.Matricula
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM HORARIOS_TRABAJO h
+    WHERE h.Id_Medico = m.Id_Medico
+      AND h.Dia_Semana = v.Dia_Semana
+      AND h.Hora_Entrada = v.Hora_Entrada
+      AND h.Hora_Salida = v.Hora_Salida
+);
+GO
+-- Consulta sugerida para el checkpoint:
+SELECT Id_Especialidad, Nombre, Descripcion, Estado FROM ESPECIALIDADES ORDER BY Nombre;
+GO
+
+SELECT Id_Medico, Nombre, Apellido, Matricula, Estado
+FROM MEDICOS;
+
+SELECT Id_Horario_Trabajo, Id_Medico, Dia_Semana,
+       Hora_Entrada, Hora_Salida, Estado
+FROM HORARIOS_TRABAJO;
+/* PENDIENTE EN NEGOCIO / IMPLEMENTACIÓN:
+ - Validar turnos no vencidos, duración de 1 hora y horarios de atención vigentes.
+ - Evitar superposición de turnos del médico y del paciente, con transacción y concurrencia.
+ - No asignar turnos a pacientes/médicos inactivos.
+ - Controlar que un usuario no quede asociado a la vez a MEDICOS y EMPLEADOS.
+ - Controlar perfiles acordes a la persona asociada y validaciones de correo.
+ - Reprogramación: registrar valores anteriores en HISTORIAL_TURNOS y resetear EmailEnviado=0.
+ - Las tablas se crean una sola vez; no re-ejecutar este script completo sobre la misma BD.
+*/
