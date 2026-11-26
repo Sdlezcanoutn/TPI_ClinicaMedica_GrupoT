@@ -11,14 +11,19 @@ namespace PresentacionWeb
 {
     public partial class Pacientes : System.Web.UI.Page
     {
+        // Carga inicial y sincronización visual del filtro por estado
         protected void Page_Load(object sender, EventArgs e)
         {
             if (!IsPostBack)
             {
                 CargarPacientes();
             }
+
+            // Mantiene el botón activo resaltado en cada postback
+            ActualizarEstiloFiltro();
         }
 
+        // Obtiene los pacientes, aplica filtro por estado y texto de búsqueda, y actualiza la grilla
         private void CargarPacientes(string filtro = "")
         {
             PacienteNegocio negocio = new PacienteNegocio();
@@ -28,8 +33,12 @@ namespace PresentacionWeb
                 lblErrorListado.Visible = false;
                 dgvPacientes.Visible = true;
 
-                List<Paciente> lista = negocio.listar();
+                // Filtra según el botón seleccionado (1 = Activos, 0 = Inactivos)
+                bool mostrarActivos = hfEstado.Value == "1";
+                List<Paciente> todos = negocio.listar();
+                List<Paciente> lista = todos.Where(p => p.Estado == mostrarActivos).ToList();
 
+                // Filtra por DNI o Apellido sin distinguir mayúsculas/minúsculas
                 if (!string.IsNullOrWhiteSpace(filtro))
                 {
                     string texto = filtro.Trim().ToLower();
@@ -41,6 +50,23 @@ namespace PresentacionWeb
 
                 dgvPacientes.DataSource = lista;
                 dgvPacientes.DataBind();
+
+                // Ajusta el mensaje vacío según el filtro o búsqueda
+                if (lista.Count == 0 && dgvPacientes.Controls.Count > 0)
+                {
+                    Label lblSin = dgvPacientes.Controls[0].Controls[0].FindControl("lblSinResultados") as Label;
+                    if (lblSin != null)
+                    {
+                        if (todos.Count == 0)
+                            lblSin.Text = "No hay pacientes registrados en el sistema.";
+                        else if (!string.IsNullOrWhiteSpace(filtro))
+                            lblSin.Text = "No se encontraron pacientes que coincidan con la búsqueda.";
+                        else if (mostrarActivos)
+                            lblSin.Text = "No hay pacientes activos.";
+                        else
+                            lblSin.Text = "No hay pacientes inactivos.";
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -51,12 +77,46 @@ namespace PresentacionWeb
             }
         }
 
+        // Recarga la grilla cuando cambia el texto del buscador
         protected void txtBuscar_TextChanged(object sender, EventArgs e)
         {
             CargarPacientes(txtBuscar.Text);
             upListado.Update();
         }
 
+        // Cambia el filtro a pacientes activos
+        protected void btnActivos_Click(object sender, EventArgs e)
+        {
+            hfEstado.Value = "1";
+            ActualizarEstiloFiltro();
+            CargarPacientes(txtBuscar.Text);
+            upListado.Update();
+        }
+
+        // Cambia el filtro a pacientes inactivos
+        protected void btnInactivos_Click(object sender, EventArgs e)
+        {
+            hfEstado.Value = "0";
+            ActualizarEstiloFiltro();
+            CargarPacientes(txtBuscar.Text);
+            upListado.Update();
+        }
+
+        // Alterna las clases CSS entre los botones Activos e Inactivos
+        private void ActualizarEstiloFiltro()
+        {
+            bool mostrarActivos = hfEstado.Value == "1";
+
+            btnActivos.CssClass = mostrarActivos
+                ? "btn btn-filtro-activo"
+                : "btn btn-outline-secondary";
+
+            btnInactivos.CssClass = mostrarActivos
+                ? "btn btn-outline-secondary"
+                : "btn btn-filtro-activo";
+        }
+
+        // Carga los datos del paciente activo y abre el modal en modo edición
         protected void btnEditar_Click(object sender, EventArgs e)
         {
             LinkButton btn = (LinkButton)sender;
@@ -77,6 +137,7 @@ namespace PresentacionWeb
                     return;
                 }
 
+                // Completa los campos del modal con los datos actuales
                 hfIdPaciente.Value = paciente.Id.ToString();
                 txtNombrePaciente.Text = paciente.Nombre;
                 txtApellidoPaciente.Text = paciente.Apellido;
@@ -107,6 +168,7 @@ namespace PresentacionWeb
             }
         }
 
+        // Valida y guarda un paciente nuevo o modifica uno existente
         protected void btnGuardarPaciente_Click(object sender, EventArgs e)
         {
             string nombre = txtNombrePaciente.Text.Trim();
@@ -117,6 +179,7 @@ namespace PresentacionWeb
             string email = txtEmailPaciente.Text.Trim();
             string direccion = txtDireccionPaciente.Text.Trim();
 
+            // Valida campos obligatorios
             if (string.IsNullOrWhiteSpace(nombre) ||
                 string.IsNullOrWhiteSpace(apellido) ||
                 string.IsNullOrWhiteSpace(dni) ||
@@ -127,12 +190,14 @@ namespace PresentacionWeb
                 return;
             }
 
+            // Valida formato de DNI (7 u 8 dígitos)
             if (dni.Length < 7 || dni.Length > 8 || !dni.All(char.IsDigit))
             {
                 MostrarErrorPaciente("Ingresá un DNI válido de 7 u 8 dígitos numéricos.");
                 return;
             }
 
+            // Valida rango de fecha de nacimiento
             if (!DateTime.TryParse(fechaTexto, out DateTime fechaNacimiento) ||
                 fechaNacimiento.Date > DateTime.Today ||
                 fechaNacimiento.Year < 1900)
@@ -141,6 +206,7 @@ namespace PresentacionWeb
                 return;
             }
 
+            // Valida formato básico de correo electrónico
             if (!Regex.IsMatch(email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
             {
                 MostrarErrorPaciente("Ingresá un correo electrónico válido.");
@@ -152,7 +218,7 @@ namespace PresentacionWeb
                 PacienteNegocio negocio = new PacienteNegocio();
                 bool esEdicion = int.TryParse(hfIdPaciente.Value, out int idActual) && idActual > 0;
 
-                // Valida DNI duplicado en alta o en edición (excluyendo el registro actual)
+                // Excluye el registro actual cuando se está editando
                 if (negocio.existeDni(dni, esEdicion ? (int?)idActual : null))
                 {
                     MostrarErrorPaciente("Ya existe un paciente registrado con ese DNI.");
@@ -181,6 +247,7 @@ namespace PresentacionWeb
                     negocio.agregar(paciente);
                 }
 
+                // Refresca el listado y limpia el estado del formulario
                 CargarPacientes(txtBuscar.Text);
                 upListado.Update();
 
@@ -207,6 +274,7 @@ namespace PresentacionWeb
             }
         }
 
+        // Muestra un mensaje de error dentro del modal de alta/edición
         private void MostrarErrorPaciente(string mensaje)
         {
             lblErrorPaciente.Text = mensaje;
@@ -214,6 +282,7 @@ namespace PresentacionWeb
             upPaciente.Update();
         }
 
+        // Prepara el modal de confirmación para dar de baja lógica a un paciente
         protected void btnEliminar_Click(object sender, EventArgs e)
         {
             LinkButton btn = (LinkButton)sender;
@@ -255,6 +324,7 @@ namespace PresentacionWeb
             }
         }
 
+        // Consulta los turnos del paciente (activo o inactivo) y abre el modal de historial
         protected void btnHistorial_Click(object sender, EventArgs e)
         {
             LinkButton btn = (LinkButton)sender;
@@ -267,14 +337,16 @@ namespace PresentacionWeb
                 PacienteNegocio pacienteNegocio = new PacienteNegocio();
                 Paciente paciente = pacienteNegocio.listar().Find(p => p.Id == idPaciente);
 
-                if (paciente == null || !paciente.Estado)
+                // Permite ver el historial tanto de pacientes activos como inactivos
+                if (paciente == null)
                 {
-                    lblErrorListado.Text = "El paciente no existe o está inactivo.";
+                    lblErrorListado.Text = "No se encontró el paciente seleccionado.";
                     lblErrorListado.Visible = true;
                     upListado.Update();
                     return;
                 }
 
+                // Ordena los turnos del más reciente al más antiguo
                 TurnoNegocio turnoNegocio = new TurnoNegocio();
                 var historial = turnoNegocio.listar()
                     .Where(t => t.Paciente != null && t.Paciente.Id == idPaciente)
@@ -292,7 +364,9 @@ namespace PresentacionWeb
                     })
                     .ToList();
 
-                lblSubtituloHistorial.Text = $"{paciente.Apellido}, {paciente.Nombre} — DNI {paciente.DNI}";
+                // Aclara en el encabezado si el paciente figura inactivo
+                string estadoTexto = paciente.Estado ? "" : " (Inactivo)";
+                lblSubtituloHistorial.Text = $"{paciente.Apellido}, {paciente.Nombre} — DNI {paciente.DNI}{estadoTexto}";
                 dgvHistorialPaciente.DataSource = historial;
                 dgvHistorialPaciente.DataBind();
                 upHistorialPaciente.Update();
@@ -314,6 +388,7 @@ namespace PresentacionWeb
             }
         }
 
+        // Ejecuta la baja lógica del paciente y actualiza el listado
         protected void btnConfirmarBajaPaciente_Click(object sender, EventArgs e)
         {
             if (!int.TryParse(hfIdBajaPaciente.Value, out int idPaciente))

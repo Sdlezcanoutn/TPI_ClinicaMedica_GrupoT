@@ -18,7 +18,7 @@ namespace Negocio
             try
             {
                 datos.setearConsulta(
-                    "SELECT Id_Paciente, Nombre, Apellido, DNI, Fecha_Nacimiento, Telefono, Email, Direccion, Estado FROM PACIENTES WHERE Estado = 1"
+                    "SELECT Id_Paciente, Nombre, Apellido, DNI, Fecha_Nacimiento, Telefono, Email, Direccion, Estado FROM PACIENTES"
                 );
 
                 datos.ejecutarLectura();
@@ -52,20 +52,24 @@ namespace Negocio
                 datos.cerrarConexion();
             }
         }
+
         public void agregar(Paciente nuevo)
         {
             AccesoDatos datos = new AccesoDatos();
             try
             {
-                datos.setearConsulta("INSERT INTO PACIENTES (Nombre, Apellido, DNI, Fecha_Nacimiento, Telefono, Email, Direccion, Estado) VALUES (@Nombre, @Apellido, @DNI, @Fecha_Nacimiento, @Telefono, @Email, @Direccion, 1)");
+                datos.setearConsulta(
+                    "INSERT INTO PACIENTES (Nombre, Apellido, DNI, Fecha_Nacimiento, Telefono, Email, Direccion, Estado) " +
+                    "VALUES (@Nombre, @Apellido, @DNI, @Fecha_Nacimiento, @Telefono, @Email, @Direccion, 1)"
+                );
 
                 datos.setearParametro("@Nombre", nuevo.Nombre);
                 datos.setearParametro("@Apellido", nuevo.Apellido);
                 datos.setearParametro("@DNI", nuevo.DNI);
                 datos.setearParametro("@Fecha_Nacimiento", nuevo.Fecha_Nacimiento);
-                datos.setearParametro("@Telefono", string.IsNullOrEmpty(nuevo.Telefono) ? (object)DBNull.Value : nuevo.Telefono);
+                datos.setearParametro("@Telefono", string.IsNullOrWhiteSpace(nuevo.Telefono) ? (object)DBNull.Value : nuevo.Telefono);
                 datos.setearParametro("@Email", nuevo.Email);
-                datos.setearParametro("@Direccion", string.IsNullOrEmpty(nuevo.Direccion) ? (object)DBNull.Value : nuevo.Direccion);
+                datos.setearParametro("@Direccion", string.IsNullOrWhiteSpace(nuevo.Direccion) ? (object)DBNull.Value : nuevo.Direccion);
 
                 datos.ejecutarAccion();
             }
@@ -78,19 +82,23 @@ namespace Negocio
                 datos.cerrarConexion();
             }
         }
+
         public void modificar(Paciente pac)
         {
             AccesoDatos datos = new AccesoDatos();
             try
             {
-                datos.setearConsulta("UPDATE PACIENTES SET Nombre = @nombre, Apellido = @apellido, DNI = @dni, Fecha_Nacimiento = @fecha, Telefono = @telefono, Email = @email, Direccion = @direccion WHERE Id_Paciente = @id");
+                datos.setearConsulta(
+                    "UPDATE PACIENTES SET Nombre = @nombre, Apellido = @apellido, DNI = @dni, Fecha_Nacimiento = @fecha, " +
+                    "Telefono = @telefono, Email = @email, Direccion = @direccion WHERE Id_Paciente = @id"
+                );
                 datos.setearParametro("@nombre", pac.Nombre);
                 datos.setearParametro("@apellido", pac.Apellido);
                 datos.setearParametro("@dni", pac.DNI);
                 datos.setearParametro("@fecha", pac.Fecha_Nacimiento);
-                datos.setearParametro("@telefono", (object)pac.Telefono ?? DBNull.Value);
+                datos.setearParametro("@telefono", string.IsNullOrWhiteSpace(pac.Telefono) ? (object)DBNull.Value : pac.Telefono);
                 datos.setearParametro("@email", pac.Email);
-                datos.setearParametro("@direccion", (object)pac.Direccion ?? DBNull.Value);
+                datos.setearParametro("@direccion", string.IsNullOrWhiteSpace(pac.Direccion) ? (object)DBNull.Value : pac.Direccion);
                 datos.setearParametro("@id", pac.Id);
 
                 datos.ejecutarAccion();
@@ -104,6 +112,7 @@ namespace Negocio
                 datos.cerrarConexion();
             }
         }
+
         public void eliminarLogico(int id)
         {
             AccesoDatos datos = new AccesoDatos();

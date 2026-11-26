@@ -39,6 +39,23 @@
                     </div>
                 </div>
 
+                <!-- Filtro por estado de pacientes -->
+                <div class="d-flex gap-2 mb-4">
+                    <asp:LinkButton ID="btnActivos" runat="server"
+                        CssClass="btn btn-filtro-activo"
+                        OnClick="btnActivos_Click">
+                        Activos
+                    </asp:LinkButton>
+
+                    <asp:LinkButton ID="btnInactivos" runat="server"
+                        CssClass="btn btn-outline-secondary"
+                        OnClick="btnInactivos_Click">
+                        Inactivos
+                    </asp:LinkButton>
+
+                    <asp:HiddenField ID="hfEstado" runat="server" Value="1" />
+                </div>
+
                 <!-- Listado y alertas -->
                 <asp:UpdatePanel ID="upListado" runat="server" UpdateMode="Conditional">
                     <ContentTemplate>
@@ -68,18 +85,21 @@
                                                 OnClick="btnHistorial_Click">
                                                 <i class="fa-solid fa-clock-rotate-left me-1"></i>Ver historial
                                             </asp:LinkButton>
+
                                             <asp:LinkButton ID="btnEditar" runat="server"
                                                 CssClass="btn btn-sm btn-outline-secondary me-1"
                                                 CommandArgument='<%# Eval("Id") %>'
-                                                OnClick="btnEditar_Click">
+                                                OnClick="btnEditar_Click"
+                                                Visible='<%# Convert.ToBoolean(Eval("Estado")) %>'>
                                                 <i class="fa-solid fa-pen-to-square me-1"></i>Editar
                                             </asp:LinkButton>
 
                                             <asp:LinkButton ID="btnEliminar" runat="server"
                                                 CssClass="btn btn-sm btn-outline-danger"
                                                 CommandArgument='<%# Eval("Id") %>'
-                                                OnClick="btnEliminar_Click">
-                                                <i class="fa-solid fa-user-xmark me-1"></i>Desactivar
+                                                OnClick="btnEliminar_Click"
+                                                Visible='<%# Convert.ToBoolean(Eval("Estado")) %>'>
+                                               <i class="fa-solid fa-user-xmark me-1"></i>Desactivar
                                             </asp:LinkButton>
                                         </ItemTemplate>
                                     </asp:TemplateField>
@@ -87,7 +107,10 @@
                                 <EmptyDataTemplate>
                                     <div class="text-center py-5 text-muted">
                                         <i class="fa-solid fa-user-slash fs-2 mb-2 d-block text-secondary opacity-50"></i>
-                                        <p class="m-0 fw-medium">No hay pacientes registrados en el sistema.</p>
+                                        <p class="m-0 fw-medium">
+                                            <asp:Label ID="lblSinResultados" runat="server"
+                                                Text="No hay pacientes registrados en el sistema." />
+                                        </p>
                                     </div>
                                 </EmptyDataTemplate>
                             </asp:GridView>
@@ -175,24 +198,25 @@
             </div>
         </div>
     </div>
+
     <!-- Modal Historial de Turnos del Paciente -->
     <div class="modal fade" id="modalHistorialPaciente" tabindex="-1"
         aria-labelledby="tituloModalHistorialPaciente" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-xl">
             <div class="modal-content">
 
-                <div class="modal-header">
-                    <div>
-                        <h5 class="modal-title fw-bold mb-0" id="tituloModalHistorialPaciente">Historial del Paciente</h5>
-                        <small class="text-muted">
-                            <asp:Label ID="lblSubtituloHistorial" runat="server" />
-                        </small>
-                    </div>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-                </div>
-
                 <asp:UpdatePanel ID="upHistorialPaciente" runat="server" UpdateMode="Conditional">
                     <ContentTemplate>
+
+                        <div class="modal-header">
+                            <div>
+                                <h5 class="modal-title fw-bold mb-0" id="tituloModalHistorialPaciente">Historial del Paciente</h5>
+                                <small class="text-muted">
+                                    <asp:Label ID="lblSubtituloHistorial" runat="server" />
+                                </small>
+                            </div>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                        </div>
 
                         <div class="modal-body">
                             <div class="table-responsive">

@@ -33,6 +33,33 @@ namespace PresentacionWeb
         protected global::System.Web.UI.WebControls.TextBox txtBuscar;
 
         /// <summary>
+        /// Control btnActivos.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.LinkButton btnActivos;
+
+        /// <summary>
+        /// Control btnInactivos.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.LinkButton btnInactivos;
+
+        /// <summary>
+        /// Control hfEstado.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.HiddenField hfEstado;
+
+        /// <summary>
         /// Control upListado.
         /// </summary>
         /// <remarks>
@@ -159,15 +186,6 @@ namespace PresentacionWeb
         protected global::System.Web.UI.WebControls.Button btnGuardarPaciente;
 
         /// <summary>
-        /// Control lblSubtituloHistorial.
-        /// </summary>
-        /// <remarks>
-        /// Campo generado automáticamente.
-        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblSubtituloHistorial;
-
-        /// <summary>
         /// Control upHistorialPaciente.
         /// </summary>
         /// <remarks>
@@ -175,6 +193,15 @@ namespace PresentacionWeb
         /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
         /// </remarks>
         protected global::System.Web.UI.UpdatePanel upHistorialPaciente;
+
+        /// <summary>
+        /// Control lblSubtituloHistorial.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblSubtituloHistorial;
 
         /// <summary>
         /// Control dgvHistorialPaciente.
