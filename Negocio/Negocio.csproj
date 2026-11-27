@@ -41,11 +41,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="EmailService.cs" />
     <Compile Include="EmpleadoNegocio.cs" />
     <Compile Include="EspecialidadNegocio.cs" />
     <Compile Include="Helpers\PasswordHelper.cs" />
     <Compile Include="HorarioTrabajoNegocio.cs" />
     <Compile Include="MedicoNegocio.cs" />
+    <Compile Include="NotificacionTurno.cs" />
     <Compile Include="PacienteNegocio.cs" />
     <Compile Include="PerfilNegocio.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -4,10 +4,8 @@
 
     <!-- CONTENEDOR -->
     <div class="container-fluid px-4 px-lg-5 my-5">
-        <div style="max-width: 1500px; margin: 0 auto;">
-
-            <!-- TARJETA PANEL PRINCIPAL DASHBOARD -->
-            <div class="card border-0 dashboard-panel p-4 p-md-5">
+        <div class="contenedor-modulo">
+            <div class="card border-0 shadow-sm rounded-4 bg-white p-4 p-md-5">
 
                 <!-- Encabezado integrado dentro del panel -->
                 <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 pb-3 border-bottom">
@@ -112,7 +110,7 @@
                                                 <div class="d-flex flex-wrap justify-content-end gap-2">
 
                                                     <asp:LinkButton ID="btnEditar" runat="server"
-                                                        CssClass="btn btn-sm btn-outline-warning text-nowrap"
+                                                        CssClass="btn btn-sm btn-outline-amber text-nowrap"
                                                         CommandArgument='<%# Eval("Id") %>'
                                                         Visible='<%# PuedeGestionarTurnos && (Eval("Estado").ToString() == "Nuevo" || Eval("Estado").ToString() == "Reprogramado") %>'
                                                         OnClick="btnEditar_Click">
@@ -179,7 +177,9 @@
                                 <EmptyDataTemplate>
                                     <div class="text-center py-5 text-muted">
                                         <i class="fa-solid fa-calendar-minus fs-2 mb-2 d-block text-secondary opacity-50"></i>
-                                        <p class="m-0 fw-medium">No hay turnos agendados por el momento.</p>
+                                        <p class="m-0 fw-medium">
+                                            <asp:Label ID="lblSinResultados" runat="server" />
+                                        </p>
                                     </div>
                                 </EmptyDataTemplate>
                             </asp:GridView>
@@ -209,7 +209,7 @@
             <div class="modal-content">
 
                 <div class="modal-header">
-                    <h5 class="modal-title fw-bold" id="tituloModalHistorial">Historial del turno
+                    <h5 class="modal-title" id="tituloModalHistorial">Historial del turno
                     </h5>
 
                     <button type="button" class="btn-close"
@@ -318,7 +318,7 @@
                     <ContentTemplate>
 
                         <div class="modal-header">
-                            <h5 class="modal-title fw-bold" id="tituloModalEstado">
+                            <h5 class="modal-title" id="tituloModalEstado">
                                 <asp:Label ID="lblTituloEstado" runat="server" />
                             </h5>
 
@@ -382,7 +382,7 @@
                     <ContentTemplate>
 
                         <div class="modal-header">
-                            <h5 class="modal-title fw-bold" id="tituloModalAtender">
+                            <h5 class="modal-title" id="tituloModalAtender">
                                 <asp:Label ID="lblTituloAtencion" runat="server"
                                     Text="Atención del paciente" />
                             </h5>
@@ -394,7 +394,7 @@
 
                         <asp:HiddenField ID="hfIdAtenderTurno" runat="server" />
 
-                        <div class="modal-body">
+                        <div class="modal-body formulario-modulo">
 
                             <asp:Label ID="lblErrorAtenderTurno" runat="server"
                                 CssClass="text-danger small d-block mb-3"
@@ -481,7 +481,7 @@
             <div class="modal-content">
 
                 <div class="modal-header">
-                    <h5 class="modal-title fw-bold" id="tituloModalTurno">Nuevo Turno</h5>
+                    <h5 class="modal-title" id="tituloModalTurno">Nuevo Turno</h5>
                     <button type="button" class="btn-close" onclick="cerrarModalTurno();" aria-label="Cerrar"></button>
                 </div>
 
@@ -490,7 +490,7 @@
 
                         <asp:HiddenField ID="hfIdTurno" runat="server" Value="0" />
 
-                        <div class="modal-body">
+                        <div class="modal-body formulario-modulo">
 
                             <asp:Label ID="lblErrorTurno" runat="server"
                                 CssClass="text-danger small d-block mb-3"
@@ -579,7 +579,7 @@
                         </div>
 
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-outline-secondary" onclick="cerrarModalTurno();">Cancelar</button>
+                            <button type="button" class="btn btn-secondary" onclick="cerrarModalTurno();">Cancelar</button>
                             <asp:Button ID="btnGuardarTurno" runat="server"
                                 Text="Guardar Turno"
                                 CssClass="btn btn-clinica-primary"
@@ -613,7 +613,7 @@
             __doPostBack('<%= btnBuscar.UniqueID %>', '');
         }
 
-        // Muestra el cartel verde de confirmación en el listado y lo oculta a los 4 segundos
+        // --- Mostrar alerta de confirmación ---
         function mostrarAlertaTurno(texto) {
             const alerta = document.getElementById("mensajeExitoTurno");
             if (!alerta) return;
@@ -621,14 +621,18 @@
             alerta.textContent = texto;
             alerta.classList.remove("d-none");
 
-            // --- Desplazar la página hacia arriba ---
-            setTimeout(function () {
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            }, 500);
+            // --- Desplazar la página hacia la alerta ---
+            setTimeout(function() {
+                alerta.scrollIntoView({
+                    behavior: "smooth",
+                    block: "center"
+                });
+            }, 350);
 
-            setTimeout(function () {
+            // --- Ocultar alerta después de 8 segundos ---
+            setTimeout(function() {
                 alerta.classList.add("d-none");
-            }, 4000);
+            }, 8000);
         }
 
         // --- Cerrar modal de turno ---
@@ -664,21 +668,25 @@
             mostrarAlertaTurno(texto);
         }
 
-        // Limpia y oculta errores previos del modal
+        // --- Ocultar errores del formulario de turnos ---
         function ocultarErrorTurno() {
             const lbl = document.getElementById("<%= lblErrorTurno.ClientID %>");
+
             if (lbl) {
                 lbl.textContent = "";
-                lbl.style.display = "none";
+                lbl.classList.remove("d-block");
+                lbl.classList.add("d-none");
             }
         }
 
         // --- Ocultar errores del modal de atención ---
         function ocultarErrorAtencion() {
             const lbl = document.getElementById("<%= lblErrorAtenderTurno.ClientID %>");
+
             if (lbl) {
                 lbl.textContent = "";
-                lbl.style.display = "none";
+                lbl.classList.remove("d-block");
+                lbl.classList.add("d-none");
             }
         }
 
@@ -769,7 +777,48 @@
             actualizarEstiloPlaceholderSelects();
 
             if (window.Sys && Sys.WebForms && Sys.WebForms.PageRequestManager) {
-                Sys.WebForms.PageRequestManager.getInstance().add_endRequest(function () {
+                const gestorPeticiones = Sys.WebForms.PageRequestManager.getInstance();
+                let botonGuardado = null;
+                let textoOriginal = "";
+
+                // --- Indicar procesamiento del turno ---
+                gestorPeticiones.add_beginRequest(function(sender, args) {
+                    const boton = args.get_postBackElement();
+
+                    if (!boton) return;
+
+                    if (boton.id === "<%= btnGuardarTurno.ClientID %>") {
+                        botonGuardado = boton;
+                        textoOriginal = boton.value;
+
+                        const idTurno = document.getElementById("<%= hfIdTurno.ClientID %>").value;
+
+                        boton.value = idTurno === "0"
+                            ? "Guardando turno..."
+                            : "Reprogramando turno...";
+
+                        boton.disabled = true;
+                    }
+                    else if (boton.id === "<%= btnConfirmarEstado.ClientID %>") {
+                        botonGuardado = boton;
+                        textoOriginal = boton.value;
+
+                        boton.value = textoOriginal.toLowerCase().includes("cancelación")
+                            ? "Cancelando turno..."
+                            : "Registrando inasistencia...";
+
+                        boton.disabled = true;
+                    }
+                });
+
+                // --- Restablecer controles al finalizar ---
+                gestorPeticiones.add_endRequest(function() {
+                    if (botonGuardado) {
+                        botonGuardado.value = textoOriginal;
+                        botonGuardado.disabled = false;
+                        botonGuardado = null;
+                    }
+
                     engancharEventosCamposTurno();
                     actualizarEstiloPlaceholderSelects();
                 });
