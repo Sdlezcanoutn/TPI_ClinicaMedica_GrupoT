@@ -620,7 +620,7 @@ namespace PresentacionWeb
                         "El turno quedará registrado como No asistió.";
 
                     btnConfirmarEstado.Text = "Confirmar inasistencia";
-                    btnConfirmarEstado.CssClass = "btn btn-warning";
+                    btnConfirmarEstado.CssClass = "btn btn-secondary";
                 }
 
                 lblErrorListadoTurno.Visible = false;
@@ -743,9 +743,35 @@ namespace PresentacionWeb
             int idMedico = int.TryParse(ddlMedico.SelectedValue, out int mId) ? mId : 0;
             string motivo = txtMotivoConsulta.Text.Trim();
 
-            if (idPaciente <= 0 || idEspecialidad <= 0 || idMedico <= 0)
+            // --- Validar campos obligatorios ---
+            List<string> camposFaltantes = new List<string>();
+
+            if (idPaciente <= 0)
+                camposFaltantes.Add("paciente");
+
+            if (idEspecialidad <= 0)
+                camposFaltantes.Add("especialidad");
+
+            if (idMedico <= 0)
+                camposFaltantes.Add("médico");
+
+            if (string.IsNullOrWhiteSpace(txtFechaTurno.Text))
+                camposFaltantes.Add("fecha");
+
+            if (string.IsNullOrWhiteSpace(ddlHorarioDisponible.SelectedValue) ||
+                ddlHorarioDisponible.SelectedValue == "0")
+                camposFaltantes.Add("horario");
+
+            if (string.IsNullOrWhiteSpace(motivo))
+                camposFaltantes.Add("motivo de consulta");
+
+            if (camposFaltantes.Count > 0)
             {
-                MostrarErrorTurno("Seleccioná paciente, especialidad y médico.");
+                string mensaje = camposFaltantes.Count == 1
+                    ? "Completá el siguiente campo: "
+                    : "Completá los siguientes campos: ";
+
+                MostrarErrorTurno(mensaje + string.Join(", ", camposFaltantes) + ".");
                 return;
             }
 
@@ -931,7 +957,9 @@ namespace PresentacionWeb
                 lblErrorListadoTurno.Visible = false;
                 dgvTurnos.Visible = true;
 
-                List<Turno> lista = negocio.listar();
+                // --- Obtener todos los turnos registrados ---
+                List<Turno> todos = negocio.listar();
+                List<Turno> lista = todos;
 
                 // --- Filtrar por texto ---
                 if (!string.IsNullOrWhiteSpace(filtro))
@@ -995,8 +1023,46 @@ namespace PresentacionWeb
                     Estado = t.Estado != null ? t.Estado.Nombre : "Nuevo"
                 }).ToList();
 
+                // --- Mostrar resultados en la tabla ---
                 dgvTurnos.DataSource = filas;
                 dgvTurnos.DataBind();
+
+                // --- Mostrar mensaje según el resultado ---
+                if (lista.Count == 0)
+                {
+                    Label lblSinResultados = dgvTurnos.Controls[0]
+                        .Controls[0].FindControl("lblSinResultados") as Label;
+
+                    if (lblSinResultados != null)
+                    {
+                        bool hayBusqueda = !string.IsNullOrWhiteSpace(filtro);
+
+                        bool hayFiltros = idEspecialidad > 0 ||
+                                          idMedico > 0 ||
+                                          fechaFiltro.HasValue;
+
+                        if (todos.Count == 0)
+                        {
+                            lblSinResultados.Text =
+                                "No hay turnos registrados en el sistema.";
+                        }
+                        else if (hayBusqueda && hayFiltros)
+                        {
+                            lblSinResultados.Text =
+                                "No se encontraron turnos que coincidan con la búsqueda y los filtros seleccionados.";
+                        }
+                        else if (hayBusqueda)
+                        {
+                            lblSinResultados.Text =
+                                "No se encontraron turnos que coincidan con la búsqueda.";
+                        }
+                        else if (hayFiltros)
+                        {
+                            lblSinResultados.Text =
+                                "No se encontraron turnos que coincidan con los filtros seleccionados.";
+                        }
+                    }
+                }
             }
             catch (Exception ex)
             {

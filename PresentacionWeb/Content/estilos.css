@@ -394,6 +394,18 @@ form > div, main, .body-content {
 
 
 /* Componentes reutilizables */
+/* --- Contenedor principal de los módulos --- */
+.contenedor-modulo {
+    max-width: 1500px;
+    margin: 0 auto;
+}
+
+/* --- Ancho de los campos de formularios --- */
+.formulario-modulo .form-control,
+.formulario-modulo .form-select {
+    max-width: 100%;
+}
+
 /* Botón principal azul institucional */
 .btn-clinica-primary {
     background-color: #18628a !important;
@@ -424,6 +436,20 @@ form > div, main, .body-content {
         border-color: #6f42c1;
     }
 
+/* --- Botón de reprogramación --- */
+.btn.btn-outline-amber {
+    color: #997404;
+    border-color: #997404;
+    background-color: transparent;
+}
+
+    .btn.btn-outline-amber:hover,
+    .btn.btn-outline-amber:focus-visible {
+        color: #ffffff;
+        background-color: #997404;
+        border-color: #997404;
+    }
+
 /* Botón seleccionado de los filtros por estado */
 .btn-filtro-activo {
     background-color: #18628a !important;
@@ -442,6 +468,11 @@ form > div, main, .body-content {
     color: #9aa0a6;
 }
 
+/* --- Buscadores dinámicos --- */
+.boton-busqueda-oculto {
+    display: none;
+}
+
 .search-box .input-group-text {
     background-color: #ffffff;
     border-right: none;
@@ -450,6 +481,8 @@ form > div, main, .body-content {
 
 .search-box .form-control {
     border-left: none;
+    border-top-right-radius: 0.375rem !important;
+    border-bottom-right-radius: 0.375rem !important;
 }
 
     .search-box .form-control:focus {
@@ -475,35 +508,23 @@ form > div, main, .body-content {
         background-color: #f1f3f5;
     }
 
-/* Color normal cuando tienen valor */
+/* --- Color normal de los campos --- */
 .form-select,
-.form-control,
-.form-control::-webkit-datetime-edit,
-.form-control::-webkit-datetime-edit-fields-wrapper,
-.form-control::-webkit-datetime-edit-text,
-.form-control::-webkit-datetime-edit-hour-field,
-.form-control::-webkit-datetime-edit-minute-field,
-.form-control::-webkit-datetime-edit-ampm-field {
+.form-control {
     color: #212529;
 }
 
-    /* Texto inicial del combo cerrado en gris clarito solo cuando está sin seleccionar */
+    /* --- Texto inicial de los desplegables --- */
     .form-select.placeholder-select {
         color: #9aa0a6 !important;
     }
 
-    /* Cuando se despliega la lista, mantener texto legible */
+    /* --- Opciones de los desplegables --- */
     .form-select option {
         color: #212529;
     }
 
-    /* Texto vacío en inputs de hora/fecha en gris clarito solo cuando están vacíos */
-    .form-control.placeholder-time,
-    .form-control.placeholder-time::-webkit-datetime-edit,
-    .form-control.placeholder-time::-webkit-datetime-edit-fields-wrapper,
-    .form-control.placeholder-time::-webkit-datetime-edit-text,
-    .form-control.placeholder-time::-webkit-datetime-edit-hour-field,
-    .form-control.placeholder-time::-webkit-datetime-edit-minute-field,
-    .form-control.placeholder-time::-webkit-datetime-edit-ampm-field {
+    /* --- Campos de fecha y hora vacíos --- */
+    .form-control.placeholder-time {
         color: #9aa0a6 !important;
     }

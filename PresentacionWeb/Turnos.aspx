@@ -4,10 +4,8 @@
 
     <!-- CONTENEDOR -->
     <div class="container-fluid px-4 px-lg-5 my-5">
-        <div style="max-width: 1500px; margin: 0 auto;">
-
-            <!-- TARJETA PANEL PRINCIPAL DASHBOARD -->
-            <div class="card border-0 dashboard-panel p-4 p-md-5">
+        <div class="contenedor-modulo">
+            <div class="card border-0 shadow-sm rounded-4 bg-white p-4 p-md-5">
 
                 <!-- Encabezado integrado dentro del panel -->
                 <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 pb-3 border-bottom">
@@ -112,7 +110,7 @@
                                                 <div class="d-flex flex-wrap justify-content-end gap-2">
 
                                                     <asp:LinkButton ID="btnEditar" runat="server"
-                                                        CssClass="btn btn-sm btn-outline-warning text-nowrap"
+                                                        CssClass="btn btn-sm btn-outline-amber text-nowrap"
                                                         CommandArgument='<%# Eval("Id") %>'
                                                         Visible='<%# Eval("Estado").ToString() == "Nuevo" || Eval("Estado").ToString() == "Reprogramado" %>'
                                                         OnClick="btnEditar_Click">
@@ -177,7 +175,9 @@
                                 <EmptyDataTemplate>
                                     <div class="text-center py-5 text-muted">
                                         <i class="fa-solid fa-calendar-minus fs-2 mb-2 d-block text-secondary opacity-50"></i>
-                                        <p class="m-0 fw-medium">No hay turnos agendados por el momento.</p>
+                                        <p class="m-0 fw-medium">
+                                            <asp:Label ID="lblSinResultados" runat="server" />
+                                        </p>
                                     </div>
                                 </EmptyDataTemplate>
                             </asp:GridView>
@@ -207,7 +207,7 @@
             <div class="modal-content">
 
                 <div class="modal-header">
-                    <h5 class="modal-title fw-bold" id="tituloModalHistorial">Historial del turno
+                    <h5 class="modal-title" id="tituloModalHistorial">Historial del turno
                     </h5>
 
                     <button type="button" class="btn-close"
@@ -316,7 +316,7 @@
                     <ContentTemplate>
 
                         <div class="modal-header">
-                            <h5 class="modal-title fw-bold" id="tituloModalEstado">
+                            <h5 class="modal-title" id="tituloModalEstado">
                                 <asp:Label ID="lblTituloEstado" runat="server" />
                             </h5>
 
@@ -380,7 +380,7 @@
                     <ContentTemplate>
 
                         <div class="modal-header">
-                            <h5 class="modal-title fw-bold" id="tituloModalAtender">
+                            <h5 class="modal-title" id="tituloModalAtender">
                                 <asp:Label ID="lblTituloAtencion" runat="server"
                                     Text="Atención del paciente" />
                             </h5>
@@ -392,7 +392,7 @@
 
                         <asp:HiddenField ID="hfIdAtenderTurno" runat="server" />
 
-                        <div class="modal-body">
+                        <div class="modal-body formulario-modulo">
 
                             <asp:Label ID="lblErrorAtenderTurno" runat="server"
                                 CssClass="text-danger small d-block mb-3"
@@ -479,7 +479,7 @@
             <div class="modal-content">
 
                 <div class="modal-header">
-                    <h5 class="modal-title fw-bold" id="tituloModalTurno">Nuevo Turno</h5>
+                    <h5 class="modal-title" id="tituloModalTurno">Nuevo Turno</h5>
                     <button type="button" class="btn-close" onclick="cerrarModalTurno();" aria-label="Cerrar"></button>
                 </div>
 
@@ -488,7 +488,7 @@
 
                         <asp:HiddenField ID="hfIdTurno" runat="server" Value="0" />
 
-                        <div class="modal-body">
+                        <div class="modal-body formulario-modulo">
 
                             <asp:Label ID="lblErrorTurno" runat="server"
                                 CssClass="text-danger small d-block mb-3"
@@ -577,7 +577,7 @@
                         </div>
 
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-outline-secondary" onclick="cerrarModalTurno();">Cancelar</button>
+                            <button type="button" class="btn btn-secondary" onclick="cerrarModalTurno();">Cancelar</button>
                             <asp:Button ID="btnGuardarTurno" runat="server"
                                 Text="Guardar Turno"
                                 CssClass="btn btn-clinica-primary"
@@ -662,21 +662,25 @@
             mostrarAlertaTurno(texto);
         }
 
-        // Limpia y oculta errores previos del modal
+        // --- Ocultar errores del formulario de turnos ---
         function ocultarErrorTurno() {
             const lbl = document.getElementById("<%= lblErrorTurno.ClientID %>");
+
             if (lbl) {
                 lbl.textContent = "";
-                lbl.style.display = "none";
+                lbl.classList.remove("d-block");
+                lbl.classList.add("d-none");
             }
         }
 
         // --- Ocultar errores del modal de atención ---
         function ocultarErrorAtencion() {
             const lbl = document.getElementById("<%= lblErrorAtenderTurno.ClientID %>");
+
             if (lbl) {
                 lbl.textContent = "";
-                lbl.style.display = "none";
+                lbl.classList.remove("d-block");
+                lbl.classList.add("d-none");
             }
         }
 

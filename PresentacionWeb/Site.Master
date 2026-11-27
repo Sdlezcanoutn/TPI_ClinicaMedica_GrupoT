@@ -16,14 +16,14 @@
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
 
     <!-- CSS de ASP.NET / Bundles -->
     <webopt:BundleReference runat="server" Path="~/Content/css" />
 
     <!-- CSS PERSONALIZADO -->
-    <link href="/Content/estilos.css?v=1.21" rel="stylesheet" type="text/css" />
+    <link href="/Content/estilos.css?v=1.31" rel="stylesheet" type="text/css" />
 
     <webopt:BundleReference runat="server" Path="~/Content/css" />
     <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon" />

@@ -91,8 +91,8 @@ namespace PresentacionWeb
 
                 // --- Mantener el texto del botón según la operación ---
                 btnGuardar.Text = string.IsNullOrEmpty(hfIdEspecialidad.Value)
-                    ? "Guardar"
-                    : "Guardar cambios";
+                    ? "Guardar Especialidad"
+                    : "Guardar  Cambios";
             }
             catch (Exception)
             {
@@ -104,8 +104,8 @@ namespace PresentacionWeb
 
                 // --- Mantener el texto del botón según la operación ---
                 btnGuardar.Text = string.IsNullOrEmpty(hfIdEspecialidad.Value)
-                    ? "Guardar"
-                    : "Guardar cambios";
+                    ? "Guardar Especialidad"
+                    : "Guardar Cambios";
             }
         }
 

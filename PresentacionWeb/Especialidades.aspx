@@ -6,9 +6,7 @@
 
     <!-- CONTENEDOR -->
     <div class="container-fluid px-4 px-lg-5 my-5">
-        <div class="contenedor-especialidades">
-
-            <!-- TARJETA PANEL PRINCIPAL DASHBOARD -->
+        <div class="contenedor-modulo">
             <div class="card border-0 shadow-sm rounded-4 bg-white p-4 p-md-5">
 
                 <!-- Encabezado integrado dentro del panel -->
@@ -209,18 +207,21 @@
 
                                     <asp:HiddenField ID="hfIdEspecialidad" runat="server" />
 
-                                    <div class="modal-body">
+                                   <div class="modal-body formulario-modulo">
+
+                                        <asp:Label ID="lblMensaje" runat="server"
+                                            CssClass="text-danger small d-block mb-3"
+                                            Visible="false" />
 
                                         <div class="mb-3">
-                                            <label class="form-label">Nombre</label>
+                                            <label class="form-label">Nombre *</label>
                                             <asp:TextBox ID="txtNombre" runat="server"
                                                 CssClass="form-control"
                                                 MaxLength="100"
                                                 oninput="actualizarContadores()" />
 
-                                            <div class="text-muted small mt-1" style="max-width: 280px; text-align: right;">
+                                            <div class="text-muted small mt-1 text-end">
                                                 <span id="contadorNombre">0</span> / 100
-                                           
                                             </div>
                                         </div>
 
@@ -233,14 +234,11 @@
                                                 MaxLength="500"
                                                 oninput="actualizarContadores()" />
 
-                                            <div class="text-muted small mt-1" style="max-width: 280px; text-align: right;">
+                                            <div class="text-muted small mt-1 text-end">
                                                 <span id="contadorDescripcion">0</span> / 500
                                             </div>
                                         </div>
 
-                                        <asp:Label ID="lblMensaje" runat="server"
-                                            CssClass="text-danger small"
-                                            Visible="false" />
                                     </div>
 
                                     <div class="modal-footer">
@@ -250,7 +248,7 @@
                                         </button>
 
                                         <asp:Button ID="btnGuardar" runat="server"
-                                            Text="Guardar"
+                                            Text="Guardar Especialidad"
                                             CssClass="btn btn-clinica-primary"
                                             OnClick="btnGuardar_Click" />
                                     </div>
@@ -375,7 +373,7 @@
         actualizarContadores();
 
         document.getElementById('tituloModalEspecialidad').textContent = 'Nueva Especialidad';
-        document.getElementById('<%= btnGuardar.ClientID %>').value = 'Guardar';
+        document.getElementById('<%= btnGuardar.ClientID %>').value = 'Guardar Especialidad';
 
         ocultarError();
 
@@ -387,7 +385,7 @@
     function prepararEdicionEspecialidad() {
         document.getElementById('tituloModalEspecialidad').textContent = 'Editar Especialidad';
 
-        document.getElementById('<%= btnGuardar.ClientID %>').value = 'Guardar cambios';
+        document.getElementById('<%= btnGuardar.ClientID %>').value = 'Guardar Cambios';
 
         actualizarContadores();
 
@@ -400,7 +398,8 @@
 
         if (mensaje) {
             mensaje.textContent = '';
-            mensaje.style.display = 'none';
+            mensaje.classList.remove('d-block');
+            mensaje.classList.add('d-none');
         }
     }
 
