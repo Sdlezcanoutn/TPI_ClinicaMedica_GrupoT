@@ -106,58 +106,68 @@
                                     <asp:TemplateField HeaderText="Acciones" ItemStyle-CssClass="text-end" HeaderStyle-CssClass="text-end">
                                         <ItemTemplate>
 
-                                            <div class="d-flex flex-wrap justify-content-end gap-2">
+                                            <div class="d-flex flex-column align-items-end gap-2">
 
-                                                <asp:LinkButton ID="btnEditar" runat="server"
-                                                    CssClass="btn btn-sm btn-outline-secondary text-nowrap"
-                                                    CommandArgument='<%# Eval("Id") %>'
-                                                    Visible='<%# Eval("Estado").ToString() == "Nuevo" || Eval("Estado").ToString() == "Reprogramado" %>'
-                                                    OnClick="btnEditar_Click">
+                                                <!-- Acciones de gestión y consulta -->
+                                                <div class="d-flex flex-wrap justify-content-end gap-2">
+
+                                                    <asp:LinkButton ID="btnEditar" runat="server"
+                                                        CssClass="btn btn-sm btn-outline-warning text-nowrap"
+                                                        CommandArgument='<%# Eval("Id") %>'
+                                                        Visible='<%# Eval("Estado").ToString() == "Nuevo" || Eval("Estado").ToString() == "Reprogramado" %>'
+                                                        OnClick="btnEditar_Click">
                                                     <i class="fa-solid fa-calendar-days me-1"></i> Reprogramar
                                                 </asp:LinkButton>
 
-                                                <asp:LinkButton ID="btnCancelar" runat="server"
-                                                    CssClass="btn btn-sm btn-outline-danger text-nowrap"
-                                                    CommandArgument='<%# Eval("Id") %>'
-                                                    Visible='<%# Eval("Estado").ToString() == "Nuevo" || Eval("Estado").ToString() == "Reprogramado" %>'
-                                                    OnClick="btnCancelar_Click">
+                                                    <asp:LinkButton ID="btnCancelar" runat="server"
+                                                        CssClass="btn btn-sm btn-outline-danger text-nowrap"
+                                                        CommandArgument='<%# Eval("Id") %>'
+                                                        Visible='<%# Eval("Estado").ToString() == "Nuevo" || Eval("Estado").ToString() == "Reprogramado" %>'
+                                                        OnClick="btnCancelar_Click">
                                                     <i class="fa-solid fa-calendar-xmark me-1"></i> Cancelar
                                                 </asp:LinkButton>
 
-                                                <asp:LinkButton ID="btnAtender" runat="server"
-                                                    CssClass="btn btn-sm btn-outline-success text-nowrap"
-                                                    CommandArgument='<%# Eval("Id") %>'
-                                                    Visible='<%# Eval("Estado").ToString() == "Nuevo" || Eval("Estado").ToString() == "Reprogramado" %>'
-                                                    OnClick="btnAtender_Click"
-                                                    ToolTip="Atender paciente">
-                                                    <i class="fa-solid fa-stethoscope me-1"></i> Atender
-                                                </asp:LinkButton>
-
-                                                <asp:LinkButton ID="btnInasistencia" runat="server"
-                                                    CssClass="btn btn-sm btn-outline-warning text-nowrap"
-                                                    CommandArgument='<%# Eval("Id") %>'
-                                                    Visible='<%# Eval("Estado").ToString() == "Nuevo" || Eval("Estado").ToString() == "Reprogramado" %>'
-                                                    OnClick="btnInasistencia_Click"
-                                                    ToolTip="Registrar inasistencia">
-                                                    <i class="fa-solid fa-user-xmark me-1"></i> No asistió
-                                                </asp:LinkButton>
-
-                                                <asp:LinkButton ID="btnVerDiagnostico" runat="server"
-                                                    CssClass="btn btn-sm btn-outline-primary text-nowrap"
-                                                    CommandArgument='<%# Eval("Id") %>'
-                                                    Visible='<%# Eval("Estado").ToString() == "Cerrado" %>'
-                                                    OnClick="btnVerDiagnostico_Click"
-                                                    ToolTip="Consultar diagnóstico">
+                                                    <asp:LinkButton ID="btnVerDiagnostico" runat="server"
+                                                        CssClass="btn btn-sm btn-outline-primary text-nowrap"
+                                                        CommandArgument='<%# Eval("Id") %>'
+                                                        Visible='<%# Eval("Estado").ToString() == "Cerrado" %>'
+                                                        OnClick="btnVerDiagnostico_Click"
+                                                        ToolTip="Consultar diagnóstico">
                                                     <i class="fa-solid fa-file-medical me-1"></i> Ver diagnóstico
                                                 </asp:LinkButton>
 
-                                                <asp:LinkButton ID="btnHistorial" runat="server"
-                                                    CssClass="btn btn-sm btn-outline-secondary text-nowrap"
-                                                    CommandArgument='<%# Eval("Id") %>'
-                                                    OnClick="btnHistorial_Click"
-                                                    ToolTip="Consultar historial">
-                                                    <i class="fa-solid fa-clock-rotate-left me-1"></i> Historial
+                                                    <asp:LinkButton ID="btnHistorial" runat="server"
+                                                        CssClass="btn btn-sm btn-outline-purple text-nowrap"
+                                                        CommandArgument='<%# Eval("Id") %>'
+                                                        OnClick="btnHistorial_Click"
+                                                        ToolTip="Consultar historial">
+                                                        <i class="fa-solid fa-clock-rotate-left me-1"></i> Historial
+                                                    </asp:LinkButton>
+
+                                                </div>
+
+                                                <!-- Acciones de atención médica -->
+                                                <asp:Panel runat="server"
+                                                    CssClass="d-flex flex-wrap justify-content-end gap-2"
+                                                    Visible='<%# Eval("Estado").ToString() == "Nuevo" || Eval("Estado").ToString() == "Reprogramado" %>'>
+
+                                                    <asp:LinkButton ID="btnAtender" runat="server"
+                                                        CssClass="btn btn-sm btn-outline-success text-nowrap"
+                                                        CommandArgument='<%# Eval("Id") %>'
+                                                        OnClick="btnAtender_Click"
+                                                        ToolTip="Atender paciente">
+                                                    <i class="fa-solid fa-stethoscope me-1"></i> Atender
                                                 </asp:LinkButton>
+
+                                                    <asp:LinkButton ID="btnInasistencia" runat="server"
+                                                        CssClass="btn btn-sm btn-outline-secondary text-nowrap"
+                                                        CommandArgument='<%# Eval("Id") %>'
+                                                        OnClick="btnInasistencia_Click"
+                                                        ToolTip="Registrar inasistencia">
+                                                    <i class="fa-solid fa-user-xmark me-1"></i> No asistió
+                                                </asp:LinkButton>
+
+                                                </asp:Panel>
 
                                             </div>
 
@@ -173,7 +183,7 @@
                             </asp:GridView>
                         </div>
 
-                       </ContentTemplate>
+                    </ContentTemplate>
 
                     <Triggers>
                         <asp:AsyncPostBackTrigger ControlID="btnBuscar" EventName="Click" />
@@ -184,10 +194,10 @@
                     </Triggers>
                 </asp:UpdatePanel>
 
-                </div>
-
             </div>
+
         </div>
+    </div>
 
     <!-- Modal Historial de Turno -->
     <div class="modal fade" id="modalHistorialTurno" tabindex="-1"
@@ -197,8 +207,7 @@
             <div class="modal-content">
 
                 <div class="modal-header">
-                    <h5 class="modal-title fw-bold" id="tituloModalHistorial">
-                        Historial del turno
+                    <h5 class="modal-title fw-bold" id="tituloModalHistorial">Historial del turno
                     </h5>
 
                     <button type="button" class="btn-close"
@@ -270,6 +279,7 @@
                                             <i class="fa-solid fa-clock-rotate-left fs-3 mb-2 d-block"></i>
                                             <p class="m-0">
                                                 Este turno aún no registra modificaciones.
+                                           
                                             </p>
                                         </div>
                                     </EmptyDataTemplate>
@@ -283,6 +293,7 @@
                             <button type="button" class="btn btn-secondary"
                                 data-bs-dismiss="modal">
                                 Cerrar
+                           
                             </button>
                         </div>
 
@@ -334,6 +345,7 @@
 
                             <p class="text-muted small mb-0">
                                 El historial del turno se conservará.
+                           
                             </p>
 
                         </div>
@@ -342,6 +354,7 @@
                             <button type="button" class="btn btn-secondary"
                                 data-bs-dismiss="modal">
                                 Volver
+                           
                             </button>
 
                             <asp:Button ID="btnConfirmarEstado" runat="server"
@@ -366,16 +379,16 @@
                     UpdateMode="Conditional">
                     <ContentTemplate>
 
-                <div class="modal-header">
-                    <h5 class="modal-title fw-bold" id="tituloModalAtender">
-                        <asp:Label ID="lblTituloAtencion" runat="server"
-                            Text="Atención del paciente" />
-                    </h5>
+                        <div class="modal-header">
+                            <h5 class="modal-title fw-bold" id="tituloModalAtender">
+                                <asp:Label ID="lblTituloAtencion" runat="server"
+                                    Text="Atención del paciente" />
+                            </h5>
 
-                    <button type="button" class="btn-close"
-                        data-bs-dismiss="modal" aria-label="Cerrar">
-                    </button>
-                </div>
+                            <button type="button" class="btn-close"
+                                data-bs-dismiss="modal" aria-label="Cerrar">
+                            </button>
+                        </div>
 
                         <asp:HiddenField ID="hfIdAtenderTurno" runat="server" />
 
@@ -400,6 +413,7 @@
                             <div class="mb-3">
                                 <label class="form-label fw-semibold">
                                     Motivo de consulta
+                               
                                 </label>
 
                                 <asp:Label ID="lblMotivoAtencion" runat="server"
@@ -416,31 +430,33 @@
                                     CssClass="form-control w-100"
                                     TextMode="MultiLine"
                                     Rows="5"
-                                    style="max-width: 100%;"
+                                    Style="max-width: 100%;"
                                     oninput="ocultarErrorAtencion();"
                                     onkeydown="ocultarErrorAtencion();"
                                     Placeholder="Ingrese el diagnóstico y las observaciones de la consulta..." />
 
                                 <asp:Label ID="lblDiagnosticoRegistrado" runat="server"
                                     CssClass="d-block bg-light border rounded-3 p-3"
-                                    style="white-space: pre-wrap; overflow-wrap: anywhere; user-select: none;"
+                                    Style="white-space: pre-wrap; overflow-wrap: anywhere; user-select: none;"
                                     Visible="false" />
                             </div>
 
                             <div id="avisoCierreTurno" runat="server"
                                 class="alert alert-info mb-0">
                                 Al guardar el diagnóstico, el turno quedará cerrado.
+                           
                             </div>
 
                         </div>
 
                         <div class="modal-footer">
 
-                           <button id="btnVolverAtencion" runat="server"
-                            type="button" class="btn btn-secondary"
-                            data-bs-dismiss="modal">
-                            Volver
-                        </button>
+                            <button id="btnVolverAtencion" runat="server"
+                                type="button" class="btn btn-secondary"
+                                data-bs-dismiss="modal">
+                                Volver
+                       
+                            </button>
 
                             <asp:Button ID="btnCerrarTurno" runat="server"
                                 Text="Guardar y cerrar turno"
@@ -603,6 +619,11 @@
             alerta.textContent = texto;
             alerta.classList.remove("d-none");
 
+            // --- Desplazar la página hacia arriba ---
+            setTimeout(function () {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }, 500);
+
             setTimeout(function () {
                 alerta.classList.add("d-none");
             }, 4000);
@@ -630,7 +651,7 @@
             document.body.style.removeProperty("overflow");
             document.body.style.removeProperty("padding-right");
 
-            document.querySelectorAll(".modal-backdrop").forEach(function(backdrop) {
+            document.querySelectorAll(".modal-backdrop").forEach(function (backdrop) {
                 backdrop.remove();
             });
         }
@@ -648,7 +669,7 @@
                 lbl.textContent = "";
                 lbl.style.display = "none";
             }
-}
+        }
 
         // --- Ocultar errores del modal de atención ---
         function ocultarErrorAtencion() {

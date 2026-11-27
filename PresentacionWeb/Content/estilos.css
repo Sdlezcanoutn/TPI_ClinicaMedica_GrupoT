@@ -32,11 +32,11 @@ h1, h2, h3, h4, h5, h6 {
     background-color: rgba(24,98,138,0.98);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08); 
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-    padding-top: 0.2rem !important;   
+    padding-top: 0.2rem !important;
     padding-bottom: 0.2rem !important;
-    overflow: visible !important;      
+    overflow: visible !important;
     z-index: 1030;
 }
 
@@ -46,19 +46,19 @@ h1, h2, h3, h4, h5, h6 {
     padding-bottom: 0 !important;
 }
 
-.navbar-brand .logo-navbar {
-    height: 105px !important;           
-    width: auto !important;
-    max-height: none !important;
-    object-fit: contain;
-    margin-top: -15px;                
-    margin-bottom: -15px;              
-    transition: transform 0.2s ease;
-}
+    .navbar-brand .logo-navbar {
+        height: 105px !important;
+        width: auto !important;
+        max-height: none !important;
+        object-fit: contain;
+        margin-top: -15px;
+        margin-bottom: -15px;
+        transition: transform 0.2s ease;
+    }
 
-.navbar-brand .logo-navbar:hover {
-    transform: scale(1.02);
-}
+        .navbar-brand .logo-navbar:hover {
+            transform: scale(1.02);
+        }
 
 .navbar-custom .nav-link {
     color: #e2e8f0;
@@ -70,11 +70,11 @@ h1, h2, h3, h4, h5, h6 {
     transition: all 0.2s ease;
 }
 
-.navbar-custom .nav-link:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-    color: #ffffff;
-    font-weight: 400;
-}
+    .navbar-custom .nav-link:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+        color: #ffffff;
+        font-weight: 400;
+    }
 
 /* Carrusel hero */
 .backdrop-blur {
@@ -89,7 +89,7 @@ h1, h2, h3, h4, h5, h6 {
     right: 50%;
     margin-left: -50vw;
     margin-right: -50vw;
-    margin-top: -1.5rem; 
+    margin-top: -1.5rem;
 }
 
 .carousel-img {
@@ -144,10 +144,10 @@ h1, h2, h3, h4, h5, h6 {
 /* Contenedor ancho del Dashboard */
 .dashboard-container-wide {
     width: 100% !important;
-    max-width: 1500px !important; 
+    max-width: 1500px !important;
     margin-left: auto !important;
     margin-right: auto !important;
-    padding-left: 2rem !important;   
+    padding-left: 2rem !important;
     padding-right: 2rem !important;
     box-sizing: border-box !important;
 }
@@ -161,10 +161,10 @@ form > div, main, .body-content {
 
 /* Tarjetas de acceso directo con efecto glass */
 .card.dashboard-glass-card {
-    background: rgba(255, 255, 255, 0.85) !important; 
+    background: rgba(255, 255, 255, 0.85) !important;
     backdrop-filter: blur(12px) !important;
     -webkit-backdrop-filter: blur(12px) !important;
-    border: 1px solid rgba(226, 232, 240, 0.8) !important; 
+    border: 1px solid rgba(226, 232, 240, 0.8) !important;
     border-radius: 18px !important;
     box-shadow: 0 20px 40px -10px rgba(15, 23, 42, 0.08), 0 10px 20px -15px rgba(15, 23, 42, 0.04) !important;
     transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease !important;
@@ -174,43 +174,43 @@ form > div, main, .body-content {
     margin-right: auto !important;
 }
 
-.card.dashboard-glass-card:hover {
-    transform: translateY(-5px);
-    background: rgba(255, 255, 255, 0.95) !important;
-    box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.15), 0 12px 24px -12px rgba(15, 23, 42, 0.08) !important;
-}
+    .card.dashboard-glass-card:hover {
+        transform: translateY(-5px);
+        background: rgba(255, 255, 255, 0.95) !important;
+        box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.15), 0 12px 24px -12px rgba(15, 23, 42, 0.08) !important;
+    }
 
-.card.dashboard-glass-card h5 {
-    color: #1e293b !important;
-}
+    .card.dashboard-glass-card h5 {
+        color: #1e293b !important;
+    }
 
-.card.dashboard-glass-card p,
-.card.dashboard-glass-card .text-muted {
-    color: #475569 !important;
-}
+    .card.dashboard-glass-card p,
+    .card.dashboard-glass-card .text-muted {
+        color: #475569 !important;
+    }
 
-/* Línea divisoria interna */
-.card.dashboard-glass-card .border-top {
-    border-color: rgba(0, 0, 0, 0.06) !important;
-}
+    /* Línea divisoria interna */
+    .card.dashboard-glass-card .border-top {
+        border-color: rgba(0, 0, 0, 0.06) !important;
+    }
 
-/* Botones */
-.card.dashboard-glass-card .btn {
-    background-color: #ffffff !important;
-    color: #0f172a !important;
-    border: 1px solid rgba(0, 0, 0, 0.1) !important;
-    font-weight: 600 !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04) !important;
-    transition: all 0.2s ease !important;
-}
- 
-.card.dashboard-glass-card .btn:hover {
-        background-color: rgba(0,166,255,0.98) !important; 
-        border-color: #0dcaf0 !important;
+    /* Botones */
+    .card.dashboard-glass-card .btn {
+        background-color: #ffffff !important;
         color: #0f172a !important;
-        transform: translateY(-1px);
-        box-shadow: 0 6px 15px rgba(13, 202, 240, 0.3) !important;
-}
+        border: 1px solid rgba(0, 0, 0, 0.1) !important;
+        font-weight: 600 !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04) !important;
+        transition: all 0.2s ease !important;
+    }
+
+        .card.dashboard-glass-card .btn:hover {
+            background-color: rgba(0,166,255,0.98) !important;
+            border-color: #0dcaf0 !important;
+            color: #0f172a !important;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 15px rgba(13, 202, 240, 0.3) !important;
+        }
 
 /* Panel contenedor unificado para páginas de gestión (Pacientes, Médicos, Especialidades, Turnos) */
 .dashboard-panel {
@@ -226,10 +226,10 @@ form > div, main, .body-content {
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.dashboard-glass-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 0.75rem 1.5rem rgba(15, 23, 42, 0.08) !important;
-}
+    .dashboard-glass-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 0.75rem 1.5rem rgba(15, 23, 42, 0.08) !important;
+    }
 
 .badge-violeta {
     background-color: #F5E59A;
@@ -309,11 +309,11 @@ form > div, main, .body-content {
     transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-.acceso-card:hover {
-    transform: translateY(-3px);
-    border-color: #cbd5e1;
-    box-shadow: 0 0.65rem 1.4rem rgba(15, 23, 42, 0.06);
-}
+    .acceso-card:hover {
+        transform: translateY(-3px);
+        border-color: #cbd5e1;
+        box-shadow: 0 0.65rem 1.4rem rgba(15, 23, 42, 0.06);
+    }
 
 .acceso-icono {
     color: #1d5fa7;
@@ -331,10 +331,10 @@ form > div, main, .body-content {
     transition: gap 0.2s ease, color 0.2s ease;
 }
 
-.acceso-link:hover {
-    color: #0f3d73;
-    gap: 0.55rem;
-}
+    .acceso-link:hover {
+        color: #0f3d73;
+        gap: 0.55rem;
+    }
 
 /* Footer */
 .footer-institucional {
@@ -344,53 +344,53 @@ form > div, main, .body-content {
     margin-top: auto;
 }
 
-.footer-institucional h6 {
-    font-weight: 400;
-    font-size: 0.95rem;
-    letter-spacing: 1.2px;
-    color: #ffffff;
-    text-transform: uppercase;
-}
+    .footer-institucional h6 {
+        font-weight: 400;
+        font-size: 0.95rem;
+        letter-spacing: 1.2px;
+        color: #ffffff;
+        text-transform: uppercase;
+    }
 
-.footer-institucional h6 i {
-    font-size: 1.1rem;
-}
+        .footer-institucional h6 i {
+            font-size: 1.1rem;
+        }
 
-.footer-institucional p, 
-.footer-institucional li, 
-.footer-institucional a, 
-.footer-institucional span {
-    font-weight: 300;
-    font-size: 0.92rem;
-    letter-spacing: 0.3px;
-}
+    .footer-institucional p,
+    .footer-institucional li,
+    .footer-institucional a,
+    .footer-institucional span {
+        font-weight: 300;
+        font-size: 0.92rem;
+        letter-spacing: 0.3px;
+    }
 
-.footer-institucional .fab {
-    font-size: 1.6rem;
-    opacity: 0.95;
-    transition: opacity 0.2s ease, transform 0.2s ease;
-}
+    .footer-institucional .fab {
+        font-size: 1.6rem;
+        opacity: 0.95;
+        transition: opacity 0.2s ease, transform 0.2s ease;
+    }
 
-.footer-institucional .fab:hover {
-    opacity: 1;
-    transform: translateY(-2px);
-}
+        .footer-institucional .fab:hover {
+            opacity: 1;
+            transform: translateY(-2px);
+        }
 
-.footer-institucional h3 {
-    font-size: 2rem;
-    font-weight: 500;
-    letter-spacing: -0.5px;
-}
+    .footer-institucional h3 {
+        font-size: 2rem;
+        font-weight: 500;
+        letter-spacing: -0.5px;
+    }
 
-.footer-institucional a:hover {
-    opacity: 1;
-    color: #ffffff;
-}
+    .footer-institucional a:hover {
+        opacity: 1;
+        color: #ffffff;
+    }
 
-.footer-institucional strong {
-    font-weight: 400;
-    color: #ffffff;
-}
+    .footer-institucional strong {
+        font-weight: 400;
+        color: #ffffff;
+    }
 
 
 /* Componentes reutilizables */
@@ -408,6 +408,20 @@ form > div, main, .body-content {
         background-color: #124c6b !important;
         border-color: #124c6b !important;
         color: #ffffff !important;
+    }
+
+/* --- Botón de historial --- */
+.btn.btn-outline-purple {
+    color: #6f42c1;
+    border-color: #6f42c1;
+    background-color: transparent;
+}
+
+    .btn.btn-outline-purple:hover,
+    .btn.btn-outline-purple:focus-visible {
+        color: #ffffff;
+        background-color: #6f42c1;
+        border-color: #6f42c1;
     }
 
 /* Botón seleccionado de los filtros por estado */
@@ -438,10 +452,10 @@ form > div, main, .body-content {
     border-left: none;
 }
 
-.search-box .form-control:focus {
-    box-shadow: none;
-    border-color: #ced4da;
-}
+    .search-box .form-control:focus {
+        box-shadow: none;
+        border-color: #ced4da;
+    }
 
 .table-custom {
     background-color: #ffffff;
@@ -449,17 +463,17 @@ form > div, main, .body-content {
     overflow: hidden;
 }
 
-.table-custom thead {
-    background-color: #f8f9fa;
-    color: #495057;
-    font-size: 0.85rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
+    .table-custom thead {
+        background-color: #f8f9fa;
+        color: #495057;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
 
-.table-custom tbody tr:hover {
-    background-color: #f1f3f5;
-}
+    .table-custom tbody tr:hover {
+        background-color: #f1f3f5;
+    }
 
 /* Color normal cuando tienen valor */
 .form-select,
@@ -473,23 +487,23 @@ form > div, main, .body-content {
     color: #212529;
 }
 
-/* Texto inicial del combo cerrado en gris clarito solo cuando está sin seleccionar */
-.form-select.placeholder-select {
-    color: #9aa0a6 !important;
-}
+    /* Texto inicial del combo cerrado en gris clarito solo cuando está sin seleccionar */
+    .form-select.placeholder-select {
+        color: #9aa0a6 !important;
+    }
 
-/* Cuando se despliega la lista, mantener texto legible */
-.form-select option {
-    color: #212529;
-}
+    /* Cuando se despliega la lista, mantener texto legible */
+    .form-select option {
+        color: #212529;
+    }
 
-/* Texto vacío en inputs de hora/fecha en gris clarito solo cuando están vacíos */
-.form-control.placeholder-time,
-.form-control.placeholder-time::-webkit-datetime-edit,
-.form-control.placeholder-time::-webkit-datetime-edit-fields-wrapper,
-.form-control.placeholder-time::-webkit-datetime-edit-text,
-.form-control.placeholder-time::-webkit-datetime-edit-hour-field,
-.form-control.placeholder-time::-webkit-datetime-edit-minute-field,
-.form-control.placeholder-time::-webkit-datetime-edit-ampm-field {
-    color: #9aa0a6 !important;
-}
+    /* Texto vacío en inputs de hora/fecha en gris clarito solo cuando están vacíos */
+    .form-control.placeholder-time,
+    .form-control.placeholder-time::-webkit-datetime-edit,
+    .form-control.placeholder-time::-webkit-datetime-edit-fields-wrapper,
+    .form-control.placeholder-time::-webkit-datetime-edit-text,
+    .form-control.placeholder-time::-webkit-datetime-edit-hour-field,
+    .form-control.placeholder-time::-webkit-datetime-edit-minute-field,
+    .form-control.placeholder-time::-webkit-datetime-edit-ampm-field {
+        color: #9aa0a6 !important;
+    }

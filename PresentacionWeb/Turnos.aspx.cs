@@ -1044,7 +1044,7 @@ namespace PresentacionWeb
             );
         }
 
-        // Devuelve la clase de badge Bootstrap según el estado del turno en la grilla
+        // --- Obtener color según el estado del turno ---
         protected string ObtenerClaseBadgeEstado(string estado)
         {
             if (string.IsNullOrWhiteSpace(estado))
@@ -1059,10 +1059,14 @@ namespace PresentacionWeb
                     return "badge bg-warning text-dark";
 
                 case "cancelado":
+                    return "badge bg-danger";
+
                 case "no asistió":
                 case "no asistio":
+                    return "badge bg-secondary";
+
                 case "cerrado":
-                    return "badge bg-danger";
+                    return "badge bg-primary";
 
                 default:
                     return "badge bg-secondary";
