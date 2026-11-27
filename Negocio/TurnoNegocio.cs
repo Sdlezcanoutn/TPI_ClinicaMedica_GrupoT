@@ -186,6 +186,71 @@ namespace Negocio
             datos.ejecutarAccionTransaccion();
         }
 
+        // --- Consultar el historial de un turno ---
+        public List<HistorialTurno> listarHistorial(int idTurno)
+        {
+            List<HistorialTurno> lista = new List<HistorialTurno>();
+            AccesoDatos datos = new AccesoDatos();
+
+            try
+            {
+                datos.setearConsulta(
+                    "SELECT H.Id_Historial_Turno, H.Id_Turno, " +
+                    "H.Fecha_Anterior, H.Hora_Inicio_Anterior, " +
+                    "H.Hora_Fin_Anterior, H.Fecha_Cambio, " +
+                    "H.Id_Estado_Turno_Anterior, E.Nombre AS NombreEstadoAnterior " +
+                    "FROM HISTORIAL_TURNOS H " +
+                    "INNER JOIN ESTADOS_TURNO E " +
+                    "ON H.Id_Estado_Turno_Anterior = E.Id_Estado_Turno " +
+                    "WHERE H.Id_Turno = @IdTurno " +
+                    "ORDER BY H.Fecha_Cambio DESC, H.Id_Historial_Turno DESC"
+                );
+
+                datos.setearParametro("@IdTurno", idTurno);
+                datos.ejecutarLectura();
+
+                while (datos.Lector.Read())
+                {
+                    DateTime fechaAnterior =
+                        (DateTime)datos.Lector["Fecha_Anterior"];
+
+                    HistorialTurno aux = new HistorialTurno
+                    {
+                        Id = (int)datos.Lector["Id_Historial_Turno"],
+
+                        Turno = new Turno
+                        {
+                            Id = (int)datos.Lector["Id_Turno"]
+                        },
+
+                        Fecha_Anterior = fechaAnterior.Date,
+
+                        Hora_Inicio_Anterior = fechaAnterior.Date.Add(
+                            (TimeSpan)datos.Lector["Hora_Inicio_Anterior"]),
+
+                        Hora_Fin_Anterior = fechaAnterior.Date.Add(
+                            (TimeSpan)datos.Lector["Hora_Fin_Anterior"]),
+
+                        Estado_Anterior = new EstadoTurno
+                        {
+                            Id = (int)datos.Lector["Id_Estado_Turno_Anterior"],
+                            Nombre = (string)datos.Lector["NombreEstadoAnterior"]
+                        },
+
+                        Fecha_Cambio = (DateTime)datos.Lector["Fecha_Cambio"]
+                    };
+
+                    lista.Add(aux);
+                }
+
+                return lista;
+            }
+            finally
+            {
+                datos.cerrarConexion();
+            }
+        }
+
         // ALTA Y ASIGNACIÓN DE TURNOS (ETAPA 1)
         public void agregar(Turno nuevo)
         {
@@ -428,8 +493,35 @@ namespace Negocio
             }
         }
 
-        // ===== CANCELACIÓN DE TURNOS =====
+        // ===== CAMBIOS DE ESTADO DE TURNOS =====
+
+        // --- Cancelar turno ---
         public void cancelar(int id)
+        {
+            cambiarEstado(id, "Cancelado");
+        }
+
+        // --- Registrar inasistencia ---
+        public void registrarInasistencia(int id)
+        {
+            cambiarEstado(id, "No asistió");
+        }
+
+        // --- Cerrar turno con diagnóstico ---
+        public void cerrar(int id, string diagnostico)
+        {
+            if (string.IsNullOrWhiteSpace(diagnostico))
+            {
+                throw new ArgumentException(
+                    "Debe ingresar el diagnóstico del paciente.");
+            }
+
+            cambiarEstado(id, "Cerrado", diagnostico.Trim());
+        }
+
+        // --- Centralizar cambios de estado ---
+        private void cambiarEstado(int id, string nuevoEstado,
+            string diagnostico = null)
         {
             // --- Validar identificador ---
             if (id <= 0)
@@ -453,7 +545,23 @@ namespace Negocio
                 original.Estado.Nombre != "Reprogramado")
             {
                 throw new ArgumentException(
-                    "Solo se pueden cancelar turnos nuevos o reprogramados.");
+                    "Solo se pueden modificar turnos nuevos o reprogramados.");
+            }
+
+            // --- Validar horario para registrar inasistencia ---
+            if (nuevoEstado == "No asistió" &&
+                original.Fecha.Date.Add(original.Hora_Fin.TimeOfDay) > DateTime.Now)
+            {
+                throw new ArgumentException(
+                    "No se puede registrar una inasistencia antes de que finalice el turno.");
+            }
+
+            // --- Validar horario para cerrar turno ---
+            if (nuevoEstado == "Cerrado" &&
+                original.Fecha.Date.Add(original.Hora_Inicio.TimeOfDay) > DateTime.Now)
+            {
+                throw new ArgumentException(
+                    "No se puede cerrar un turno antes de que comience.");
             }
 
             // --- Preparar la conexión ---
@@ -468,17 +576,21 @@ namespace Negocio
                 // --- Registrar los datos anteriores en el historial ---
                 registrarHistorial(datos, original);
 
-                // --- Actualizar estado del turno ---
+                // --- Actualizar estado y diagnóstico del turno ---
                 datos.limpiarParametros();
 
                 datos.setearConsulta(
                     "UPDATE TURNOS SET " +
                     "Id_Estado_Turno = (SELECT Id_Estado_Turno " +
-                    "FROM ESTADOS_TURNO WHERE Nombre = N'Cancelado') " +
+                    "FROM ESTADOS_TURNO WHERE Nombre = @NuevoEstado), " +
+                    "Diagnostico = CASE WHEN @NuevoEstado = 'Cerrado' " +
+                    "THEN @Diagnostico ELSE Diagnostico END " +
                     "WHERE Id_Turno = @IdTurno"
                 );
 
+                datos.setearParametro("@NuevoEstado", nuevoEstado);
                 datos.setearParametro("@IdTurno", original.Id);
+                datos.setearParametro("@Diagnostico", (object)diagnostico ?? DBNull.Value);
 
                 datos.ejecutarAccionTransaccion();
 
