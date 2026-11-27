@@ -392,7 +392,7 @@
 
                         <asp:HiddenField ID="hfIdAtenderTurno" runat="server" />
 
-                        <div class="modal-body">
+                        <div class="modal-body formulario-modulo">
 
                             <asp:Label ID="lblErrorAtenderTurno" runat="server"
                                 CssClass="text-danger small d-block mb-3"
@@ -488,7 +488,7 @@
 
                         <asp:HiddenField ID="hfIdTurno" runat="server" Value="0" />
 
-                        <div class="modal-body">
+                        <div class="modal-body formulario-modulo">
 
                             <asp:Label ID="lblErrorTurno" runat="server"
                                 CssClass="text-danger small d-block mb-3"

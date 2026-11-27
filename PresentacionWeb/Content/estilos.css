@@ -400,6 +400,12 @@ form > div, main, .body-content {
     margin: 0 auto;
 }
 
+/* --- Ancho de los campos de formularios --- */
+.formulario-modulo .form-control,
+.formulario-modulo .form-select {
+    max-width: 100%;
+}
+
 /* Botón principal azul institucional */
 .btn-clinica-primary {
     background-color: #18628a !important;

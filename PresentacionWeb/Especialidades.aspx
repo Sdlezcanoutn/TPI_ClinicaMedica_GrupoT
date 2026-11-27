@@ -207,19 +207,18 @@
 
                                     <asp:HiddenField ID="hfIdEspecialidad" runat="server" />
 
-                                    <div class="modal-body">
+                                    <div class="modal-body formulario-modulo">
 
                                         <div class="mb-3">
-                                            <label class="form-label">Nombre</label>
+                                            <label class="form-label">Nombre *</label>
                                             <asp:TextBox ID="txtNombre" runat="server"
                                                 CssClass="form-control"
                                                 MaxLength="100"
                                                 oninput="actualizarContadores()" />
 
-                                            <div class="text-muted small mt-1" style="max-width: 280px; text-align: right;">
-                                                <span id="contadorNombre">0</span> / 100
-                                           
-                                            </div>
+                                           <div class="text-muted small mt-1 text-end">
+                                            <span id="contadorNombre">0</span> / 100
+                                        </div>
                                         </div>
 
                                         <div class="mb-3">
@@ -231,9 +230,9 @@
                                                 MaxLength="500"
                                                 oninput="actualizarContadores()" />
 
-                                            <div class="text-muted small mt-1" style="max-width: 280px; text-align: right;">
-                                                <span id="contadorDescripcion">0</span> / 500
-                                            </div>
+                                           <div class="text-muted small mt-1 text-end">
+                                               <span id="contadorDescripcion">0</span> / 500
+                                           </div>
                                         </div>
 
                                         <asp:Label ID="lblMensaje" runat="server"

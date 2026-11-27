@@ -251,7 +251,7 @@
 
                         <asp:HiddenField ID="hfIdMedico" runat="server" />
 
-                        <div class="modal-body">
+                        <div class="modal-body formulario-modulo">
 
                             <!-- Mensaje de error del formulario -->
                             <asp:Label
@@ -685,12 +685,12 @@
             // --- Limpiar el identificador del médico ---
             document.getElementById('<%= hfIdMedico.ClientID %>').value = '';
 
-        // --- Limpiar los datos del formulario ---
-        limpiarFormularioMedico();
+            // --- Limpiar los datos del formulario ---
+            limpiarFormularioMedico();
 
-        // --- Restablecer el título y el botón ---
-        document.getElementById('tituloModalMedico').textContent = 'Nuevo Médico';
-        document.getElementById('<%= btnGuardarMedico.ClientID %>').value = 'Guardar Médico';
+            // --- Restablecer el título y el botón ---
+            document.getElementById('tituloModalMedico').textContent = 'Nuevo Médico';
+            document.getElementById('<%= btnGuardarMedico.ClientID %>').value = 'Guardar Médico';
 
             // --- Abrir el formulario ---
             bootstrap.Modal.getOrCreateInstance(
@@ -734,11 +734,11 @@
         function limpiarFormularioMedico() {
             // --- Limpiar los campos ---
             document.getElementById('<%= txtNombreMedico.ClientID %>').value = '';
-        document.getElementById('<%= txtApellidoMedico.ClientID %>').value = '';
-        document.getElementById('<%= txtDniMedico.ClientID %>').value = '';
-        document.getElementById('<%= txtMatriculaMedico.ClientID %>').value = '';
-        document.getElementById('<%= txtTelefonoMedico.ClientID %>').value = '';
-        document.getElementById('<%= txtEmailMedico.ClientID %>').value = '';
+            document.getElementById('<%= txtApellidoMedico.ClientID %>').value = '';
+            document.getElementById('<%= txtDniMedico.ClientID %>').value = '';
+            document.getElementById('<%= txtMatriculaMedico.ClientID %>').value = '';
+            document.getElementById('<%= txtTelefonoMedico.ClientID %>').value = '';
+            document.getElementById('<%= txtEmailMedico.ClientID %>').value = '';
 
             // --- Desmarcar las especialidades ---
             document.querySelectorAll(
