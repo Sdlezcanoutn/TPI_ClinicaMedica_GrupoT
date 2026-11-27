@@ -611,7 +611,7 @@
             __doPostBack('<%= btnBuscar.UniqueID %>', '');
         }
 
-        // Muestra el cartel verde de confirmación en el listado y lo oculta a los 4 segundos
+        // --- Mostrar alerta de confirmación ---
         function mostrarAlertaTurno(texto) {
             const alerta = document.getElementById("mensajeExitoTurno");
             if (!alerta) return;
@@ -619,14 +619,18 @@
             alerta.textContent = texto;
             alerta.classList.remove("d-none");
 
-            // --- Desplazar la página hacia arriba ---
-            setTimeout(function () {
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            }, 500);
+            // --- Desplazar la página hacia la alerta ---
+            setTimeout(function() {
+                alerta.scrollIntoView({
+                    behavior: "smooth",
+                    block: "center"
+                });
+            }, 350);
 
-            setTimeout(function () {
+            // --- Ocultar alerta después de 8 segundos ---
+            setTimeout(function() {
                 alerta.classList.add("d-none");
-            }, 4000);
+            }, 8000);
         }
 
         // --- Cerrar modal de turno ---
@@ -771,7 +775,48 @@
             actualizarEstiloPlaceholderSelects();
 
             if (window.Sys && Sys.WebForms && Sys.WebForms.PageRequestManager) {
-                Sys.WebForms.PageRequestManager.getInstance().add_endRequest(function () {
+                const gestorPeticiones = Sys.WebForms.PageRequestManager.getInstance();
+                let botonGuardado = null;
+                let textoOriginal = "";
+
+                // --- Indicar procesamiento del turno ---
+                gestorPeticiones.add_beginRequest(function(sender, args) {
+                    const boton = args.get_postBackElement();
+
+                    if (!boton) return;
+
+                    if (boton.id === "<%= btnGuardarTurno.ClientID %>") {
+                        botonGuardado = boton;
+                        textoOriginal = boton.value;
+
+                        const idTurno = document.getElementById("<%= hfIdTurno.ClientID %>").value;
+
+                        boton.value = idTurno === "0"
+                            ? "Guardando turno..."
+                            : "Reprogramando turno...";
+
+                        boton.disabled = true;
+                    }
+                    else if (boton.id === "<%= btnConfirmarEstado.ClientID %>") {
+                        botonGuardado = boton;
+                        textoOriginal = boton.value;
+
+                        boton.value = textoOriginal.toLowerCase().includes("cancelación")
+                            ? "Cancelando turno..."
+                            : "Registrando inasistencia...";
+
+                        boton.disabled = true;
+                    }
+                });
+
+                // --- Restablecer controles al finalizar ---
+                gestorPeticiones.add_endRequest(function() {
+                    if (botonGuardado) {
+                        botonGuardado.value = textoOriginal;
+                        botonGuardado.disabled = false;
+                        botonGuardado = null;
+                    }
+
                     engancharEventosCamposTurno();
                     actualizarEstiloPlaceholderSelects();
                 });

@@ -671,8 +671,40 @@ namespace PresentacionWeb
                 // --- Ejecutar acción seleccionada ---
                 if (nuevoEstado == "Cancelado")
                 {
-                    negocio.cancelar(id);
-                    mensaje = "Turno cancelado correctamente.";
+                    // --- Cancelar turno y recuperar sus datos ---
+                    Turno turnoCancelado = negocio.cancelar(id);
+
+                    mensaje = $"Turno #{turnoCancelado.Id:D3} cancelado correctamente.";
+
+                    // --- Enviar correo de cancelación ---
+                    bool emailEnviado = false;
+
+                    try
+                    {
+                        NotificacionTurno notificacion = new NotificacionTurno();
+                        notificacion.enviarCancelacion(turnoCancelado);
+
+                        emailEnviado = true;
+                        mensaje += " Correo de cancelación enviado.";
+                    }
+                    catch (Exception ex)
+                    {
+                        Session["error"] = ex.ToString();
+
+                        mensaje += " No se pudo enviar el correo de cancelación.";
+                    }
+
+                    // --- Actualizar estado del envío ---
+                    try
+                    {
+                        negocio.actualizarEmailEnviado(turnoCancelado.Id, emailEnviado);
+                    }
+                    catch (Exception ex)
+                    {
+                        Session["error"] = ex.ToString();
+
+                        mensaje += " No se pudo actualizar el estado del correo.";
+                    }
                 }
                 else if (nuevoEstado == "No asistió")
                 {
@@ -822,12 +854,79 @@ namespace PresentacionWeb
                 if (IdTurno == 0)
                 {
                     negocio.agregar(nuevo);
-                    mensaje = "Turno registrado correctamente.";
+
+                    mensaje = $"Turno #{nuevo.Id:D3} registrado correctamente.";
+
+                    // --- Enviar correo de confirmación ---
+                    bool emailEnviado = false;
+
+                    try
+                    {
+                        NotificacionTurno notificacion = new NotificacionTurno();
+                        notificacion.enviarConfirmacion(nuevo);
+
+                        emailEnviado = true;
+                        mensaje += " Correo de confirmación enviado.";
+                    }
+                    catch (Exception ex)
+                    {
+                        Session["error"] = ex.ToString();
+
+                        mensaje += " No se pudo enviar el correo de confirmación.";
+                    }
+
+                    // --- Actualizar estado del envío ---
+                    try
+                    {
+                        negocio.actualizarEmailEnviado(nuevo.Id, emailEnviado);
+                    }
+                    catch (Exception ex)
+                    {
+                        Session["error"] = ex.ToString();
+
+                        mensaje += " No se pudo actualizar el estado del correo.";
+                    }
                 }
                 else
                 {
-                    negocio.reprogramar(nuevo);
-                    mensaje = "Turno reprogramado correctamente.";
+                    Turno turnoAnterior = negocio.reprogramar(nuevo);
+
+                    // --- Completar los datos del turno reprogramado ---
+                    nuevo.Paciente = turnoAnterior.Paciente;
+                    nuevo.Medico = turnoAnterior.Medico;
+                    nuevo.Especialidad = turnoAnterior.Especialidad;
+
+                    mensaje = $"Turno #{nuevo.Id:D3} reprogramado correctamente.";
+
+                    // --- Enviar correo de reprogramación ---
+                    bool emailEnviado = false;
+
+                    try
+                    {
+                        NotificacionTurno notificacion = new NotificacionTurno();
+                        notificacion.enviarReprogramacion(nuevo, turnoAnterior);
+
+                        emailEnviado = true;
+                        mensaje += " Correo de reprogramación enviado.";
+                    }
+                    catch (Exception ex)
+                    {
+                        Session["error"] = ex.ToString();
+
+                        mensaje += " No se pudo enviar el correo de reprogramación.";
+                    }
+
+                    // --- Actualizar estado del envío ---
+                    try
+                    {
+                        negocio.actualizarEmailEnviado(nuevo.Id, emailEnviado);
+                    }
+                    catch (Exception ex)
+                    {
+                        Session["error"] = ex.ToString();
+
+                        mensaje += " No se pudo actualizar el estado del correo.";
+                    }
                 }
 
                 AplicarFiltrosListado();

@@ -20,7 +20,7 @@ namespace Negocio
                 datos.setearConsulta(
                     "SELECT T.Id_Turno, T.Fecha_Alta, T.Fecha, T.Hora_Inicio, T.Hora_Fin, " +
                     "T.Motivo_Consulta, T.Diagnostico, T.Email_Enviado, " +
-                    "P.Id_Paciente, P.Nombre AS NombrePaciente, P.Apellido AS ApellidoPaciente, P.DNI AS DniPaciente, P.Estado AS EstadoPaciente, " +
+                    "P.Id_Paciente, P.Nombre AS NombrePaciente, P.Apellido AS ApellidoPaciente, P.DNI AS DniPaciente, P.Email AS EmailPaciente, P.Estado AS EstadoPaciente, " +
                     "M.Id_Medico, M.Nombre AS NombreMedico, M.Apellido AS ApellidoMedico, M.Matricula, M.Estado AS EstadoMedico, " +
                     "E.Id_Especialidad, E.Nombre AS NombreEspecialidad, E.Estado AS EstadoEspecialidad, " +
                     "ET.Id_Estado_Turno, ET.Nombre AS NombreEstadoTurno " +
@@ -59,6 +59,9 @@ namespace Negocio
                             Nombre = (string)datos.Lector["NombrePaciente"],
                             Apellido = (string)datos.Lector["ApellidoPaciente"],
                             DNI = (string)datos.Lector["DniPaciente"],
+                            Email = datos.Lector["EmailPaciente"] == DBNull.Value
+                                ? string.Empty
+                                : (string)datos.Lector["EmailPaciente"],
                             Estado = (bool)datos.Lector["EstadoPaciente"]
                         },
                         Medico = new Medico
@@ -324,11 +327,12 @@ namespace Negocio
 
             try
             {
-                // Insertar turno con estado inicial 'Nuevo' y Email_Enviado en 0 
+                // --- Insertar turno y recuperar el identificador generado ---
                 datos.setearConsulta(
                     "INSERT INTO TURNOS " +
                     "(Id_Paciente, Id_Medico, Id_Especialidad, Fecha_Alta, Fecha, Hora_Inicio, Hora_Fin, " +
                     "Id_Estado_Turno, Motivo_Consulta, Diagnostico, Email_Enviado) " +
+                    "OUTPUT INSERTED.Id_Turno " +
                     "VALUES " +
                     "(@IdPaciente, @IdMedico, @IdEspecialidad, GETDATE(), @Fecha, @HoraInicio, @HoraFin, " +
                     "(SELECT TOP 1 Id_Estado_Turno FROM ESTADOS_TURNO WHERE Nombre = N'Nuevo'), " +
@@ -343,6 +347,47 @@ namespace Negocio
                 datos.setearParametro("@HoraFin", horaFin);
                 datos.setearParametro("@Motivo", nuevo.Motivo_Consulta.Trim());
 
+                // --- Registrar turno y obtener su identificador ---
+                datos.iniciarTransaccion();
+
+                int idTurno = Convert.ToInt32(datos.ejecutarEscalar());
+
+                datos.confirmarTransaccion();
+
+                // --- Completar los datos del turno registrado ---
+                nuevo.Id = idTurno;
+                nuevo.Paciente = paciente;
+                nuevo.Medico = medico;
+                nuevo.Especialidad = especialidad;
+            }
+            catch
+            {
+                datos.cancelarTransaccion();
+                throw;
+            }
+            finally
+            {
+                datos.cerrarConexion();
+            }
+        }
+
+        // ===== NOTIFICACIONES DE TURNOS =====
+
+        // --- Actualizar estado de envío del correo ---
+        public void actualizarEmailEnviado(int idTurno, bool enviado)
+        {
+            AccesoDatos datos = new AccesoDatos();
+
+            try
+            {
+                datos.setearConsulta(
+                    "UPDATE TURNOS SET Email_Enviado = @Enviado " +
+                    "WHERE Id_Turno = @IdTurno"
+                );
+
+                datos.setearParametro("@Enviado", enviado);
+                datos.setearParametro("@IdTurno", idTurno);
+
                 datos.ejecutarAccion();
             }
             finally
@@ -352,7 +397,7 @@ namespace Negocio
         }
 
         // ===== REPROGRAMACIÓN DE TURNOS =====
-        public void reprogramar(Turno turno)
+        public Turno reprogramar(Turno turno)
         {
             // --- Validar identificador ---
             if (turno == null || turno.Id <= 0)
@@ -469,6 +514,9 @@ namespace Negocio
                 // --- Confirmar las operaciones ---
                 datos.confirmarTransaccion();
                 transaccionIniciada = false;
+
+                // --- Devolver los datos anteriores del turno ---
+                return original;
             }
             catch (System.Data.SqlClient.SqlException ex)
             {
@@ -496,9 +544,9 @@ namespace Negocio
         // ===== CAMBIOS DE ESTADO DE TURNOS =====
 
         // --- Cancelar turno ---
-        public void cancelar(int id)
+        public Turno cancelar(int id)
         {
-            cambiarEstado(id, "Cancelado");
+            return cambiarEstado(id, "Cancelado");
         }
 
         // --- Registrar inasistencia ---
@@ -520,8 +568,7 @@ namespace Negocio
         }
 
         // --- Centralizar cambios de estado ---
-        private void cambiarEstado(int id, string nuevoEstado,
-            string diagnostico = null)
+        private Turno cambiarEstado(int id, string nuevoEstado, string diagnostico = null)
         {
             // --- Validar identificador ---
             if (id <= 0)
@@ -584,7 +631,9 @@ namespace Negocio
                     "Id_Estado_Turno = (SELECT Id_Estado_Turno " +
                     "FROM ESTADOS_TURNO WHERE Nombre = @NuevoEstado), " +
                     "Diagnostico = CASE WHEN @NuevoEstado = 'Cerrado' " +
-                    "THEN @Diagnostico ELSE Diagnostico END " +
+                    "THEN @Diagnostico ELSE Diagnostico END, " +
+                    "Email_Enviado = CASE WHEN @NuevoEstado = 'Cancelado' " +
+                    "THEN 0 ELSE Email_Enviado END " +
                     "WHERE Id_Turno = @IdTurno"
                 );
 
@@ -597,6 +646,9 @@ namespace Negocio
                 // --- Confirmar las operaciones ---
                 datos.confirmarTransaccion();
                 transaccionIniciada = false;
+
+                // --- Devolver los datos del turno ---
+                return original;
             }
             catch (System.Data.SqlClient.SqlException ex)
             {
