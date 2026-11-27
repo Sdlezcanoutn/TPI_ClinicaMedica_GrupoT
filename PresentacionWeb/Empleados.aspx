@@ -39,6 +39,23 @@
                     </div>
                 </div>
 
+                <!-- Filtro de estado (Activos por defecto / Inactivos) -->
+                <asp:HiddenField ID="hfEstado" runat="server" Value="1" />
+
+                <div class="d-flex gap-2 mb-4">
+                    <asp:LinkButton ID="btnActivos" runat="server"
+                        CssClass="btn btn-sm btn-clinica-primary px-3 rounded-3"
+                        OnClick="btnActivos_Click">
+                        Activos
+                    </asp:LinkButton>
+
+                    <asp:LinkButton ID="btnInactivos" runat="server"
+                        CssClass="btn btn-sm btn-outline-secondary px-3 rounded-3"
+                        OnClick="btnInactivos_Click">
+                        Inactivos
+                    </asp:LinkButton>
+                </div>
+
                 <!-- Listado y alertas -->
                 <asp:UpdatePanel ID="upListado" runat="server" UpdateMode="Conditional">
                     <ContentTemplate>
@@ -62,15 +79,28 @@
                                             <asp:LinkButton ID="btnEditar" runat="server"
                                                 CssClass="btn btn-sm btn-outline-secondary me-1"
                                                 CommandArgument='<%# Eval("Id") %>'
-                                                OnClick="btnEditar_Click">
+                                                OnClick="btnEditar_Click"
+                                                Visible='<%# Convert.ToBoolean(Eval("Estado")) %>'>
                                                 <i class="fa-solid fa-pen-to-square me-1"></i>Editar
                                             </asp:LinkButton>
 
                                             <asp:LinkButton ID="btnEliminar" runat="server"
                                                 CssClass="btn btn-sm btn-outline-danger"
                                                 CommandArgument='<%# Eval("Id") %>'
-                                                OnClick="btnEliminar_Click">
-                                                <i class="fa-solid fa-user-xmark me-1"></i>Desactivar
+                                                OnClick="btnEliminar_Click"
+                                                Visible='<%# Convert.ToBoolean(Eval("Estado")) %>'>
+                                               <i class="fa-solid fa-user-xmark me-1"></i>Desactivar
+                                            </asp:LinkButton>
+
+                                            <asp:LinkButton ID="btnReactivar" runat="server"
+                                                CssClass="btn btn-sm btn-outline-success"
+                                                CommandArgument='<%# Eval("Id") %>'
+                                                OnClick="btnReactivar_Click"
+                                                Visible='<%# !Convert.ToBoolean(Eval("Estado")) %>'>
+                                          
+                                                
+                                                
+                                                <i class="fa-solid fa-rotate-left me-1"></i>Reactivar
                                             </asp:LinkButton>
                                         </ItemTemplate>
                                     </asp:TemplateField>
@@ -78,7 +108,9 @@
                                 <EmptyDataTemplate>
                                     <div class="text-center py-5 text-muted">
                                         <i class="fa-solid fa-user-slash fs-2 mb-2 d-block text-secondary opacity-50"></i>
-                                        <p class="m-0 fw-medium">No hay empleados registrados en el sistema.</p>
+                                        <p class="m-0 fw-medium">
+                                            <asp:Label ID="lblVacioEmpleados" runat="server" Text="No hay empleados registrados en el sistema." />
+                                        </p>
                                     </div>
                                 </EmptyDataTemplate>
                             </asp:GridView>
@@ -159,25 +191,72 @@
                         <asp:HiddenField ID="hfIdBajaEmpleado" runat="server" />
 
                         <div class="modal-header">
-                            <h5 class="modal-title fw-bold" id="tituloModalBajaEmpleado">Desactivar empleado</h5>
+                            <h5 class="modal-title fw-bold" id="tituloModalBajaEmpleado">Dar de baja empleado</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                         </div>
 
                         <div class="modal-body">
                             <p class="mb-2">
-                                Empleado: <strong><asp:Label ID="lblNombreBajaEmpleado" runat="server" /></strong>
+                                ¿Está seguro de que desea dar de baja al empleado
+                            <strong>
+                                <asp:Label ID="lblNombreBajaEmpleado" runat="server" /></strong>?
                             </p>
-                            <p class="text-muted mb-0">
-                                ¿Confirmás que querés dar de baja a este empleado?
+                            <p class="mb-1">El registro del empleado se conservará en el sistema.</p>
+                            <p class="text-muted small mb-0">
+                                Una vez confirmada la baja, el empleado pasará a figurar como inactivo y podrá reactivarse más adelante.
                             </p>
                         </div>
 
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
-                            <asp:Button ID="btnConfirmarBajaEmpleado" runat="server"
-                                Text="Confirmar baja"
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <asp:LinkButton ID="btnConfirmarBajaEmpleado" runat="server"
                                 CssClass="btn btn-danger"
-                                OnClick="btnConfirmarBajaEmpleado_Click" />
+                                OnClick="btnConfirmarBajaEmpleado_Click">
+                            Confirmar baja
+                            </asp:LinkButton>
+                        </div>
+
+                    </ContentTemplate>
+                </asp:UpdatePanel>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Reactivación de Empleado -->
+    <div class="modal fade" id="modalReactivarEmpleado" tabindex="-1"
+        aria-labelledby="tituloModalReactivarEmpleado" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+
+                <asp:UpdatePanel ID="upReactivarEmpleado" runat="server" UpdateMode="Conditional">
+                    <ContentTemplate>
+
+                        <asp:HiddenField ID="hfIdReactivarEmpleado" runat="server" />
+
+                        <div class="modal-header">
+                            <h5 class="modal-title fw-bold" id="tituloModalReactivarEmpleado">Reactivar empleado</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                        </div>
+
+                        <div class="modal-body">
+                            <p class="mb-2">
+                                ¿Está seguro de que desea reactivar al empleado
+                            <strong>
+                                <asp:Label ID="lblNombreReactivarEmpleado" runat="server" /></strong>?
+                            </p>
+                            <p class="text-muted small mb-0">
+                                Una vez reactivado, el empleado volverá a figurar como activo en la clínica.
+                            </p>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <asp:LinkButton ID="btnConfirmarReactivarEmpleado" runat="server"
+                                CssClass="btn btn-success"
+                                OnClick="btnConfirmarReactivarEmpleado_Click">
+                            Confirmar reactivación
+                            </asp:LinkButton>
                         </div>
 
                     </ContentTemplate>
