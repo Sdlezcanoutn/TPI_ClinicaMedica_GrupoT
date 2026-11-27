@@ -1,5 +1,6 @@
 ﻿using Dominio;
 using Negocio;
+using PresentacionWeb.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +10,7 @@ using System.Web.UI.WebControls;
 
 namespace PresentacionWeb
 {
-    public partial class Pacientes : System.Web.UI.Page
+    public partial class Pacientes : PaginaProtegida
     {
         // Carga inicial y sincronización visual del filtro por estado
         protected void Page_Load(object sender, EventArgs e)

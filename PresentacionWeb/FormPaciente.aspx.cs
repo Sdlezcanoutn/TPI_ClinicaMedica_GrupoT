@@ -1,15 +1,16 @@
-﻿using System;
+﻿using Dominio;
+using Negocio;
+using PresentacionWeb.Helpers;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-using Dominio;
-using Negocio;
 
 namespace PresentacionWeb
 {
-    public partial class FormPaciente : System.Web.UI.Page
+    public partial class FormPaciente : PaginaProtegida
     {
         protected void Page_Load(object sender, EventArgs e)
         {

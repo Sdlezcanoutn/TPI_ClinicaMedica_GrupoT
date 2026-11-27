@@ -1,5 +1,6 @@
 ﻿using Dominio;
 using Negocio;
+using PresentacionWeb.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -10,7 +11,7 @@ using System.Web.UI.WebControls;
 
 namespace PresentacionWeb
 {
-    public partial class Especialidades : System.Web.UI.Page
+    public partial class Especialidades : PaginaProtegida
     {
         // ============================================================
         // CARGA INICIAL DE ESPECIALIDADES

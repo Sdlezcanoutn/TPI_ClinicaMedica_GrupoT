@@ -1,15 +1,16 @@
-﻿using System;
+﻿using Dominio;
+using Negocio;
+using PresentacionWeb.Helpers;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-using Dominio;
-using Negocio;
 
 namespace PresentacionWeb
 {
-    public partial class Turnos : System.Web.UI.Page
+    public partial class Turnos : PaginaProtegida
     {
         // ===== IDENTIFICADOR DEL TURNO =====
         private int IdTurno
