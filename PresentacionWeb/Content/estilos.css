@@ -394,6 +394,12 @@ form > div, main, .body-content {
 
 
 /* Componentes reutilizables */
+/* --- Contenedor principal de los módulos --- */
+.contenedor-modulo {
+    max-width: 1500px;
+    margin: 0 auto;
+}
+
 /* Botón principal azul institucional */
 .btn-clinica-primary {
     background-color: #18628a !important;

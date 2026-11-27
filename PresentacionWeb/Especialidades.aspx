@@ -6,9 +6,7 @@
 
     <!-- CONTENEDOR -->
     <div class="container-fluid px-4 px-lg-5 my-5">
-        <div class="contenedor-especialidades">
-
-            <!-- TARJETA PANEL PRINCIPAL DASHBOARD -->
+        <div class="contenedor-modulo">
             <div class="card border-0 shadow-sm rounded-4 bg-white p-4 p-md-5">
 
                 <!-- Encabezado integrado dentro del panel -->

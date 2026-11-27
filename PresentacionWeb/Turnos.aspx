@@ -4,10 +4,8 @@
 
     <!-- CONTENEDOR -->
     <div class="container-fluid px-4 px-lg-5 my-5">
-        <div style="max-width: 1500px; margin: 0 auto;">
-
-            <!-- TARJETA PANEL PRINCIPAL DASHBOARD -->
-            <div class="card border-0 dashboard-panel p-4 p-md-5">
+        <div class="contenedor-modulo">
+            <div class="card border-0 shadow-sm rounded-4 bg-white p-4 p-md-5">
 
                 <!-- Encabezado integrado dentro del panel -->
                 <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 pb-3 border-bottom">
