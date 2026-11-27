@@ -619,8 +619,13 @@
             alerta.textContent = texto;
             alerta.classList.remove("d-none");
 
-            // --- Desplazar la página hacia arriba ---
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            // --- Desplazar la página hacia la alerta ---
+            setTimeout(function() {
+                alerta.scrollIntoView({
+                    behavior: "smooth",
+                    block: "center"
+                });
+            }, 350);
 
             // --- Ocultar alerta después de 8 segundos ---
             setTimeout(function() {
@@ -782,9 +787,14 @@
                         botonGuardado = boton;
                         textoOriginal = boton.value;
 
-                        boton.value = "Guardando turno...";
+                        const idTurno = document.getElementById("<%= hfIdTurno.ClientID %>").value;
+
+                        boton.value = idTurno === "0"
+                            ? "Guardando turno..."
+                            : "Reprogramando turno...";
+
                         boton.disabled = true;
-                    }
+    }
                 });
 
                 // --- Restablecer controles al finalizar ---

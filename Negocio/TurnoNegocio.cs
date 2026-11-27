@@ -20,7 +20,7 @@ namespace Negocio
                 datos.setearConsulta(
                     "SELECT T.Id_Turno, T.Fecha_Alta, T.Fecha, T.Hora_Inicio, T.Hora_Fin, " +
                     "T.Motivo_Consulta, T.Diagnostico, T.Email_Enviado, " +
-                    "P.Id_Paciente, P.Nombre AS NombrePaciente, P.Apellido AS ApellidoPaciente, P.DNI AS DniPaciente, P.Estado AS EstadoPaciente, " +
+                    "P.Id_Paciente, P.Nombre AS NombrePaciente, P.Apellido AS ApellidoPaciente, P.DNI AS DniPaciente, P.Email AS EmailPaciente, P.Estado AS EstadoPaciente, " +
                     "M.Id_Medico, M.Nombre AS NombreMedico, M.Apellido AS ApellidoMedico, M.Matricula, M.Estado AS EstadoMedico, " +
                     "E.Id_Especialidad, E.Nombre AS NombreEspecialidad, E.Estado AS EstadoEspecialidad, " +
                     "ET.Id_Estado_Turno, ET.Nombre AS NombreEstadoTurno " +
@@ -59,6 +59,9 @@ namespace Negocio
                             Nombre = (string)datos.Lector["NombrePaciente"],
                             Apellido = (string)datos.Lector["ApellidoPaciente"],
                             DNI = (string)datos.Lector["DniPaciente"],
+                            Email = datos.Lector["EmailPaciente"] == DBNull.Value
+                                ? string.Empty
+                                : (string)datos.Lector["EmailPaciente"],
                             Estado = (bool)datos.Lector["EstadoPaciente"]
                         },
                         Medico = new Medico
@@ -394,7 +397,7 @@ namespace Negocio
         }
 
         // ===== REPROGRAMACIÓN DE TURNOS =====
-        public void reprogramar(Turno turno)
+        public Turno reprogramar(Turno turno)
         {
             // --- Validar identificador ---
             if (turno == null || turno.Id <= 0)
@@ -511,6 +514,9 @@ namespace Negocio
                 // --- Confirmar las operaciones ---
                 datos.confirmarTransaccion();
                 transaccionIniciada = false;
+
+                // --- Devolver los datos anteriores del turno ---
+                return original;
             }
             catch (System.Data.SqlClient.SqlException ex)
             {

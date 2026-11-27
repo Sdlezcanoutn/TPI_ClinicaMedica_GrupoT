@@ -857,8 +857,44 @@ namespace PresentacionWeb
                 }
                 else
                 {
-                    negocio.reprogramar(nuevo);
-                    mensaje = "Turno reprogramado correctamente.";
+                    Turno turnoAnterior = negocio.reprogramar(nuevo);
+
+                    // --- Completar los datos del turno reprogramado ---
+                    nuevo.Paciente = turnoAnterior.Paciente;
+                    nuevo.Medico = turnoAnterior.Medico;
+                    nuevo.Especialidad = turnoAnterior.Especialidad;
+
+                    mensaje = $"Turno #{nuevo.Id:D3} reprogramado correctamente.";
+
+                    // --- Enviar correo de reprogramación ---
+                    bool emailEnviado = false;
+
+                    try
+                    {
+                        NotificacionTurno notificacion = new NotificacionTurno();
+                        notificacion.enviarReprogramacion(nuevo, turnoAnterior);
+
+                        emailEnviado = true;
+                        mensaje += " Correo de reprogramación enviado.";
+                    }
+                    catch (Exception ex)
+                    {
+                        Session["error"] = ex.ToString();
+
+                        mensaje += " No se pudo enviar el correo de reprogramación.";
+                    }
+
+                    // --- Actualizar estado del envío ---
+                    try
+                    {
+                        negocio.actualizarEmailEnviado(nuevo.Id, emailEnviado);
+                    }
+                    catch (Exception ex)
+                    {
+                        Session["error"] = ex.ToString();
+
+                        mensaje += " No se pudo actualizar el estado del correo.";
+                    }
                 }
 
                 AplicarFiltrosListado();
