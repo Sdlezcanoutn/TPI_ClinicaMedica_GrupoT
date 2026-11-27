@@ -620,7 +620,7 @@ namespace PresentacionWeb
                         "El turno quedará registrado como No asistió.";
 
                     btnConfirmarEstado.Text = "Confirmar inasistencia";
-                    btnConfirmarEstado.CssClass = "btn btn-warning";
+                    btnConfirmarEstado.CssClass = "btn btn-secondary";
                 }
 
                 lblErrorListadoTurno.Visible = false;

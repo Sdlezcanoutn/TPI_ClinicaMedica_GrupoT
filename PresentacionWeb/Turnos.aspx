@@ -577,7 +577,7 @@
                         </div>
 
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-outline-secondary" onclick="cerrarModalTurno();">Cancelar</button>
+                            <button type="button" class="btn btn-secondary" onclick="cerrarModalTurno();">Cancelar</button>
                             <asp:Button ID="btnGuardarTurno" runat="server"
                                 Text="Guardar Turno"
                                 CssClass="btn btn-clinica-primary"

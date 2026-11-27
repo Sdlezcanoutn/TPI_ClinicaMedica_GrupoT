@@ -250,7 +250,7 @@
                                         </button>
 
                                         <asp:Button ID="btnGuardar" runat="server"
-                                            Text="Guardar"
+                                            Text="Guardar Especialidad"
                                             CssClass="btn btn-clinica-primary"
                                             OnClick="btnGuardar_Click" />
                                     </div>
@@ -375,7 +375,7 @@
         actualizarContadores();
 
         document.getElementById('tituloModalEspecialidad').textContent = 'Nueva Especialidad';
-        document.getElementById('<%= btnGuardar.ClientID %>').value = 'Guardar';
+        document.getElementById('<%= btnGuardar.ClientID %>').value = 'Guardar Especialidad';
 
         ocultarError();
 
@@ -387,7 +387,7 @@
     function prepararEdicionEspecialidad() {
         document.getElementById('tituloModalEspecialidad').textContent = 'Editar Especialidad';
 
-        document.getElementById('<%= btnGuardar.ClientID %>').value = 'Guardar cambios';
+        document.getElementById('<%= btnGuardar.ClientID %>').value = 'Guardar Cambios';
 
         actualizarContadores();
 

@@ -226,6 +226,9 @@ namespace PresentacionWeb
                 // --- Cargar únicamente las especialidades activas ---
                 cargarEspecialidades();
 
+                // --- Restablecer texto del botón ---
+                btnGuardarMedico.Text = "Guardar Médico";
+
                 // --- Actualizar el contenido del formulario ---
                 upMedico.Update();
 
