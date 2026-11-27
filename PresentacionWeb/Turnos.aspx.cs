@@ -743,9 +743,35 @@ namespace PresentacionWeb
             int idMedico = int.TryParse(ddlMedico.SelectedValue, out int mId) ? mId : 0;
             string motivo = txtMotivoConsulta.Text.Trim();
 
-            if (idPaciente <= 0 || idEspecialidad <= 0 || idMedico <= 0)
+            // --- Validar campos obligatorios ---
+            List<string> camposFaltantes = new List<string>();
+
+            if (idPaciente <= 0)
+                camposFaltantes.Add("paciente");
+
+            if (idEspecialidad <= 0)
+                camposFaltantes.Add("especialidad");
+
+            if (idMedico <= 0)
+                camposFaltantes.Add("médico");
+
+            if (string.IsNullOrWhiteSpace(txtFechaTurno.Text))
+                camposFaltantes.Add("fecha");
+
+            if (string.IsNullOrWhiteSpace(ddlHorarioDisponible.SelectedValue) ||
+                ddlHorarioDisponible.SelectedValue == "0")
+                camposFaltantes.Add("horario");
+
+            if (string.IsNullOrWhiteSpace(motivo))
+                camposFaltantes.Add("motivo de consulta");
+
+            if (camposFaltantes.Count > 0)
             {
-                MostrarErrorTurno("Seleccioná paciente, especialidad y médico.");
+                string mensaje = camposFaltantes.Count == 1
+                    ? "Completá el siguiente campo: "
+                    : "Completá los siguientes campos: ";
+
+                MostrarErrorTurno(mensaje + string.Join(", ", camposFaltantes) + ".");
                 return;
             }
 

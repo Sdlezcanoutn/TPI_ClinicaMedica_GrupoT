@@ -662,21 +662,25 @@
             mostrarAlertaTurno(texto);
         }
 
-        // Limpia y oculta errores previos del modal
+        // --- Ocultar errores del formulario de turnos ---
         function ocultarErrorTurno() {
             const lbl = document.getElementById("<%= lblErrorTurno.ClientID %>");
+
             if (lbl) {
                 lbl.textContent = "";
-                lbl.style.display = "none";
+                lbl.classList.remove("d-block");
+                lbl.classList.add("d-none");
             }
         }
 
         // --- Ocultar errores del modal de atención ---
         function ocultarErrorAtencion() {
             const lbl = document.getElementById("<%= lblErrorAtenderTurno.ClientID %>");
+
             if (lbl) {
                 lbl.textContent = "";
-                lbl.style.display = "none";
+                lbl.classList.remove("d-block");
+                lbl.classList.add("d-none");
             }
         }
 

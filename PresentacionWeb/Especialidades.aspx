@@ -207,7 +207,11 @@
 
                                     <asp:HiddenField ID="hfIdEspecialidad" runat="server" />
 
-                                    <div class="modal-body formulario-modulo">
+                                   <div class="modal-body formulario-modulo">
+
+                                        <asp:Label ID="lblMensaje" runat="server"
+                                            CssClass="text-danger small d-block mb-3"
+                                            Visible="false" />
 
                                         <div class="mb-3">
                                             <label class="form-label">Nombre *</label>
@@ -216,9 +220,9 @@
                                                 MaxLength="100"
                                                 oninput="actualizarContadores()" />
 
-                                           <div class="text-muted small mt-1 text-end">
-                                            <span id="contadorNombre">0</span> / 100
-                                        </div>
+                                            <div class="text-muted small mt-1 text-end">
+                                                <span id="contadorNombre">0</span> / 100
+                                            </div>
                                         </div>
 
                                         <div class="mb-3">
@@ -230,14 +234,11 @@
                                                 MaxLength="500"
                                                 oninput="actualizarContadores()" />
 
-                                           <div class="text-muted small mt-1 text-end">
-                                               <span id="contadorDescripcion">0</span> / 500
-                                           </div>
+                                            <div class="text-muted small mt-1 text-end">
+                                                <span id="contadorDescripcion">0</span> / 500
+                                            </div>
                                         </div>
 
-                                        <asp:Label ID="lblMensaje" runat="server"
-                                            CssClass="text-danger small"
-                                            Visible="false" />
                                     </div>
 
                                     <div class="modal-footer">
@@ -397,7 +398,8 @@
 
         if (mensaje) {
             mensaje.textContent = '';
-            mensaje.style.display = 'none';
+            mensaje.classList.remove('d-block');
+            mensaje.classList.add('d-none');
         }
     }
 

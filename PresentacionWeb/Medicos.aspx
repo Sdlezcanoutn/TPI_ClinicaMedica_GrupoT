@@ -724,7 +724,8 @@
 
             if (mensaje) {
                 mensaje.textContent = '';
-                mensaje.style.display = 'none';
+                mensaje.classList.remove('d-block');
+                mensaje.classList.add('d-none');
             }
         }
 
