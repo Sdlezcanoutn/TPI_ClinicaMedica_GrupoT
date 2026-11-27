@@ -175,7 +175,9 @@
                                 <EmptyDataTemplate>
                                     <div class="text-center py-5 text-muted">
                                         <i class="fa-solid fa-calendar-minus fs-2 mb-2 d-block text-secondary opacity-50"></i>
-                                        <p class="m-0 fw-medium">No hay turnos agendados por el momento.</p>
+                                        <p class="m-0 fw-medium">
+                                            <asp:Label ID="lblSinResultados" runat="server" />
+                                        </p>
                                     </div>
                                 </EmptyDataTemplate>
                             </asp:GridView>

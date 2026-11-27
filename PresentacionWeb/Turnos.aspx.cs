@@ -931,7 +931,9 @@ namespace PresentacionWeb
                 lblErrorListadoTurno.Visible = false;
                 dgvTurnos.Visible = true;
 
-                List<Turno> lista = negocio.listar();
+                // --- Obtener todos los turnos registrados ---
+                List<Turno> todos = negocio.listar();
+                List<Turno> lista = todos;
 
                 // --- Filtrar por texto ---
                 if (!string.IsNullOrWhiteSpace(filtro))
@@ -995,8 +997,46 @@ namespace PresentacionWeb
                     Estado = t.Estado != null ? t.Estado.Nombre : "Nuevo"
                 }).ToList();
 
+                // --- Mostrar resultados en la tabla ---
                 dgvTurnos.DataSource = filas;
                 dgvTurnos.DataBind();
+
+                // --- Mostrar mensaje según el resultado ---
+                if (lista.Count == 0)
+                {
+                    Label lblSinResultados = dgvTurnos.Controls[0]
+                        .Controls[0].FindControl("lblSinResultados") as Label;
+
+                    if (lblSinResultados != null)
+                    {
+                        bool hayBusqueda = !string.IsNullOrWhiteSpace(filtro);
+
+                        bool hayFiltros = idEspecialidad > 0 ||
+                                          idMedico > 0 ||
+                                          fechaFiltro.HasValue;
+
+                        if (todos.Count == 0)
+                        {
+                            lblSinResultados.Text =
+                                "No hay turnos registrados en el sistema.";
+                        }
+                        else if (hayBusqueda && hayFiltros)
+                        {
+                            lblSinResultados.Text =
+                                "No se encontraron turnos que coincidan con la búsqueda y los filtros seleccionados.";
+                        }
+                        else if (hayBusqueda)
+                        {
+                            lblSinResultados.Text =
+                                "No se encontraron turnos que coincidan con la búsqueda.";
+                        }
+                        else if (hayFiltros)
+                        {
+                            lblSinResultados.Text =
+                                "No se encontraron turnos que coincidan con los filtros seleccionados.";
+                        }
+                    }
+                }
             }
             catch (Exception ex)
             {
