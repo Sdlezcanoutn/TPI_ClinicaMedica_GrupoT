@@ -544,9 +544,9 @@ namespace Negocio
         // ===== CAMBIOS DE ESTADO DE TURNOS =====
 
         // --- Cancelar turno ---
-        public void cancelar(int id)
+        public Turno cancelar(int id)
         {
-            cambiarEstado(id, "Cancelado");
+            return cambiarEstado(id, "Cancelado");
         }
 
         // --- Registrar inasistencia ---
@@ -568,8 +568,7 @@ namespace Negocio
         }
 
         // --- Centralizar cambios de estado ---
-        private void cambiarEstado(int id, string nuevoEstado,
-            string diagnostico = null)
+        private Turno cambiarEstado(int id, string nuevoEstado, string diagnostico = null)
         {
             // --- Validar identificador ---
             if (id <= 0)
@@ -632,7 +631,9 @@ namespace Negocio
                     "Id_Estado_Turno = (SELECT Id_Estado_Turno " +
                     "FROM ESTADOS_TURNO WHERE Nombre = @NuevoEstado), " +
                     "Diagnostico = CASE WHEN @NuevoEstado = 'Cerrado' " +
-                    "THEN @Diagnostico ELSE Diagnostico END " +
+                    "THEN @Diagnostico ELSE Diagnostico END, " +
+                    "Email_Enviado = CASE WHEN @NuevoEstado = 'Cancelado' " +
+                    "THEN 0 ELSE Email_Enviado END " +
                     "WHERE Id_Turno = @IdTurno"
                 );
 
@@ -645,6 +646,9 @@ namespace Negocio
                 // --- Confirmar las operaciones ---
                 datos.confirmarTransaccion();
                 transaccionIniciada = false;
+
+                // --- Devolver los datos del turno ---
+                return original;
             }
             catch (System.Data.SqlClient.SqlException ex)
             {

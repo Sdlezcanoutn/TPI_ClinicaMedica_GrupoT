@@ -783,7 +783,9 @@
                 gestorPeticiones.add_beginRequest(function(sender, args) {
                     const boton = args.get_postBackElement();
 
-                    if (boton && boton.id === "<%= btnGuardarTurno.ClientID %>") {
+                    if (!boton) return;
+
+                    if (boton.id === "<%= btnGuardarTurno.ClientID %>") {
                         botonGuardado = boton;
                         textoOriginal = boton.value;
 
@@ -794,7 +796,17 @@
                             : "Reprogramando turno...";
 
                         boton.disabled = true;
-    }
+                    }
+                    else if (boton.id === "<%= btnConfirmarEstado.ClientID %>") {
+                        botonGuardado = boton;
+                        textoOriginal = boton.value;
+
+                        boton.value = textoOriginal.toLowerCase().includes("cancelación")
+                            ? "Cancelando turno..."
+                            : "Registrando inasistencia...";
+
+                        boton.disabled = true;
+                    }
                 });
 
                 // --- Restablecer controles al finalizar ---

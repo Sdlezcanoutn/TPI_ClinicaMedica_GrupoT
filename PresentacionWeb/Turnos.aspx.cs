@@ -671,8 +671,40 @@ namespace PresentacionWeb
                 // --- Ejecutar acción seleccionada ---
                 if (nuevoEstado == "Cancelado")
                 {
-                    negocio.cancelar(id);
-                    mensaje = "Turno cancelado correctamente.";
+                    // --- Cancelar turno y recuperar sus datos ---
+                    Turno turnoCancelado = negocio.cancelar(id);
+
+                    mensaje = $"Turno #{turnoCancelado.Id:D3} cancelado correctamente.";
+
+                    // --- Enviar correo de cancelación ---
+                    bool emailEnviado = false;
+
+                    try
+                    {
+                        NotificacionTurno notificacion = new NotificacionTurno();
+                        notificacion.enviarCancelacion(turnoCancelado);
+
+                        emailEnviado = true;
+                        mensaje += " Correo de cancelación enviado.";
+                    }
+                    catch (Exception ex)
+                    {
+                        Session["error"] = ex.ToString();
+
+                        mensaje += " No se pudo enviar el correo de cancelación.";
+                    }
+
+                    // --- Actualizar estado del envío ---
+                    try
+                    {
+                        negocio.actualizarEmailEnviado(turnoCancelado.Id, emailEnviado);
+                    }
+                    catch (Exception ex)
+                    {
+                        Session["error"] = ex.ToString();
+
+                        mensaje += " No se pudo actualizar el estado del correo.";
+                    }
                 }
                 else if (nuevoEstado == "No asistió")
                 {
