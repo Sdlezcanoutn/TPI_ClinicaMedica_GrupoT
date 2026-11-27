@@ -76,20 +76,20 @@
 
                                         <ItemTemplate>
 
-                                            <%-- Editar: solo especialidades activas --%>
+                                            <%-- Editar: solo con el perfil de administrador y por las especialidades activas --%>
                                             <asp:LinkButton ID="btnEditar" runat="server"
                                                 CssClass="btn btn-sm btn-outline-secondary me-1"
                                                 CommandArgument='<%# Eval("Id") %>'
-                                                Visible='<%# Convert.ToBoolean(Eval("Estado")) %>'
+                                                Visible='<%# PuedeGestionarEspecialidades && Convert.ToBoolean(Eval("Estado")) %>'
                                                 OnClick="btnEditar_Click">
                                         <i class="fa-solid fa-pen-to-square me-1"></i> Editar
                                             </asp:LinkButton>
 
-                                            <%-- Dar de baja: solo especialidades activas --%>
+                                            <%-- Dar de baja: solo con el perfil de administrador y por las especialidades activas --%>
                                             <asp:LinkButton ID="btnEliminar" runat="server"
                                                 CssClass="btn btn-sm btn-outline-danger"
                                                 CommandArgument='<%# Eval("Id") %>'
-                                                Visible='<%# Convert.ToBoolean(Eval("Estado")) %>'
+                                                Visible='<%# PuedeGestionarEspecialidades && Convert.ToBoolean(Eval("Estado")) %>'
                                                 OnClick="btnEliminar_Click">
                                                 <i class="fa-solid fa-trash me-1"></i> Dar de baja
                                             </asp:LinkButton>
@@ -98,7 +98,7 @@
                                             <asp:LinkButton ID="btnReactivar" runat="server"
                                                 CssClass="btn btn-sm btn-outline-success"
                                                 CommandArgument='<%# Eval("Id") %>'
-                                                Visible='<%# !Convert.ToBoolean(Eval("Estado")) %>'
+                                                Visible='<%# PuedeGestionarEspecialidades && !Convert.ToBoolean(Eval("Estado")) %>'
                                                 OnClick="btnReactivar_Click">
                                                 <i class="fa-solid fa-rotate-left me-1"></i> Reactivar
                                             </asp:LinkButton>

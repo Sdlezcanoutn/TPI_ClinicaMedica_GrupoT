@@ -114,7 +114,7 @@
                                                     <asp:LinkButton ID="btnEditar" runat="server"
                                                         CssClass="btn btn-sm btn-outline-warning text-nowrap"
                                                         CommandArgument='<%# Eval("Id") %>'
-                                                        Visible='<%# Eval("Estado").ToString() == "Nuevo" || Eval("Estado").ToString() == "Reprogramado" %>'
+                                                        Visible='<%# PuedeGestionarTurnos && (Eval("Estado").ToString() == "Nuevo" || Eval("Estado").ToString() == "Reprogramado") %>'
                                                         OnClick="btnEditar_Click">
                                                     <i class="fa-solid fa-calendar-days me-1"></i> Reprogramar
                                                 </asp:LinkButton>
@@ -122,7 +122,7 @@
                                                     <asp:LinkButton ID="btnCancelar" runat="server"
                                                         CssClass="btn btn-sm btn-outline-danger text-nowrap"
                                                         CommandArgument='<%# Eval("Id") %>'
-                                                        Visible='<%# Eval("Estado").ToString() == "Nuevo" || Eval("Estado").ToString() == "Reprogramado" %>'
+                                                        Visible='<%# PuedeGestionarTurnos && (Eval("Estado").ToString() == "Nuevo" || Eval("Estado").ToString() == "Reprogramado") %>'
                                                         OnClick="btnCancelar_Click">
                                                     <i class="fa-solid fa-calendar-xmark me-1"></i> Cancelar
                                                 </asp:LinkButton>
@@ -154,6 +154,7 @@
                                                     <asp:LinkButton ID="btnAtender" runat="server"
                                                         CssClass="btn btn-sm btn-outline-success text-nowrap"
                                                         CommandArgument='<%# Eval("Id") %>'
+                                                        Visible='<%# PuedeRegistrarAtencion %>'
                                                         OnClick="btnAtender_Click"
                                                         ToolTip="Atender paciente">
                                                     <i class="fa-solid fa-stethoscope me-1"></i> Atender
@@ -162,6 +163,7 @@
                                                     <asp:LinkButton ID="btnInasistencia" runat="server"
                                                         CssClass="btn btn-sm btn-outline-secondary text-nowrap"
                                                         CommandArgument='<%# Eval("Id") %>'
+                                                        Visible='<%# PuedeRegistrarAtencion %>'
                                                         OnClick="btnInasistencia_Click"
                                                         ToolTip="Registrar inasistencia">
                                                     <i class="fa-solid fa-user-xmark me-1"></i> No asistió

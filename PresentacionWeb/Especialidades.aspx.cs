@@ -14,7 +14,7 @@ namespace PresentacionWeb
     public partial class Especialidades : PaginaProtegida
     {
         // Propiedades
-        private bool PuedeGestionarEspecialidades
+        protected bool PuedeGestionarEspecialidades
         {
             get 
             {

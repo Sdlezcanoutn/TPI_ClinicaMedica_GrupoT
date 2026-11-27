@@ -43,7 +43,7 @@ namespace PresentacionWeb
             }
         }
 
-        private bool PuedeGestionarTurnos
+        protected bool PuedeGestionarTurnos
         {
             get
             {
@@ -51,7 +51,7 @@ namespace PresentacionWeb
             }
         }
 
-        private bool PuedeRegistrarAtencion
+        protected bool PuedeRegistrarAtencion
         {
             get
             {
@@ -59,6 +59,19 @@ namespace PresentacionWeb
             }
         }
 
+        private bool PuedeCambiarEstado(Turno turno, string nuevoEstado)
+        {
+            if (!PuedeAccederTurno(turno))
+                return false;
+
+            if (nuevoEstado == "Cancelado")
+                return PuedeGestionarTurnos;
+
+            if (nuevoEstado == "No asistió")
+                return EsAdministrador || EsMedico;
+
+            return false;
+        }
         private int? IdMedicoActual
         {
             get
@@ -89,6 +102,8 @@ namespace PresentacionWeb
         // Se ejecuta al cargar la página; solo en la primera carga (!IsPostBack) inicializa combos, horarios y grilla
         protected void Page_Load(object sender, EventArgs e)
         {
+            btnAgregar.Visible = PuedeGestionarTurnos;
+
             if (!IsPostBack)
             {
                 CargarCombos();
@@ -539,6 +554,16 @@ namespace PresentacionWeb
 
                 // --- Guardar diagnóstico y cerrar turno ---
                 TurnoNegocio negocio = new TurnoNegocio();
+                Turno turno = negocio.listar()
+                    .FirstOrDefault(t => t.Id == id);
+
+                // Comprobar nuevamente el permiso antes de guardar
+                if (!PuedeRegistrarAtencion || !PuedeAccederTurno(turno))
+                {
+                    Response.StatusCode = 403;
+                    return;
+                }
+
                 negocio.cerrar(id, diagnostico);
 
                 // --- Restablecer formulario ---
@@ -596,6 +621,13 @@ namespace PresentacionWeb
 
                 if (turno == null)
                     throw new ArgumentException("No se encontró el turno seleccionado.");
+
+                // Validar si el perfil del usuario puede hacer esta acción
+                if (!PuedeAccederTurno(turno))
+                {
+                    Response.StatusCode = 403;
+                    return;
+                }
 
                 // --- Mostrar datos actuales del turno ---
                 lblDatosHistorial.Text = Server.HtmlEncode(
@@ -672,6 +704,13 @@ namespace PresentacionWeb
 
                 if (turno == null)
                     throw new ArgumentException("No se encontró el turno seleccionado.");
+
+                // Validamos que el perfil tenga permisos para realizar esta acción
+                if (!PuedeCambiarEstado(turno, nuevoEstado))
+                {
+                    Response.StatusCode = 403;
+                    return;
+                }
 
                 // --- Validar estado del turno ---
                 if (turno.Estado.Nombre != "Nuevo" &&
@@ -767,6 +806,16 @@ namespace PresentacionWeb
                 string nuevoEstado = ViewState["NuevoEstadoTurno"] as string;
 
                 TurnoNegocio negocio = new TurnoNegocio();
+                Turno turno = negocio.listar()
+                    .FirstOrDefault(t => t.Id == id);
+
+                // Validamos que el perfil tenga permisos para realizar esta acción
+                if (!PuedeCambiarEstado(turno, nuevoEstado))
+                {
+                    Response.StatusCode = 403;
+                    return;
+                }
+
                 string mensaje;
 
                 // --- Ejecutar acción seleccionada ---
@@ -1316,17 +1365,6 @@ namespace PresentacionWeb
             rptSugerenciasTurno.DataSource = sugerencias;
             rptSugerenciasTurno.DataBind();
             lblSinSugerencias.Visible = sugerencias.Count == 0;
-        }
-
-        private bool PuedeAccederTurno(Turno turno, int? idMedicoActual)
-        {
-            if (turno == null)
-                return false;
-
-            if (!EsMedico)
-                return EsAdministrador || EsRecepcionista;
-
-            return idMedicoActual.HasValue && turno.Medico != null && turno.Medico.Id == idMedicoActual.Value;
         }
 
         #endregion
