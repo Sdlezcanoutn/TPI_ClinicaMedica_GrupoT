@@ -13,11 +13,24 @@ namespace PresentacionWeb
 {
     public partial class Especialidades : PaginaProtegida
     {
+        // Propiedades
+        private bool PuedeGestionarEspecialidades
+        {
+            get 
+            {
+                return UsuarioActual != null &&
+                       UsuarioActual.Perfil != null &&
+                       UsuarioActual.Perfil.Nombre == "Administrador";
+            }
+        }
+
         // ============================================================
         // CARGA INICIAL DE ESPECIALIDADES
         // ============================================================
         protected void Page_Load(object sender, EventArgs e)
         {
+            btnAgregar.Visible = PuedeGestionarEspecialidades;
+
             if (!IsPostBack)
             {
                 cargarEspecialidades();
@@ -39,6 +52,13 @@ namespace PresentacionWeb
         // ============================================================
         protected void btnGuardar_Click(object sender, EventArgs e)
         {
+            // Validar si el perfil del usuario puede hacer esta acción
+            if (!PuedeGestionarEspecialidades)
+            {
+                Response.StatusCode = 403;
+                return;
+            }
+
             try
             {
                 // --- Obtener datos del formulario ---
@@ -238,6 +258,13 @@ namespace PresentacionWeb
         // ============================================================
         protected void btnEditar_Click(object sender, EventArgs e)
         {
+            // Validar si el perfil del usuario puede hacer esta acción
+            if (!PuedeGestionarEspecialidades)
+            {
+                Response.StatusCode = 403;
+                return;
+            }
+
             // --- Obtener especialidad seleccionada ---
             LinkButton boton = (LinkButton)sender;
             int id = int.Parse(boton.CommandArgument);
@@ -276,6 +303,13 @@ namespace PresentacionWeb
         // ============================================================
         protected void btnEliminar_Click(object sender, EventArgs e)
         {
+            // Validar si el perfil del usuario puede hacer esta acción
+            if (!PuedeGestionarEspecialidades)
+            {
+                Response.StatusCode = 403;
+                return;
+            }
+
             // --- Obtener especialidad seleccionada ---
             LinkButton boton = (LinkButton)sender;
             int id = int.Parse(boton.CommandArgument);
@@ -337,6 +371,13 @@ namespace PresentacionWeb
         // ============================================================
         protected void btnConfirmarBaja_Click(object sender, EventArgs e)
         {
+            // Validar si el perfil del usuario puede hacer esta acción
+            if (!PuedeGestionarEspecialidades)
+            {
+                Response.StatusCode = 403;
+                return;
+            }
+
             try
             {
                 // --- Obtener especialidad seleccionada ---
@@ -384,6 +425,13 @@ namespace PresentacionWeb
         // ============================================================
         protected void btnReactivar_Click(object sender, EventArgs e)
         {
+            // Validar si el perfil del usuario puede hacer esta acción
+            if (!PuedeGestionarEspecialidades)
+            {
+                Response.StatusCode = 403;
+                return;
+            }
+
             // --- Obtener especialidad seleccionada ---
             LinkButton boton = (LinkButton)sender;
             int id = int.Parse(boton.CommandArgument);
@@ -419,6 +467,13 @@ namespace PresentacionWeb
         // ============================================================
         protected void btnConfirmarReactivar_Click(object sender, EventArgs e)
         {
+            // Validar si el perfil del usuario puede hacer esta acción
+            if (!PuedeGestionarEspecialidades)
+            {
+                Response.StatusCode = 403;
+                return;
+            }
+
             try
             {
                 // --- Obtener especialidad seleccionada ---

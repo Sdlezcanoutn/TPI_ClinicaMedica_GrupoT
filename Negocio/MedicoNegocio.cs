@@ -643,6 +643,39 @@ namespace Negocio
                 datos.cerrarConexion();
             }
         }
+        public int? obtenerIdPorUsuario(int idUsuario)
+        {
+            AccesoDatos datos = new AccesoDatos();
+
+            try
+            {
+                datos.setearConsulta(
+                    "SELECT Id_Medico " +
+                    "FROM MEDICOS " +
+                    "WHERE Id_Usuario = @IdUsuario " +
+                    "AND Estado = 1;"
+                );
+
+                datos.setearParametro("@IdUsuario", idUsuario);
+                datos.ejecutarLectura();
+
+                if (datos.Lector.Read())
+                {
+                    return (int)datos.Lector["Id_Medico"];
+                }
+
+                return null;
+
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            finally
+            {
+                datos.cerrarConexion();
+            }
+        }
     }
 }
 
