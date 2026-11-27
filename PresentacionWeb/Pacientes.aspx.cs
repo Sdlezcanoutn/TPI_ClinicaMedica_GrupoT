@@ -24,6 +24,13 @@ namespace PresentacionWeb
             ActualizarEstiloFiltro();
         }
 
+        protected override bool TienePermiso(Usuario usuario)
+        {
+            return usuario.Perfil != null &&
+                (usuario.Perfil.Nombre == "Administrador" ||
+                 usuario.Perfil.Nombre == "Recepcionista");
+        }
+
         // Obtiene los pacientes, aplica filtro por estado y texto de búsqueda, y actualiza la grilla
         private void CargarPacientes(string filtro = "")
         {

@@ -21,6 +21,13 @@ namespace PresentacionWeb
             }
         }
 
+        protected override bool TienePermiso(Usuario usuario)
+        {
+            return usuario.Perfil != null &&
+                (usuario.Perfil.Nombre == "Administrador" ||
+                 usuario.Perfil.Nombre == "Recepcionista");
+        }
+
         private void cargar()
         {
             HorarioTrabajoNegocio negocio = new HorarioTrabajoNegocio();

@@ -40,6 +40,14 @@ namespace PresentacionWeb
                 Page.Title = "Editar Horario";
             }
         }
+
+        protected override bool TienePermiso(Usuario usuario)
+        {
+            return usuario.Perfil != null &&
+                (usuario.Perfil.Nombre == "Administrador" ||
+                 usuario.Perfil.Nombre == "Recepcionista");
+        }
+
         private void cargarMedicos()
         {
             MedicoNegocio negocio = new MedicoNegocio();

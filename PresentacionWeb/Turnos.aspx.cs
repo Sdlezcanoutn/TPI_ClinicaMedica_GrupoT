@@ -38,6 +38,14 @@ namespace PresentacionWeb
             }
         }
 
+        protected override bool TienePermiso(Usuario usuario)
+        {
+            return usuario.Perfil != null && 
+                (usuario.Perfil.Nombre == "Administrador" || 
+                 usuario.Perfil.Nombre == "Recepcionista" || 
+                 usuario.Perfil.Nombre == "Médico");
+        }
+
         // --- Ejecutar búsqueda de turnos ---
         protected void btnBuscar_Click(object sender, EventArgs e)
         {

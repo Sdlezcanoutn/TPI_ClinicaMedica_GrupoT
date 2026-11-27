@@ -28,6 +28,13 @@ namespace PresentacionWeb
             actualizarEstiloFiltro();
         }
 
+        protected override bool TienePermiso(Usuario usuario)
+        {
+            return usuario.Perfil != null &&
+                (usuario.Perfil.Nombre == "Administrador" ||
+                 usuario.Perfil.Nombre == "Recepcionista");
+        }
+
         // ============================================================
         // LISTADO DE MÉDICOS
         // ============================================================

@@ -25,7 +25,6 @@
     <!-- CSS PERSONALIZADO -->
     <link href="/Content/estilos.css?v=1.21" rel="stylesheet" type="text/css" />
 
-    <webopt:BundleReference runat="server" Path="~/Content/css" />
     <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon" />
 </head>
 <body>
@@ -55,12 +54,26 @@
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse d-sm-inline-flex justify-content-end">
-                    <ul class="navbar-nav gap-2">
-                        <li class="nav-item"><a class="nav-link" runat="server" href="~/">Inicio</a></li>
-                        <li class="nav-item"><a class="nav-link" runat="server" href="~/Pacientes">Pacientes</a></li>
-                        <li class="nav-item"><a class="nav-link" runat="server" href="~/Medicos">Médicos</a></li>
-                        <li class="nav-item"><a class="nav-link" runat="server" href="~/Especialidades">Especialidades</a></li>
-                        <li class="nav-item"><a class="nav-link" runat="server" href="~/Turnos">Turnos</a></li>
+                    <ul class="navbar-nav gap-2 align-items-lg-center">
+                        <li ID="navInicio" runat="server" class="nav-item"><a class="nav-link" runat="server" href="~/">Inicio</a></li>
+                        <li ID="navPacientes" runat="server" class="nav-item"><a class="nav-link" runat="server" href="~/Pacientes">Pacientes</a></li>
+                        <li ID="navMedicos" runat="server" class="nav-item"><a class="nav-link" runat="server" href="~/Medicos">Médicos</a></li>
+                        <li ID="navEspecialidades" runat="server" class="nav-item"><a class="nav-link" runat="server" href="~/Especialidades">Especialidades</a></li>
+                        <li ID="navHorarios" runat="server" class="nav-item"><a class="nav-link" runat="server" href="~/Horarios">Horarios</a></li>
+                        <li ID="navEmpleados" runat="server" class="nav-item"><a class="nav-link" runat="server" href="~/Empleados">Empleados</a></li>
+                        <li ID="navTurnos" runat="server" class="nav-item"><a class="nav-link" runat="server" href="~/Turnos">Turnos</a></li>
+                        <li ID="navUsuario" runat="server" class="nav-item">
+                            <span> 
+                                <i class="fas fa-user-circle me-1"></i>
+                                <asp:Literal ID="litUsuario" runat="server" Mode="Encode" />
+                            </span>
+                        </li>
+                        <li ID="navLogout" runat="server" class="nav-item">
+                            <a class="nav-link" runat="server" href="~/Logout.aspx"> Cerrar sesión </a>
+                        </li>
+                        <li ID="navLogin" runat="server" class="nav-item">
+                            <a class="nav-link" runat="server" href="~/Login.aspx"> Iniciar sesión </a>
+                        </li>
                     </ul>
                 </div>
             </div>
