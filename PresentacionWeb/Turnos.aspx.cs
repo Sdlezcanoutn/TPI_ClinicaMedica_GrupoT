@@ -822,7 +822,38 @@ namespace PresentacionWeb
                 if (IdTurno == 0)
                 {
                     negocio.agregar(nuevo);
-                    mensaje = "Turno registrado correctamente.";
+
+                    mensaje = $"Turno #{nuevo.Id:D3} registrado correctamente.";
+
+                    // --- Enviar correo de confirmación ---
+                    bool emailEnviado = false;
+
+                    try
+                    {
+                        NotificacionTurno notificacion = new NotificacionTurno();
+                        notificacion.enviarConfirmacion(nuevo);
+
+                        emailEnviado = true;
+                        mensaje += " Correo de confirmación enviado.";
+                    }
+                    catch (Exception ex)
+                    {
+                        Session["error"] = ex.ToString();
+
+                        mensaje += " No se pudo enviar el correo de confirmación.";
+                    }
+
+                    // --- Actualizar estado del envío ---
+                    try
+                    {
+                        negocio.actualizarEmailEnviado(nuevo.Id, emailEnviado);
+                    }
+                    catch (Exception ex)
+                    {
+                        Session["error"] = ex.ToString();
+
+                        mensaje += " No se pudo actualizar el estado del correo.";
+                    }
                 }
                 else
                 {

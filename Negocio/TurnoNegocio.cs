@@ -324,11 +324,12 @@ namespace Negocio
 
             try
             {
-                // Insertar turno con estado inicial 'Nuevo' y Email_Enviado en 0 
+                // --- Insertar turno y recuperar el identificador generado ---
                 datos.setearConsulta(
                     "INSERT INTO TURNOS " +
                     "(Id_Paciente, Id_Medico, Id_Especialidad, Fecha_Alta, Fecha, Hora_Inicio, Hora_Fin, " +
                     "Id_Estado_Turno, Motivo_Consulta, Diagnostico, Email_Enviado) " +
+                    "OUTPUT INSERTED.Id_Turno " +
                     "VALUES " +
                     "(@IdPaciente, @IdMedico, @IdEspecialidad, GETDATE(), @Fecha, @HoraInicio, @HoraFin, " +
                     "(SELECT TOP 1 Id_Estado_Turno FROM ESTADOS_TURNO WHERE Nombre = N'Nuevo'), " +
@@ -342,6 +343,47 @@ namespace Negocio
                 datos.setearParametro("@HoraInicio", horaInicio);
                 datos.setearParametro("@HoraFin", horaFin);
                 datos.setearParametro("@Motivo", nuevo.Motivo_Consulta.Trim());
+
+                // --- Registrar turno y obtener su identificador ---
+                datos.iniciarTransaccion();
+
+                int idTurno = Convert.ToInt32(datos.ejecutarEscalar());
+
+                datos.confirmarTransaccion();
+
+                // --- Completar los datos del turno registrado ---
+                nuevo.Id = idTurno;
+                nuevo.Paciente = paciente;
+                nuevo.Medico = medico;
+                nuevo.Especialidad = especialidad;
+            }
+            catch
+            {
+                datos.cancelarTransaccion();
+                throw;
+            }
+            finally
+            {
+                datos.cerrarConexion();
+            }
+        }
+
+        // ===== NOTIFICACIONES DE TURNOS =====
+
+        // --- Actualizar estado de envío del correo ---
+        public void actualizarEmailEnviado(int idTurno, bool enviado)
+        {
+            AccesoDatos datos = new AccesoDatos();
+
+            try
+            {
+                datos.setearConsulta(
+                    "UPDATE TURNOS SET Email_Enviado = @Enviado " +
+                    "WHERE Id_Turno = @IdTurno"
+                );
+
+                datos.setearParametro("@Enviado", enviado);
+                datos.setearParametro("@IdTurno", idTurno);
 
                 datos.ejecutarAccion();
             }
