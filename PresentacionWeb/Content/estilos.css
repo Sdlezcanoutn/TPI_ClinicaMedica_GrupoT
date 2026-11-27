@@ -508,35 +508,23 @@ form > div, main, .body-content {
         background-color: #f1f3f5;
     }
 
-/* Color normal cuando tienen valor */
+/* --- Color normal de los campos --- */
 .form-select,
-.form-control,
-.form-control::-webkit-datetime-edit,
-.form-control::-webkit-datetime-edit-fields-wrapper,
-.form-control::-webkit-datetime-edit-text,
-.form-control::-webkit-datetime-edit-hour-field,
-.form-control::-webkit-datetime-edit-minute-field,
-.form-control::-webkit-datetime-edit-ampm-field {
+.form-control {
     color: #212529;
 }
 
-    /* Texto inicial del combo cerrado en gris clarito solo cuando está sin seleccionar */
+    /* --- Texto inicial de los desplegables --- */
     .form-select.placeholder-select {
         color: #9aa0a6 !important;
     }
 
-    /* Cuando se despliega la lista, mantener texto legible */
+    /* --- Opciones de los desplegables --- */
     .form-select option {
         color: #212529;
     }
 
-    /* Texto vacío en inputs de hora/fecha en gris clarito solo cuando están vacíos */
-    .form-control.placeholder-time,
-    .form-control.placeholder-time::-webkit-datetime-edit,
-    .form-control.placeholder-time::-webkit-datetime-edit-fields-wrapper,
-    .form-control.placeholder-time::-webkit-datetime-edit-text,
-    .form-control.placeholder-time::-webkit-datetime-edit-hour-field,
-    .form-control.placeholder-time::-webkit-datetime-edit-minute-field,
-    .form-control.placeholder-time::-webkit-datetime-edit-ampm-field {
+    /* --- Campos de fecha y hora vacíos --- */
+    .form-control.placeholder-time {
         color: #9aa0a6 !important;
     }
