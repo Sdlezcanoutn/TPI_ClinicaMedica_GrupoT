@@ -78,6 +78,15 @@ namespace PresentacionWeb
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl navTurnos;
 
         /// <summary>
+        /// Control liUsuarios.
+        /// </summary>
+        /// <remarks>
+        /// Campo generado automáticamente.
+        /// Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl liUsuarios;
+
+        /// <summary>
         /// Control navUsuario.
         /// </summary>
         /// <remarks>

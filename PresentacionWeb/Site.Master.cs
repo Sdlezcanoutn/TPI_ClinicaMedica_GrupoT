@@ -35,6 +35,7 @@ namespace PresentacionWeb
             navHorarios.Visible = false;
             navEmpleados.Visible = false;
             navTurnos.Visible = false;
+            liUsuarios.Visible = false;
 
             if (!autenticado)
                 return;
@@ -54,6 +55,7 @@ namespace PresentacionWeb
             navHorarios.Visible = esAdministrador || esRecepcionista;
 
             navEmpleados.Visible = esAdministrador;
+            liUsuarios.Visible = esAdministrador;
 
             navTurnos.Visible = esAdministrador || esRecepcionista || esMedico;
         }

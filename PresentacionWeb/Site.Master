@@ -62,6 +62,7 @@
                         <li ID="navHorarios" runat="server" class="nav-item"><a class="nav-link" runat="server" href="~/Horarios">Horarios</a></li>
                         <li ID="navEmpleados" runat="server" class="nav-item"><a class="nav-link" runat="server" href="~/Empleados">Empleados</a></li>
                         <li ID="navTurnos" runat="server" class="nav-item"><a class="nav-link" runat="server" href="~/Turnos">Turnos</a></li>
+                        <li ID="liUsuarios" runat="server" class="nav-item"><a class="nav-link" runat="server" href="~/Usuarios">Usuarios</a></li>
                         <li ID="navUsuario" runat="server" class="nav-item">
                             <span> 
                                 <i class="fas fa-user-circle me-1"></i>
