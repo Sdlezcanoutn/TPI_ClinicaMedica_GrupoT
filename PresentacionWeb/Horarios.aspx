@@ -2,15 +2,15 @@
 
 <asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
 
-<%@ Import Namespace="PresentacionWeb.Helpers" %>
+    <%@ Import Namespace="PresentacionWeb.Helpers" %>
 
     <!-- CONTENEDOR -->
     <div class="container-fluid px-4 px-lg-5 my-5">
         <div style="max-width: 1500px; margin: 0 auto;">
-    
+
             <!-- TARJETA PANEL PRINCIPAL DASHBOARD -->
             <div class="card border-0 shadow-sm rounded-4 bg-white p-4 p-md-5">
-    
+
                 <!-- Encabezado integrado dentro del panel -->
                 <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 pb-3 border-bottom">
                     <div>
@@ -21,68 +21,68 @@
                         <asp:Button ID="btnAgregar" runat="server" Text="+ Nuevo Horario" CssClass="btn btn-clinica-primary px-4 py-2 rounded-3 shadow-sm" OnClick="btnAgregar_Click" />
                     </div>
                 </div>
-    
+
                 <!-- Buscador -->
                 <div class="row g-3 mb-4 align-items-end">
 
-                  <!-- Filtro por médico -->
-                  <div class="col-md-6 col-lg-4">
-                      <asp:Label Text="Médico" runat="server"/>
-                      <div class="input-group filtro-medico">
-                          <span class="input-group-text bg-light border-end-0">
-                              <i class="fa-solid fa-magnifying-glass"></i>
-                          </span>    
-                          <asp:TextBox ID="txtBuscarMedico" runat="server" CssClass="form-control bg-light border-start-0" Placeholder="Nombre o apellido" AutoPostBack="true" OnTextChanged="txtBuscarMedico_TextChanged">
-                          </asp:TextBox>
-                      </div>
-                  </div>
+                    <!-- Filtro por médico -->
+                    <div class="col-md-6 col-lg-4">
+                        <asp:Label Text="Médico" runat="server" />
+                        <div class="input-group filtro-medico">
+                            <span class="input-group-text bg-light border-end-0">
+                                <i class="fa-solid fa-magnifying-glass"></i>
+                            </span>
+                            <asp:TextBox ID="txtBuscarMedico" runat="server" CssClass="form-control bg-light border-start-0" Placeholder="Nombre o apellido" AutoPostBack="true" OnTextChanged="txtBuscarMedico_TextChanged">
+                            </asp:TextBox>
+                        </div>
+                    </div>
 
-                  <!-- Filtro por día -->
-                  <div class="col-md-6 col-lg-4">
-                      <asp:Label Text="Día de la semana" runat="server"/>
-                      <asp:DropDownList ID="ddlDiaSemana" runat="server" CssClass="form-select" AutoPostBack="true" OnSelectedIndexChanged="ddlDiaSemana_SelectedIndexChanged">
-                          <asp:ListItem Text="Todos los días" Value="" />
-                          <asp:ListItem Text="Lunes" Value="1" />
-                          <asp:ListItem Text="Martes" Value="2" />
-                          <asp:ListItem Text="Miércoles" Value="3" />
-                          <asp:ListItem Text="Jueves" Value="4" />
-                          <asp:ListItem Text="Viernes" Value="5" />
-                          <asp:ListItem Text="Sábado" Value="6" />
-                          <asp:ListItem Text="Domingo" Value="7" />
-                      </asp:DropDownList>
-                  </div>
+                    <!-- Filtro por día -->
+                    <div class="col-md-6 col-lg-4">
+                        <asp:Label Text="Día de la semana" runat="server" />
+                        <asp:DropDownList ID="ddlDiaSemana" runat="server" CssClass="form-select" AutoPostBack="true" OnSelectedIndexChanged="ddlDiaSemana_SelectedIndexChanged">
+                            <asp:ListItem Text="Todos los días" Value="" />
+                            <asp:ListItem Text="Lunes" Value="1" />
+                            <asp:ListItem Text="Martes" Value="2" />
+                            <asp:ListItem Text="Miércoles" Value="3" />
+                            <asp:ListItem Text="Jueves" Value="4" />
+                            <asp:ListItem Text="Viernes" Value="5" />
+                            <asp:ListItem Text="Sábado" Value="6" />
+                            <asp:ListItem Text="Domingo" Value="7" />
+                        </asp:DropDownList>
+                    </div>
 
-                 <!-- Filtro Estado del Horario-->
-                 <div class="col-md-6 col-lg-4">
-                     <asp:Label Text="Estado" runat="server"/>
-                     <asp:DropDownList ID="ddlEstado" runat="server" CssClass="form-select w-100 filtro-estado" AutoPostBack="true" OnSelectedIndexChanged="ddlEstado_Filtros_Changed">
-                         <asp:ListItem Text="Activos" Value="1" />
-                         <asp:ListItem Text="Inactivos" Value="0" />
-                         <asp:ListItem Text="Todos" Value="todos" />
-                     </asp:DropDownList>
-                 </div>
+                    <!-- Filtro Estado del Horario-->
+                    <div class="col-md-6 col-lg-4">
+                        <asp:Label Text="Estado" runat="server" />
+                        <asp:DropDownList ID="ddlEstado" runat="server" CssClass="form-select w-100 filtro-estado" AutoPostBack="true" OnSelectedIndexChanged="ddlEstado_Filtros_Changed">
+                            <asp:ListItem Text="Activos" Value="1" />
+                            <asp:ListItem Text="Inactivos" Value="0" />
+                            <asp:ListItem Text="Todos" Value="todos" />
+                        </asp:DropDownList>
+                    </div>
 
-                  <!-- Botones Buscar y Limpiar -->
-                  <div class="col-md-12 col-lg-4">
-                      <div class="d-flex gap-2">
-                         <!-- Botón Buscar -->
-                         <asp:LinkButton ID="btnBuscar" runat="server" CssClass="btn btn-primary rounded-3 px-4" OnClick="btnBuscar_Click">
-                             <i class="fa-solid fa-magnifying-glass me-2"></i>
-                                 Buscar
-                         </asp:LinkButton>
+                    <!-- Botones Buscar y Limpiar -->
+                    <div class="col-md-12 col-lg-4">
+                        <div class="d-flex gap-2">
+                            <!-- Botón Buscar -->
+                            <asp:LinkButton ID="btnBuscar" runat="server" CssClass="btn btn-clinica-primary rounded-3 px-4" OnClick="btnBuscar_Click">
+                              <i class="fa-solid fa-magnifying-glass me-2"></i>
+                               Buscar
+                            </asp:LinkButton>
 
-                         <!-- Botón Limpiar Filtros -->
-                         <asp:LinkButton ID="btnLimpiar" runat="server" CssClass="btn btn-outline-secondary rounded-3 px-3" OnClick="btnLimpiar_Click">
+                            <!-- Botón Limpiar Filtros -->
+                            <asp:LinkButton ID="btnLimpiar" runat="server" CssClass="btn btn-outline-secondary rounded-3 px-3" OnClick="btnLimpiar_Click">
                              <i class="fa-solid fa-rotate-left me-1"></i>
                              Limpiar
-                         </asp:LinkButton>
-                     </div>
-                 </div>
+                            </asp:LinkButton>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Tabla -->
                 <div class="table-responsive">
-                    <asp:GridView ID="dgvHorarios" runat="server" DataKeyNames="Id" AutoGenerateColumns="False" 
+                    <asp:GridView ID="dgvHorarios" runat="server" DataKeyNames="Id" AutoGenerateColumns="False"
                         CssClass="table table-custom align-middle mb-0" GridLines="None">
                         <Columns>
                             <asp:BoundField DataField="Id" HeaderText="ID" ItemStyle-CssClass="fw-semibold text-secondary" HeaderStyle-Width="80px" />
@@ -98,7 +98,7 @@
                                 </ItemTemplate>
                             </asp:TemplateField>
                             <asp:BoundField DataField="Hora_Entrada" HeaderText="Hora de Entrada" DataFormatString="{0:HH:mm}" />
-                            <asp:BoundField DataField="Hora_Salida" HeaderText="Hora de Salida" DataFormatString="{0:HH:mm}"/>
+                            <asp:BoundField DataField="Hora_Salida" HeaderText="Hora de Salida" DataFormatString="{0:HH:mm}" />
                             <asp:TemplateField HeaderText="Estado">
                                 <ItemTemplate>
                                     <span class='<%# Convert.ToBoolean(Eval("Estado"))
@@ -112,9 +112,9 @@
                             <asp:TemplateField HeaderText="Acciones" ItemStyle-CssClass="text-end" HeaderStyle-CssClass="text-end">
                                 <ItemTemplate>
                                     <!-- Botón Editar -->
-                                    <asp:LinkButton ID="btnEditar" runat="server" CommandArgument='<%# Eval("Id") %>' 
+                                    <asp:LinkButton ID="btnEditar" runat="server" CommandArgument='<%# Eval("Id") %>'
                                         Enabled='<%# Convert.ToBoolean(Eval("Estado")) %>'
-                                        OnClick="btnEditar_Click" 
+                                        OnClick="btnEditar_Click"
                                         CssClass='<%# Convert.ToBoolean(Eval("Estado"))
                                                 ? "btn btn-sm btn-outline-secondary me-1"
                                                 : "btn btn-sm btn-outline-secondary me-1 disabled opacity-50" %>'>
@@ -123,7 +123,7 @@
                                     <!-- Botón Eliminar -->
                                     <asp:LinkButton ID="btnEliminar" runat="server" CommandArgument='<%# Eval("Id") %>'
                                         Enabled='<%# Convert.ToBoolean(Eval("Estado")) %>'
-                                        OnClick="btnEliminar_Click" 
+                                        OnClick="btnEliminar_Click"
                                         CssClass='<%# Convert.ToBoolean(Eval("Estado")) 
                                                 ? "btn btn-sm btn-outline-danger"
                                                 : "btn btn-sm btn-outline-danger disabled opacity-50" %>'
