@@ -456,6 +456,11 @@ form > div, main, .body-content {
     color: #9aa0a6;
 }
 
+/* --- Buscadores dinámicos --- */
+.boton-busqueda-oculto {
+    display: none;
+}
+
 .search-box .input-group-text {
     background-color: #ffffff;
     border-right: none;
@@ -464,6 +469,8 @@ form > div, main, .body-content {
 
 .search-box .form-control {
     border-left: none;
+    border-top-right-radius: 0.375rem !important;
+    border-bottom-right-radius: 0.375rem !important;
 }
 
     .search-box .form-control:focus {
