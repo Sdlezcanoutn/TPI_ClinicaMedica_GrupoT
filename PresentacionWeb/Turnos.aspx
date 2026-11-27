@@ -207,7 +207,7 @@
             <div class="modal-content">
 
                 <div class="modal-header">
-                    <h5 class="modal-title fw-bold" id="tituloModalHistorial">Historial del turno
+                    <h5 class="modal-title" id="tituloModalHistorial">Historial del turno
                     </h5>
 
                     <button type="button" class="btn-close"
@@ -316,7 +316,7 @@
                     <ContentTemplate>
 
                         <div class="modal-header">
-                            <h5 class="modal-title fw-bold" id="tituloModalEstado">
+                            <h5 class="modal-title" id="tituloModalEstado">
                                 <asp:Label ID="lblTituloEstado" runat="server" />
                             </h5>
 
@@ -380,7 +380,7 @@
                     <ContentTemplate>
 
                         <div class="modal-header">
-                            <h5 class="modal-title fw-bold" id="tituloModalAtender">
+                            <h5 class="modal-title" id="tituloModalAtender">
                                 <asp:Label ID="lblTituloAtencion" runat="server"
                                     Text="Atención del paciente" />
                             </h5>
@@ -479,7 +479,7 @@
             <div class="modal-content">
 
                 <div class="modal-header">
-                    <h5 class="modal-title fw-bold" id="tituloModalTurno">Nuevo Turno</h5>
+                    <h5 class="modal-title" id="tituloModalTurno">Nuevo Turno</h5>
                     <button type="button" class="btn-close" onclick="cerrarModalTurno();" aria-label="Cerrar"></button>
                 </div>
 

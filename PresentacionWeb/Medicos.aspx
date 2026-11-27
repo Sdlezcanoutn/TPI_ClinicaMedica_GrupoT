@@ -81,7 +81,7 @@
     <!-- CONTENEDOR -->
     <div class="container-fluid px-4 px-lg-5 my-5">
         <div class="contenedor-modulo">
-             <div class="card border-0 shadow-sm rounded-4 bg-white p-4 p-md-5">
+            <div class="card border-0 shadow-sm rounded-4 bg-white p-4 p-md-5">
 
                 <!-- Encabezado integrado dentro del panel -->
                 <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 pb-3 border-bottom">
@@ -236,7 +236,7 @@
 
                 <!-- Encabezado del modal -->
                 <div class="modal-header">
-                    <h5 class="modal-title fw-bold" id="tituloModalMedico">Nuevo Médico
+                    <h5 class="modal-title" id="tituloModalMedico">Nuevo Médico
                     </h5>
                     <button type="button" class="btn-close"
                         data-bs-dismiss="modal" aria-label="Cerrar">
@@ -362,6 +362,7 @@
                                 class="btn btn-secondary"
                                 data-bs-dismiss="modal">
                                 Cancelar
+                           
                             </button>
 
                             <asp:Button ID="btnGuardarMedico"
@@ -370,7 +371,7 @@
                                 CssClass="btn btn-clinica-primary"
                                 OnClick="btnGuardarMedico_Click" />
                         </div>
-                        </ContentTemplate>
+                    </ContentTemplate>
 
                     <Triggers>
                         <asp:AsyncPostBackTrigger
@@ -414,7 +415,8 @@
 
                             <p>
                                 <asp:Label ID="lblMensajeBaja" runat="server" />
-                                <strong><asp:Label ID="lblNombreBaja" runat="server" /></strong><asp:Label ID="lblSignoBaja" runat="server" />
+                                <strong>
+                                    <asp:Label ID="lblNombreBaja" runat="server" /></strong><asp:Label ID="lblSignoBaja" runat="server" />
                             </p>
 
                             <asp:Panel ID="pnlBajaBloqueada" runat="server"
@@ -480,7 +482,7 @@
 
                 <div class="modal-header">
                     <h5 class="modal-title" id="tituloModalReactivar">Reactivar médico
-                </h5>
+                    </h5>
                     <button type="button" class="btn-close"
                         data-bs-dismiss="modal" aria-label="Cerrar">
                     </button>
@@ -495,7 +497,8 @@
                         <div class="modal-body">
                             <p>
                                 ¿Está seguro de que desea reactivar al médico
-                                <strong><asp:Label ID="lblNombreReactivar" runat="server" /></strong>?
+                                <strong>
+                                    <asp:Label ID="lblNombreReactivar" runat="server" /></strong>?
                             </p>
 
                             <p class="text-muted small mb-0">
@@ -525,162 +528,162 @@
     </div>
 
     <script>
-    // ============================================================
-    // NORMALIZACIÓN DE TEXTO PARA BÚSQUEDAS
-    // ============================================================
-    function normalizarTexto(texto) {
-        // Ignorar mayúsculas, minúsculas y tildes.
-        return (texto || "")
-            .normalize("NFD")
-            .replace(/[\u0300-\u036f]/g, "")
-            .toLowerCase()
-            .trim();
-    }
+        // ============================================================
+        // NORMALIZACIÓN DE TEXTO PARA BÚSQUEDAS
+        // ============================================================
+        function normalizarTexto(texto) {
+            // Ignorar mayúsculas, minúsculas y tildes.
+            return (texto || "")
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "")
+                .toLowerCase()
+                .trim();
+        }
 
-    // ============================================================
-    // ABRIR Y CERRAR EL DESPLEGABLE
-    // ============================================================
-    function alternarEspecialidades() {
-        const panel = document.getElementById("panelEspecialidades");
+        // ============================================================
+        // ABRIR Y CERRAR EL DESPLEGABLE
+        // ============================================================
+        function alternarEspecialidades() {
+            const panel = document.getElementById("panelEspecialidades");
 
-        // Mostrar u ocultar las especialidades.
-        panel.style.display =
-            getComputedStyle(panel).display === "none" ? "block" : "none";
-    }
+            // Mostrar u ocultar las especialidades.
+            panel.style.display =
+                getComputedStyle(panel).display === "none" ? "block" : "none";
+        }
 
-    // ============================================================
-    // FILTRAR ESPECIALIDADES EN TIEMPO REAL
-    // ============================================================
-    function filtrarEspecialidades() {
+        // ============================================================
+        // FILTRAR ESPECIALIDADES EN TIEMPO REAL
+        // ============================================================
+        function filtrarEspecialidades() {
 
-        // Obtener la búsqueda sin distinguir mayúsculas ni tildes.
-        const busqueda = normalizarTexto(
-            document.getElementById("txtBuscarEspecialidadMedico").value
-        );
-
-        // Obtener las filas de la tabla de especialidades.
-        const filas = document.querySelectorAll(
-            ".lista-especialidades-medico tr"
-        );
-
-        // Mostrar únicamente las especialidades que coincidan.
-        filas.forEach(fila => {
-
-            const nombre = normalizarTexto(fila.textContent);
-
-            fila.style.display =
-                nombre.includes(busqueda) ? "" : "none";
-        });
-    }
-
-    // ============================================================
-    // ACTUALIZAR LAS ESPECIALIDADES SELECCIONADAS
-    // ============================================================
-    function actualizarEspecialidadesSeleccionadas() {
-        const contenedor = document.getElementById(
-            "especialidadesSeleccionadas"
-        );
-
-        const boton = document.getElementById(
-            "btnSelectorEspecialidades"
-        );
-
-        const seleccionadas = document.querySelectorAll(
-            ".lista-especialidades-medico input[type='checkbox']:checked"
-        );
-
-        // Limpiar las etiquetas anteriores.
-        contenedor.innerHTML = "";
-
-        seleccionadas.forEach(checkbox => {
-            // Buscar el nombre asociado a la casilla seleccionada.
-            const etiqueta = document.querySelector(
-                "label[for='" + checkbox.id + "']"
+            // Obtener la búsqueda sin distinguir mayúsculas ni tildes.
+            const busqueda = normalizarTexto(
+                document.getElementById("txtBuscarEspecialidadMedico").value
             );
 
-            if (!etiqueta) return;
+            // Obtener las filas de la tabla de especialidades.
+            const filas = document.querySelectorAll(
+                ".lista-especialidades-medico tr"
+            );
 
-            // Crear una etiqueta visual para cada especialidad.
-            const badge = document.createElement("span");
-            badge.className =
-                "badge bg-primary-subtle text-primary border p-2";
-            badge.textContent = etiqueta.textContent;
+            // Mostrar únicamente las especialidades que coincidan.
+            filas.forEach(fila => {
 
-            contenedor.appendChild(badge);
+                const nombre = normalizarTexto(fila.textContent);
+
+                fila.style.display =
+                    nombre.includes(busqueda) ? "" : "none";
+            });
+        }
+
+        // ============================================================
+        // ACTUALIZAR LAS ESPECIALIDADES SELECCIONADAS
+        // ============================================================
+        function actualizarEspecialidadesSeleccionadas() {
+            const contenedor = document.getElementById(
+                "especialidadesSeleccionadas"
+            );
+
+            const boton = document.getElementById(
+                "btnSelectorEspecialidades"
+            );
+
+            const seleccionadas = document.querySelectorAll(
+                ".lista-especialidades-medico input[type='checkbox']:checked"
+            );
+
+            // Limpiar las etiquetas anteriores.
+            contenedor.innerHTML = "";
+
+            seleccionadas.forEach(checkbox => {
+                // Buscar el nombre asociado a la casilla seleccionada.
+                const etiqueta = document.querySelector(
+                    "label[for='" + checkbox.id + "']"
+                );
+
+                if (!etiqueta) return;
+
+                // Crear una etiqueta visual para cada especialidad.
+                const badge = document.createElement("span");
+                badge.className =
+                    "badge bg-primary-subtle text-primary border p-2";
+                badge.textContent = etiqueta.textContent;
+
+                contenedor.appendChild(badge);
+            });
+
+            // Actualizar el texto del botón desplegable.
+            boton.textContent = seleccionadas.length > 0
+                ? seleccionadas.length + " especialidad(es) seleccionada(s)"
+                : "Seleccionar especialidades";
+        }
+
+        // ============================================================
+        // DETECTAR CAMBIOS EN LA SELECCIÓN
+        // ============================================================
+        document.addEventListener("change", function (evento) {
+            if (evento.target.matches(
+                ".lista-especialidades-medico input[type='checkbox']"
+            )) {
+                actualizarEspecialidadesSeleccionadas();
+            }
         });
 
-        // Actualizar el texto del botón desplegable.
-        boton.textContent = seleccionadas.length > 0
-            ? seleccionadas.length + " especialidad(es) seleccionada(s)"
-            : "Seleccionar especialidades";
-    }
+        // ============================================================
+        // RESTAURAR ESPECIALIDADES DESPUÉS DE UN POSTBACK PARCIAL
+        // ============================================================
 
-    // ============================================================
-    // DETECTAR CAMBIOS EN LA SELECCIÓN
-    // ============================================================
-    document.addEventListener("change", function (evento) {
-        if (evento.target.matches(
-            ".lista-especialidades-medico input[type='checkbox']"
-        )) {
+        // --- Actualizar las etiquetas después de que ASP.NET
+        //     vuelva a cargar el contenido del UpdatePanel ---
+        Sys.WebForms.PageRequestManager.getInstance().add_endRequest(function () {
             actualizarEspecialidadesSeleccionadas();
+        });
+
+        // ============================================================
+        // CONFIRMACIÓN DE ALTA Y MODIFICACIÓN DE MÉDICOS
+        // ============================================================
+        function mostrarExito(texto) {
+
+            // --- Cerrar el modal ---
+            var elementoModal = document.getElementById('modalMedico');
+            var modal = bootstrap.Modal.getOrCreateInstance(elementoModal);
+
+            modal.hide();
+
+            // --- Mostrar confirmación ---
+            mostrarExitoListado(texto);
         }
-    });
 
-    // ============================================================
-    // RESTAURAR ESPECIALIDADES DESPUÉS DE UN POSTBACK PARCIAL
-    // ============================================================
+        // ============================================================
+        // MENSAJES DE CONFIRMACIÓN DEL LISTADO
+        // ============================================================
+        function mostrarExitoListado(texto) {
 
-    // --- Actualizar las etiquetas después de que ASP.NET
-    //     vuelva a cargar el contenido del UpdatePanel ---
-    Sys.WebForms.PageRequestManager.getInstance().add_endRequest(function () {
-        actualizarEspecialidadesSeleccionadas();
-    });
+            // --- Obtener el contenedor del mensaje ---
+            var mensaje = document.getElementById('mensajeExito');
 
-    // ============================================================
-    // CONFIRMACIÓN DE ALTA Y MODIFICACIÓN DE MÉDICOS
-    // ============================================================
-    function mostrarExito(texto) {
+            // --- Mostrar la confirmación ---
+            mensaje.textContent = texto;
+            mensaje.classList.remove('d-none');
 
-        // --- Cerrar el modal ---
-        var elementoModal = document.getElementById('modalMedico');
-        var modal = bootstrap.Modal.getOrCreateInstance(elementoModal);
+            // --- Desplazar la página hacia arriba ---
+            setTimeout(function () {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }, 500);
 
-        modal.hide();
+            // --- Ocultar el mensaje después de 4 segundos ---
+            setTimeout(function () {
+                mensaje.classList.add('d-none');
+            }, 4000);
+        }
 
-        // --- Mostrar confirmación ---
-        mostrarExitoListado(texto);
-    }
+        // ============================================================
+        // PREPARAR FORMULARIO PARA NUEVO MÉDICO
+        // ============================================================
+        function prepararNuevoMedico() {
 
-    // ============================================================
-    // MENSAJES DE CONFIRMACIÓN DEL LISTADO
-    // ============================================================
-    function mostrarExitoListado(texto) {
-
-        // --- Obtener el contenedor del mensaje ---
-        var mensaje = document.getElementById('mensajeExito');
-
-        // --- Mostrar la confirmación ---
-        mensaje.textContent = texto;
-        mensaje.classList.remove('d-none');
-
-        // --- Desplazar la página hacia arriba ---
-        setTimeout(function() {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }, 500);
-
-        // --- Ocultar el mensaje después de 4 segundos ---
-        setTimeout(function() {
-            mensaje.classList.add('d-none');
-                }, 4000);
-    }
-
-    // ============================================================
-    // PREPARAR FORMULARIO PARA NUEVO MÉDICO
-    // ============================================================
-    function prepararNuevoMedico() {
-
-        // --- Limpiar el identificador del médico ---
-        document.getElementById('<%= hfIdMedico.ClientID %>').value = '';
+            // --- Limpiar el identificador del médico ---
+            document.getElementById('<%= hfIdMedico.ClientID %>').value = '';
 
         // --- Limpiar los datos del formulario ---
         limpiarFormularioMedico();
@@ -689,69 +692,69 @@
         document.getElementById('tituloModalMedico').textContent = 'Nuevo Médico';
         document.getElementById('<%= btnGuardarMedico.ClientID %>').value = 'Guardar Médico';
 
-        // --- Abrir el formulario ---
-        bootstrap.Modal.getOrCreateInstance(
-            document.getElementById('modalMedico')
-        ).show();
-    }
-
-    // ============================================================
-    // PREPARAR FORMULARIO PARA EDITAR MÉDICO
-    // ============================================================
-    function prepararEdicionMedico() {
-
-        // --- Restablecer el título y el botón ---
-        document.getElementById('tituloModalMedico').textContent = 'Editar Médico';
-        document.getElementById('<%= btnGuardarMedico.ClientID %>').value = 'Guardar Cambios';
-
-        // --- Actualizar las especialidades seleccionadas ---
-        actualizarEspecialidadesSeleccionadas();
-
-        // --- Abrir el formulario ---
-        bootstrap.Modal.getOrCreateInstance(
-            document.getElementById('modalMedico')
-        ).show();
-    }
-
-    // ============================================================
-    // OCULTAR MENSAJES DE ERROR
-    // ============================================================
-    function ocultarError() {
-        var mensaje = document.getElementById('<%= lblErrorMedico.ClientID %>');
-
-        if (mensaje) {
-            mensaje.textContent = '';
-            mensaje.style.display = 'none';
+            // --- Abrir el formulario ---
+            bootstrap.Modal.getOrCreateInstance(
+                document.getElementById('modalMedico')
+            ).show();
         }
-    }
 
-    // ============================================================
-    // LIMPIAR FORMULARIO AL CERRAR EL MODAL
-    // ============================================================
-    function limpiarFormularioMedico() {
-        // --- Limpiar los campos ---
-        document.getElementById('<%= txtNombreMedico.ClientID %>').value = '';
+        // ============================================================
+        // PREPARAR FORMULARIO PARA EDITAR MÉDICO
+        // ============================================================
+        function prepararEdicionMedico() {
+
+            // --- Restablecer el título y el botón ---
+            document.getElementById('tituloModalMedico').textContent = 'Editar Médico';
+            document.getElementById('<%= btnGuardarMedico.ClientID %>').value = 'Guardar Cambios';
+
+            // --- Actualizar las especialidades seleccionadas ---
+            actualizarEspecialidadesSeleccionadas();
+
+            // --- Abrir el formulario ---
+            bootstrap.Modal.getOrCreateInstance(
+                document.getElementById('modalMedico')
+            ).show();
+        }
+
+        // ============================================================
+        // OCULTAR MENSAJES DE ERROR
+        // ============================================================
+        function ocultarError() {
+            var mensaje = document.getElementById('<%= lblErrorMedico.ClientID %>');
+
+            if (mensaje) {
+                mensaje.textContent = '';
+                mensaje.style.display = 'none';
+            }
+        }
+
+        // ============================================================
+        // LIMPIAR FORMULARIO AL CERRAR EL MODAL
+        // ============================================================
+        function limpiarFormularioMedico() {
+            // --- Limpiar los campos ---
+            document.getElementById('<%= txtNombreMedico.ClientID %>').value = '';
         document.getElementById('<%= txtApellidoMedico.ClientID %>').value = '';
         document.getElementById('<%= txtDniMedico.ClientID %>').value = '';
         document.getElementById('<%= txtMatriculaMedico.ClientID %>').value = '';
         document.getElementById('<%= txtTelefonoMedico.ClientID %>').value = '';
         document.getElementById('<%= txtEmailMedico.ClientID %>').value = '';
 
-        // --- Desmarcar las especialidades ---
-        document.querySelectorAll(
-            '.lista-especialidades-medico input[type="checkbox"]'
-        ).forEach(function (checkbox) {
-            checkbox.checked = false;
-        });
+            // --- Desmarcar las especialidades ---
+            document.querySelectorAll(
+                '.lista-especialidades-medico input[type="checkbox"]'
+            ).forEach(function (checkbox) {
+                checkbox.checked = false;
+            });
 
-        // --- Limpiar el buscador de especialidades ---
-        document.getElementById('txtBuscarEspecialidadMedico').value = '';
-        
-        // --- Cerrar el desplegable de especialidades ---
-        document.getElementById('panelEspecialidades').style.display = 'none';
+            // --- Limpiar el buscador de especialidades ---
+            document.getElementById('txtBuscarEspecialidadMedico').value = '';
 
-        // --- Actualizar las especialidades seleccionadas ---
-        actualizarEspecialidadesSeleccionadas();
+            // --- Cerrar el desplegable de especialidades ---
+            document.getElementById('panelEspecialidades').style.display = 'none';
+
+            // --- Actualizar las especialidades seleccionadas ---
+            actualizarEspecialidadesSeleccionadas();
         }
 
         // --- Limpiar al cerrar con Cancelar o la X ---
@@ -764,7 +767,7 @@
 
         // --- Ocultar errores al modificar los campos del formulario ---
         document.getElementById('modalMedico')
-        .addEventListener('input', ocultarError);
+            .addEventListener('input', ocultarError);
 
         // ============================================================
         // BÚSQUEDA DINÁMICA DE MÉDICOS
