@@ -14,10 +14,27 @@ namespace PresentacionWeb
         {
             if (!IsPostBack)
             {
+                hfEstado.Value = "1";
+                ActualizarEstiloFiltro();
                 CargarEmpleados();
             }
         }
 
+        // Actualiza la apariencia visual de los botones Activos / Inactivos
+        private void ActualizarEstiloFiltro()
+        {
+            bool esActivo = hfEstado.Value != "0";
+
+            btnActivos.CssClass = esActivo
+                ? "btn btn-sm btn-clinica-primary px-3 rounded-3"
+                : "btn btn-sm btn-outline-secondary px-3 rounded-3";
+
+            btnInactivos.CssClass = !esActivo
+                ? "btn btn-sm btn-clinica-primary px-3 rounded-3"
+                : "btn btn-sm btn-outline-secondary px-3 rounded-3";
+        }
+
+        // Carga el listado aplicando el filtro de estado (activo/inactivo) y la búsqueda por DNI o Apellido
         private void CargarEmpleados(string filtro = "")
         {
             EmpleadoNegocio negocio = new EmpleadoNegocio();
@@ -27,7 +44,10 @@ namespace PresentacionWeb
                 lblErrorListado.Visible = false;
                 dgvEmpleados.Visible = true;
 
-                List<Empleado> lista = negocio.listar();
+                bool buscarActivos = hfEstado.Value != "0";
+                List<Empleado> lista = negocio.listar()
+                    .Where(emp => emp.Estado == buscarActivos)
+                    .ToList();
 
                 if (!string.IsNullOrWhiteSpace(filtro))
                 {
@@ -40,6 +60,20 @@ namespace PresentacionWeb
 
                 dgvEmpleados.DataSource = lista;
                 dgvEmpleados.DataBind();
+
+                if (lista.Count == 0 && dgvEmpleados.Controls.Count > 0)
+                {
+                    Label lblVacio = dgvEmpleados.Controls[0].FindControl("lblVacioEmpleados") as Label;
+                    if (lblVacio != null)
+                    {
+                        if (!string.IsNullOrWhiteSpace(filtro))
+                            lblVacio.Text = "No se encontraron empleados que coincidan con la búsqueda.";
+                        else
+                            lblVacio.Text = buscarActivos
+                                ? "No hay empleados activos registrados."
+                                : "No hay empleados inactivos registrados.";
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -48,6 +82,22 @@ namespace PresentacionWeb
                 lblErrorListado.Visible = true;
                 dgvEmpleados.Visible = false;
             }
+        }
+
+        protected void btnActivos_Click(object sender, EventArgs e)
+        {
+            hfEstado.Value = "1";
+            ActualizarEstiloFiltro();
+            CargarEmpleados(txtBuscar.Text);
+            upListado.Update();
+        }
+
+        protected void btnInactivos_Click(object sender, EventArgs e)
+        {
+            hfEstado.Value = "0";
+            ActualizarEstiloFiltro();
+            CargarEmpleados(txtBuscar.Text);
+            upListado.Update();
         }
 
         protected void txtBuscar_TextChanged(object sender, EventArgs e)
@@ -184,6 +234,7 @@ namespace PresentacionWeb
             upEmpleado.Update();
         }
 
+        // Abre el modal de confirmación de baja lógica
         protected void btnEliminar_Click(object sender, EventArgs e)
         {
             LinkButton btn = (LinkButton)sender;
@@ -205,7 +256,7 @@ namespace PresentacionWeb
                 }
 
                 hfIdBajaEmpleado.Value = empleado.Id.ToString();
-                lblNombreBajaEmpleado.Text = $"{empleado.Nombre} {empleado.Apellido} (DNI {empleado.DNI})";
+                lblNombreBajaEmpleado.Text = $"{empleado.Nombre} {empleado.Apellido}";
                 upBajaEmpleado.Update();
 
                 ScriptManager.RegisterStartupScript(
@@ -225,6 +276,7 @@ namespace PresentacionWeb
             }
         }
 
+        // Ejecuta la baja lógica y refresca el listado
         protected void btnConfirmarBajaEmpleado_Click(object sender, EventArgs e)
         {
             if (!int.TryParse(hfIdBajaEmpleado.Value, out int idEmpleado))
@@ -252,6 +304,89 @@ namespace PresentacionWeb
             {
                 Session["error"] = ex.ToString();
                 lblErrorListado.Text = "No se pudo desactivar el empleado. Intentá nuevamente.";
+                lblErrorListado.Visible = true;
+                upListado.Update();
+            }
+        }
+
+        // Abre el modal de confirmación para reactivar un empleado inactivo
+        protected void btnReactivar_Click(object sender, EventArgs e)
+        {
+            LinkButton btn = (LinkButton)sender;
+
+            if (!int.TryParse(btn.CommandArgument, out int idEmpleado))
+                return;
+
+            try
+            {
+                EmpleadoNegocio negocio = new EmpleadoNegocio();
+                Empleado empleado = negocio.listar().Find(emp => emp.Id == idEmpleado);
+
+                if (empleado == null)
+                {
+                    lblErrorListado.Text = "El empleado seleccionado no existe.";
+                    lblErrorListado.Visible = true;
+                    upListado.Update();
+                    return;
+                }
+
+                if (empleado.Estado)
+                {
+                    lblErrorListado.Text = "El empleado ya se encuentra activo.";
+                    lblErrorListado.Visible = true;
+                    upListado.Update();
+                    return;
+                }
+
+                hfIdReactivarEmpleado.Value = empleado.Id.ToString();
+                lblNombreReactivarEmpleado.Text = $"{empleado.Nombre} {empleado.Apellido}";
+                upReactivarEmpleado.Update();
+
+                ScriptManager.RegisterStartupScript(
+                    this,
+                    GetType(),
+                    "abrirModalReactivarEmpleado",
+                    "bootstrap.Modal.getOrCreateInstance(document.getElementById('modalReactivarEmpleado')).show();",
+                    true
+                );
+            }
+            catch (Exception ex)
+            {
+                Session["error"] = ex.ToString();
+                lblErrorListado.Text = "No se pudieron consultar los datos del empleado.";
+                lblErrorListado.Visible = true;
+                upListado.Update();
+            }
+        }
+
+        // Reactiva el empleado y refresca el listado
+        protected void btnConfirmarReactivarEmpleado_Click(object sender, EventArgs e)
+        {
+            if (!int.TryParse(hfIdReactivarEmpleado.Value, out int idEmpleado))
+                return;
+
+            try
+            {
+                EmpleadoNegocio negocio = new EmpleadoNegocio();
+                negocio.reactivar(idEmpleado);
+
+                hfIdReactivarEmpleado.Value = "";
+                CargarEmpleados(txtBuscar.Text);
+                upListado.Update();
+
+                ScriptManager.RegisterStartupScript(
+                    this,
+                    GetType(),
+                    "reactivarEmpleadoOk",
+                    "bootstrap.Modal.getOrCreateInstance(document.getElementById('modalReactivarEmpleado')).hide();" +
+                    "mostrarAlertaEmpleado('Empleado reactivado correctamente.');",
+                    true
+                );
+            }
+            catch (Exception ex)
+            {
+                Session["error"] = ex.ToString();
+                lblErrorListado.Text = "No se pudo reactivar el empleado. Intentá nuevamente.";
                 lblErrorListado.Visible = true;
                 upListado.Update();
             }

@@ -10,6 +10,7 @@ namespace Negocio
 {
     public class EmpleadoNegocio
     {
+        // Devuelve todos los empleados registrados (activos e inactivos)
         public List<Empleado> listar()
         {
             List<Empleado> lista = new List<Empleado>();
@@ -18,7 +19,7 @@ namespace Negocio
             try
             {
                 datos.setearConsulta(
-                    "SELECT Id_Empleado, Nombre, Apellido, DNI, Estado FROM EMPLEADOS WHERE Estado = 1"
+                    "SELECT Id_Empleado, Nombre, Apellido, DNI, Estado FROM EMPLEADOS"
                 );
                 datos.ejecutarLectura();
 
@@ -119,6 +120,40 @@ namespace Negocio
             }
         }
 
+        // Reactiva un empleado dado de baja lógica
+        public void reactivar(int id)
+        {
+            Empleado empleado = listar().FirstOrDefault(emp => emp.Id == id);
+
+            if (empleado == null)
+            {
+                throw new ArgumentException("El empleado seleccionado no existe.");
+            }
+
+            if (empleado.Estado)
+            {
+                throw new ArgumentException("El empleado ya se encuentra activo.");
+            }
+
+            AccesoDatos datos = new AccesoDatos();
+
+            try
+            {
+                datos.setearConsulta(
+                    "UPDATE EMPLEADOS SET Estado = 1 WHERE Id_Empleado = @Id AND Estado = 0"
+                );
+                datos.setearParametro("@Id", id);
+                datos.ejecutarAccion();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            finally
+            {
+                datos.cerrarConexion();
+            }
+        }
         public bool existeDni(string dni, int? idActual = null)
         {
             AccesoDatos datos = new AccesoDatos();
