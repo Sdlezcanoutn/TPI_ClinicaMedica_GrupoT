@@ -10,6 +10,7 @@ namespace Negocio
 {
     public class PacienteNegocio
     {
+        // Devuelve el listado completo de pacientes (activos e inactivos)
         public List<Paciente> listar()
         {
             List<Paciente> lista = new List<Paciente>();
@@ -18,7 +19,7 @@ namespace Negocio
             try
             {
                 datos.setearConsulta(
-                    "SELECT Id_Paciente, Nombre, Apellido, DNI, Fecha_Nacimiento, Telefono, Email, Direccion, Estado FROM PACIENTES WHERE Estado = 1"
+                    "SELECT Id_Paciente, Nombre, Apellido, DNI, Fecha_Nacimiento, Telefono, Email, Direccion, Estado FROM PACIENTES"
                 );
 
                 datos.ejecutarLectura();
@@ -33,6 +34,7 @@ namespace Negocio
                     aux.DNI = (string)datos.Lector["DNI"];
                     aux.Fecha_Nacimiento = (DateTime)datos.Lector["Fecha_Nacimiento"];
 
+                    // Convierte valores NULL opcionales a cadena vacía
                     aux.Telefono = datos.Lector["Telefono"] == DBNull.Value ? "" : (string)datos.Lector["Telefono"];
                     aux.Email = (string)datos.Lector["Email"];
                     aux.Direccion = datos.Lector["Direccion"] == DBNull.Value ? "" : (string)datos.Lector["Direccion"];
@@ -52,20 +54,25 @@ namespace Negocio
                 datos.cerrarConexion();
             }
         }
+
+        // Registra un nuevo paciente activo en la base de datos
         public void agregar(Paciente nuevo)
         {
             AccesoDatos datos = new AccesoDatos();
             try
             {
-                datos.setearConsulta("INSERT INTO PACIENTES (Nombre, Apellido, DNI, Fecha_Nacimiento, Telefono, Email, Direccion, Estado) VALUES (@Nombre, @Apellido, @DNI, @Fecha_Nacimiento, @Telefono, @Email, @Direccion, 1)");
+                datos.setearConsulta(
+                    "INSERT INTO PACIENTES (Nombre, Apellido, DNI, Fecha_Nacimiento, Telefono, Email, Direccion, Estado) " +
+                    "VALUES (@Nombre, @Apellido, @DNI, @Fecha_Nacimiento, @Telefono, @Email, @Direccion, 1)"
+                );
 
                 datos.setearParametro("@Nombre", nuevo.Nombre);
                 datos.setearParametro("@Apellido", nuevo.Apellido);
                 datos.setearParametro("@DNI", nuevo.DNI);
                 datos.setearParametro("@Fecha_Nacimiento", nuevo.Fecha_Nacimiento);
-                datos.setearParametro("@Telefono", string.IsNullOrEmpty(nuevo.Telefono) ? (object)DBNull.Value : nuevo.Telefono);
+                datos.setearParametro("@Telefono", string.IsNullOrWhiteSpace(nuevo.Telefono) ? (object)DBNull.Value : nuevo.Telefono);
                 datos.setearParametro("@Email", nuevo.Email);
-                datos.setearParametro("@Direccion", string.IsNullOrEmpty(nuevo.Direccion) ? (object)DBNull.Value : nuevo.Direccion);
+                datos.setearParametro("@Direccion", string.IsNullOrWhiteSpace(nuevo.Direccion) ? (object)DBNull.Value : nuevo.Direccion);
 
                 datos.ejecutarAccion();
             }
@@ -78,19 +85,24 @@ namespace Negocio
                 datos.cerrarConexion();
             }
         }
+
+        // Actualiza los datos personales de un paciente existente
         public void modificar(Paciente pac)
         {
             AccesoDatos datos = new AccesoDatos();
             try
             {
-                datos.setearConsulta("UPDATE PACIENTES SET Nombre = @nombre, Apellido = @apellido, DNI = @dni, Fecha_Nacimiento = @fecha, Telefono = @telefono, Email = @email, Direccion = @direccion WHERE Id_Paciente = @id");
+                datos.setearConsulta(
+                    "UPDATE PACIENTES SET Nombre = @nombre, Apellido = @apellido, DNI = @dni, Fecha_Nacimiento = @fecha, " +
+                    "Telefono = @telefono, Email = @email, Direccion = @direccion WHERE Id_Paciente = @id"
+                );
                 datos.setearParametro("@nombre", pac.Nombre);
                 datos.setearParametro("@apellido", pac.Apellido);
                 datos.setearParametro("@dni", pac.DNI);
                 datos.setearParametro("@fecha", pac.Fecha_Nacimiento);
-                datos.setearParametro("@telefono", (object)pac.Telefono ?? DBNull.Value);
+                datos.setearParametro("@telefono", string.IsNullOrWhiteSpace(pac.Telefono) ? (object)DBNull.Value : pac.Telefono);
                 datos.setearParametro("@email", pac.Email);
-                datos.setearParametro("@direccion", (object)pac.Direccion ?? DBNull.Value);
+                datos.setearParametro("@direccion", string.IsNullOrWhiteSpace(pac.Direccion) ? (object)DBNull.Value : pac.Direccion);
                 datos.setearParametro("@id", pac.Id);
 
                 datos.ejecutarAccion();
@@ -104,6 +116,8 @@ namespace Negocio
                 datos.cerrarConexion();
             }
         }
+
+        // Realiza la baja lógica cambiando el estado del paciente a inactivo
         public void eliminarLogico(int id)
         {
             AccesoDatos datos = new AccesoDatos();
@@ -123,6 +137,45 @@ namespace Negocio
             }
         }
 
+        // Reactiva un paciente dado de baja lógica
+        public void reactivar(int id)
+        {
+            Paciente paciente = listar().FirstOrDefault(p => p.Id == id);
+
+            if (paciente == null)
+            {
+                throw new ArgumentException("El paciente seleccionado no existe.");
+            }
+
+            if (paciente.Estado)
+            {
+                throw new ArgumentException("El paciente ya se encuentra activo.");
+            }
+
+            AccesoDatos datos = new AccesoDatos();
+
+            try
+            {
+                datos.setearConsulta(
+                    "UPDATE PACIENTES " +
+                    "SET Estado = 1 " +
+                    "WHERE Id_Paciente = @Id AND Estado = 0"
+                );
+
+                datos.setearParametro("@Id", id);
+                datos.ejecutarAccion();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                datos.cerrarConexion();
+            }
+        }
+
+        // Verifica si el DNI ya está registrado (opcionalmente excluyendo un ID en edición)
         public bool existeDni(string dni, int? idActual = null)
         {
             AccesoDatos datos = new AccesoDatos();
