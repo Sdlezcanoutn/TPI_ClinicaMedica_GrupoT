@@ -1,16 +1,89 @@
-﻿using System;
+﻿using Dominio;
+using Negocio;
+using PresentacionWeb.Helpers;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-using Dominio;
-using Negocio;
 
 namespace PresentacionWeb
 {
-    public partial class Turnos : System.Web.UI.Page
+    public partial class Turnos : PaginaProtegida
     {
+        // Propiedades de acceso y seguridad
+        private bool EsAdministrador
+        {
+            get
+            {
+                return UsuarioActual != null &&
+                       UsuarioActual.Perfil != null &&
+                       UsuarioActual.Perfil.Nombre == "Administrador";
+            }
+        }
+
+        private bool EsRecepcionista
+        {
+            get
+            {
+                return UsuarioActual != null &&
+                       UsuarioActual.Perfil != null &&
+                       UsuarioActual.Perfil.Nombre == "Recepcionista";
+            }
+        }
+
+        private bool EsMedico
+        {
+            get
+            {
+                return UsuarioActual != null &&
+                       UsuarioActual.Perfil != null &&
+                       UsuarioActual.Perfil.Nombre == "Médico";
+            }
+        }
+
+        protected bool PuedeGestionarTurnos
+        {
+            get
+            {
+                return EsAdministrador || EsRecepcionista;
+            }
+        }
+
+        protected bool PuedeRegistrarAtencion
+        {
+            get
+            {
+                return EsAdministrador || EsMedico;
+            }
+        }
+
+        private bool PuedeCambiarEstado(Turno turno, string nuevoEstado)
+        {
+            if (!PuedeAccederTurno(turno))
+                return false;
+
+            if (nuevoEstado == "Cancelado")
+                return PuedeGestionarTurnos;
+
+            if (nuevoEstado == "No asistió")
+                return EsAdministrador || EsMedico;
+
+            return false;
+        }
+        private int? IdMedicoActual
+        {
+            get
+            {
+                if (!EsMedico)
+                    return null;
+
+                MedicoNegocio negocio = new MedicoNegocio();
+                return negocio.obtenerIdPorUsuario(UsuarioActual.Id);
+            }
+        }
+
         // ===== IDENTIFICADOR DEL TURNO =====
         private int IdTurno
         {
@@ -29,12 +102,22 @@ namespace PresentacionWeb
         // Se ejecuta al cargar la página; solo en la primera carga (!IsPostBack) inicializa combos, horarios y grilla
         protected void Page_Load(object sender, EventArgs e)
         {
+            btnAgregar.Visible = PuedeGestionarTurnos;
+
             if (!IsPostBack)
             {
                 CargarCombos();
                 CargarHorariosDisponibles();
                 CargarTurnos();
             }
+        }
+
+        protected override bool TienePermiso(Usuario usuario)
+        {
+            return usuario.Perfil != null && 
+                (usuario.Perfil.Nombre == "Administrador" || 
+                 usuario.Perfil.Nombre == "Recepcionista" || 
+                 usuario.Perfil.Nombre == "Médico");
         }
 
         // --- Ejecutar búsqueda de turnos ---
@@ -180,6 +263,13 @@ namespace PresentacionWeb
         // --- Preparar formulario para un nuevo turno ---
         protected void btnAgregar_Click(object sender, EventArgs e)
         {
+            // Validar si el perfil del usuario puede hacer esta acción
+            if (!PuedeGestionarTurnos)
+            {
+                Response.StatusCode = 403;
+                return;
+            }
+
             IdTurno = 0;
 
             // --- Habilitar campos del formulario ---
@@ -215,6 +305,13 @@ namespace PresentacionWeb
         // --- Recuperar turno para reprogramar ---
         protected void btnEditar_Click(object sender, EventArgs e)
         {
+            // Validar si el perfil del usuario puede hacer esta acción
+            if (!PuedeGestionarTurnos)
+            {
+                Response.StatusCode = 403;
+                return;
+            }
+
             LinkButton boton = (LinkButton)sender;
             int id = int.Parse(boton.CommandArgument);
 
@@ -325,6 +422,18 @@ namespace PresentacionWeb
                     throw new ArgumentException(
                         "No se encontró el turno seleccionado.");
 
+                if (!PuedeAccederTurno(turno))
+                {
+                    Response.StatusCode = 403;
+                    return;
+                }
+
+                if (!soloLectura && !PuedeRegistrarAtencion)
+                {
+                    Response.StatusCode = 403;
+                    return;
+                }
+
                 // --- Validar según la acción seleccionada ---
                 if (soloLectura)
                 {
@@ -428,6 +537,13 @@ namespace PresentacionWeb
         // --- Guardar diagnóstico y cerrar turno ---
         protected void btnCerrarTurno_Click(object sender, EventArgs e)
         {
+            // Validar si el perfil del usuario puede hacer esta acción
+            if (!PuedeRegistrarAtencion)
+            {
+                Response.StatusCode = 403;
+                return;
+            }
+
             try
             {
                 int id = int.TryParse(hfIdAtenderTurno.Value, out int valor)
@@ -438,6 +554,16 @@ namespace PresentacionWeb
 
                 // --- Guardar diagnóstico y cerrar turno ---
                 TurnoNegocio negocio = new TurnoNegocio();
+                Turno turno = negocio.listar()
+                    .FirstOrDefault(t => t.Id == id);
+
+                // Comprobar nuevamente el permiso antes de guardar
+                if (!PuedeRegistrarAtencion || !PuedeAccederTurno(turno))
+                {
+                    Response.StatusCode = 403;
+                    return;
+                }
+
                 negocio.cerrar(id, diagnostico);
 
                 // --- Restablecer formulario ---
@@ -495,6 +621,13 @@ namespace PresentacionWeb
 
                 if (turno == null)
                     throw new ArgumentException("No se encontró el turno seleccionado.");
+
+                // Validar si el perfil del usuario puede hacer esta acción
+                if (!PuedeAccederTurno(turno))
+                {
+                    Response.StatusCode = 403;
+                    return;
+                }
 
                 // --- Mostrar datos actuales del turno ---
                 lblDatosHistorial.Text = Server.HtmlEncode(
@@ -571,6 +704,13 @@ namespace PresentacionWeb
 
                 if (turno == null)
                     throw new ArgumentException("No se encontró el turno seleccionado.");
+
+                // Validamos que el perfil tenga permisos para realizar esta acción
+                if (!PuedeCambiarEstado(turno, nuevoEstado))
+                {
+                    Response.StatusCode = 403;
+                    return;
+                }
 
                 // --- Validar estado del turno ---
                 if (turno.Estado.Nombre != "Nuevo" &&
@@ -666,6 +806,16 @@ namespace PresentacionWeb
                 string nuevoEstado = ViewState["NuevoEstadoTurno"] as string;
 
                 TurnoNegocio negocio = new TurnoNegocio();
+                Turno turno = negocio.listar()
+                    .FirstOrDefault(t => t.Id == id);
+
+                // Validamos que el perfil tenga permisos para realizar esta acción
+                if (!PuedeCambiarEstado(turno, nuevoEstado))
+                {
+                    Response.StatusCode = 403;
+                    return;
+                }
+
                 string mensaje;
 
                 // --- Ejecutar acción seleccionada ---
@@ -770,6 +920,13 @@ namespace PresentacionWeb
         // Valida los datos del modal, registra el nuevo turno en BD, refresca la grilla y muestra aviso de éxito
         protected void btnGuardarTurno_Click(object sender, EventArgs e)
         {
+            // Validar si el perfil del usuario puede hacer esta acción
+            if (!PuedeGestionarTurnos)
+            {
+                Response.StatusCode = 403;
+                return;
+            }
+
             int idPaciente = int.TryParse(ddlPaciente.SelectedValue, out int pId) ? pId : 0;
             int idEspecialidad = int.TryParse(ddlEspecialidad.SelectedValue, out int eId) ? eId : 0;
             int idMedico = int.TryParse(ddlMedico.SelectedValue, out int mId) ? mId : 0;
@@ -1060,6 +1217,17 @@ namespace PresentacionWeb
                 List<Turno> todos = negocio.listar();
                 List<Turno> lista = todos;
 
+                if (EsMedico)
+                {
+                    int? idMedicoSesion = IdMedicoActual;
+
+                    lista = lista.Where(t =>
+                        idMedicoSesion.HasValue &&
+                        t.Medico != null &&
+                        t.Medico.Id == idMedicoSesion.Value
+                    ).ToList();
+                }
+
                 // --- Filtrar por texto ---
                 if (!string.IsNullOrWhiteSpace(filtro))
                 {
@@ -1170,6 +1338,22 @@ namespace PresentacionWeb
                 lblErrorListadoTurno.Visible = true;
                 dgvTurnos.Visible = false;
             }
+        }
+
+        private bool PuedeAccederTurno(Turno turno)
+        {
+            if (turno == null)
+                return false;
+
+            if (EsAdministrador || EsRecepcionista)
+                return true;
+
+            if (!EsMedico)
+                return false;
+
+            int? idMedico = IdMedicoActual;
+
+            return idMedico.HasValue && turno.Medico != null && turno.Medico.Id == idMedico.Value;
         }
 
         // Lee los valores actuales de los controles de filtro y llama a CargarTurnos

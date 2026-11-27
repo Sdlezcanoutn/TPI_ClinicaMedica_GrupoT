@@ -1,5 +1,6 @@
 ﻿using Dominio;
 using Negocio;
+using PresentacionWeb.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +10,7 @@ using System.Web.UI.WebControls;
 
 namespace PresentacionWeb
 {
-    public partial class Pacientes : System.Web.UI.Page
+    public partial class Pacientes : PaginaProtegida
     {
         // Carga inicial y sincronización visual del filtro por estado
         protected void Page_Load(object sender, EventArgs e)
@@ -21,6 +22,13 @@ namespace PresentacionWeb
 
             // Mantiene el botón activo resaltado en cada postback
             ActualizarEstiloFiltro();
+        }
+
+        protected override bool TienePermiso(Usuario usuario)
+        {
+            return usuario.Perfil != null &&
+                (usuario.Perfil.Nombre == "Administrador" ||
+                 usuario.Perfil.Nombre == "Recepcionista");
         }
 
         // Obtiene los pacientes, aplica filtro por estado y texto de búsqueda, y actualiza la grilla

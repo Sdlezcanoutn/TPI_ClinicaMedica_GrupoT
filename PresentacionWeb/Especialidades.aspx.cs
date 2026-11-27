@@ -1,5 +1,6 @@
 ﻿using Dominio;
 using Negocio;
+using PresentacionWeb.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -10,13 +11,26 @@ using System.Web.UI.WebControls;
 
 namespace PresentacionWeb
 {
-    public partial class Especialidades : System.Web.UI.Page
+    public partial class Especialidades : PaginaProtegida
     {
+        // Propiedades
+        protected bool PuedeGestionarEspecialidades
+        {
+            get 
+            {
+                return UsuarioActual != null &&
+                       UsuarioActual.Perfil != null &&
+                       UsuarioActual.Perfil.Nombre == "Administrador";
+            }
+        }
+
         // ============================================================
         // CARGA INICIAL DE ESPECIALIDADES
         // ============================================================
         protected void Page_Load(object sender, EventArgs e)
         {
+            btnAgregar.Visible = PuedeGestionarEspecialidades;
+
             if (!IsPostBack)
             {
                 cargarEspecialidades();
@@ -26,11 +40,25 @@ namespace PresentacionWeb
             actualizarEstiloFiltro();
         }
 
+        protected override bool TienePermiso(Usuario usuario)
+        {
+            return usuario.Perfil != null &&
+                (usuario.Perfil.Nombre == "Administrador" ||
+                 usuario.Perfil.Nombre == "Recepcionista");
+        }
+
         // ============================================================
         // ALTA Y MODIFICACIÓN DE ESPECIALIDADES
         // ============================================================
         protected void btnGuardar_Click(object sender, EventArgs e)
         {
+            // Validar si el perfil del usuario puede hacer esta acción
+            if (!PuedeGestionarEspecialidades)
+            {
+                Response.StatusCode = 403;
+                return;
+            }
+
             try
             {
                 // --- Obtener datos del formulario ---
@@ -230,6 +258,13 @@ namespace PresentacionWeb
         // ============================================================
         protected void btnEditar_Click(object sender, EventArgs e)
         {
+            // Validar si el perfil del usuario puede hacer esta acción
+            if (!PuedeGestionarEspecialidades)
+            {
+                Response.StatusCode = 403;
+                return;
+            }
+
             // --- Obtener especialidad seleccionada ---
             LinkButton boton = (LinkButton)sender;
             int id = int.Parse(boton.CommandArgument);
@@ -268,6 +303,13 @@ namespace PresentacionWeb
         // ============================================================
         protected void btnEliminar_Click(object sender, EventArgs e)
         {
+            // Validar si el perfil del usuario puede hacer esta acción
+            if (!PuedeGestionarEspecialidades)
+            {
+                Response.StatusCode = 403;
+                return;
+            }
+
             // --- Obtener especialidad seleccionada ---
             LinkButton boton = (LinkButton)sender;
             int id = int.Parse(boton.CommandArgument);
@@ -329,6 +371,13 @@ namespace PresentacionWeb
         // ============================================================
         protected void btnConfirmarBaja_Click(object sender, EventArgs e)
         {
+            // Validar si el perfil del usuario puede hacer esta acción
+            if (!PuedeGestionarEspecialidades)
+            {
+                Response.StatusCode = 403;
+                return;
+            }
+
             try
             {
                 // --- Obtener especialidad seleccionada ---
@@ -376,6 +425,13 @@ namespace PresentacionWeb
         // ============================================================
         protected void btnReactivar_Click(object sender, EventArgs e)
         {
+            // Validar si el perfil del usuario puede hacer esta acción
+            if (!PuedeGestionarEspecialidades)
+            {
+                Response.StatusCode = 403;
+                return;
+            }
+
             // --- Obtener especialidad seleccionada ---
             LinkButton boton = (LinkButton)sender;
             int id = int.Parse(boton.CommandArgument);
@@ -411,6 +467,13 @@ namespace PresentacionWeb
         // ============================================================
         protected void btnConfirmarReactivar_Click(object sender, EventArgs e)
         {
+            // Validar si el perfil del usuario puede hacer esta acción
+            if (!PuedeGestionarEspecialidades)
+            {
+                Response.StatusCode = 403;
+                return;
+            }
+
             try
             {
                 // --- Obtener especialidad seleccionada ---

@@ -1,5 +1,6 @@
 ﻿using Dominio;
 using Negocio;
+using PresentacionWeb.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -10,7 +11,7 @@ using System.Web.UI.WebControls;
 
 namespace PresentacionWeb
 {
-    public partial class Medicos : System.Web.UI.Page
+    public partial class Medicos : PaginaProtegida
     {
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -25,6 +26,13 @@ namespace PresentacionWeb
             }
             // Mantener la apariencia del filtro seleccionado.
             actualizarEstiloFiltro();
+        }
+
+        protected override bool TienePermiso(Usuario usuario)
+        {
+            return usuario.Perfil != null &&
+                (usuario.Perfil.Nombre == "Administrador" ||
+                 usuario.Perfil.Nombre == "Recepcionista");
         }
 
         // ============================================================

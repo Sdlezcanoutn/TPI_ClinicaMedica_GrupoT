@@ -1,5 +1,6 @@
 ﻿using Dominio;
 using Negocio;
+using PresentacionWeb.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +10,7 @@ using System.Web.UI.WebControls;
 
 namespace PresentacionWeb
 {
-    public partial class FormHorario : System.Web.UI.Page
+    public partial class FormHorario : PaginaProtegida
     {
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -39,6 +40,14 @@ namespace PresentacionWeb
                 Page.Title = "Editar Horario";
             }
         }
+
+        protected override bool TienePermiso(Usuario usuario)
+        {
+            return usuario.Perfil != null &&
+                (usuario.Perfil.Nombre == "Administrador" ||
+                 usuario.Perfil.Nombre == "Recepcionista");
+        }
+
         private void cargarMedicos()
         {
             MedicoNegocio negocio = new MedicoNegocio();
