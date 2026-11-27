@@ -112,7 +112,7 @@
                                                 <div class="d-flex flex-wrap justify-content-end gap-2">
 
                                                     <asp:LinkButton ID="btnEditar" runat="server"
-                                                        CssClass="btn btn-sm btn-outline-warning text-nowrap"
+                                                        CssClass="btn btn-sm btn-outline-amber text-nowrap"
                                                         CommandArgument='<%# Eval("Id") %>'
                                                         Visible='<%# Eval("Estado").ToString() == "Nuevo" || Eval("Estado").ToString() == "Reprogramado" %>'
                                                         OnClick="btnEditar_Click">

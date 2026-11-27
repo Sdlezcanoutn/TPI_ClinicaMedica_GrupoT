@@ -424,6 +424,20 @@ form > div, main, .body-content {
         border-color: #6f42c1;
     }
 
+/* --- Botón de reprogramación --- */
+.btn.btn-outline-amber {
+    color: #997404;
+    border-color: #997404;
+    background-color: transparent;
+}
+
+    .btn.btn-outline-amber:hover,
+    .btn.btn-outline-amber:focus-visible {
+        color: #ffffff;
+        background-color: #997404;
+        border-color: #997404;
+    }
+
 /* Botón seleccionado de los filtros por estado */
 .btn-filtro-activo {
     background-color: #18628a !important;
